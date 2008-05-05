@@ -1,0 +1,13 @@
+--- 
+:renderoutlinewith: halo
+:dreamweaver: false
+:smartypants: true
+:halo_shortcut: "|"
+:templateNOT: dreamweaver
+:haloautoparagraphs: true
+:useImageCache: false
+:includeMetaCharset: true
+:usestylesheet: styles
+:bgcolor: FFFFFF
+:includeMetaGenerator: true
+:dolinkback: false

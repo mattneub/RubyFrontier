@@ -1,0 +1,74 @@
+li {
+margin-top: 5px;
+margin-bottom: 5px; 
+}
+
+dt, dd, p, body, td {
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 12px
+}
+
+body {
+padding: 0.1cm;
+background-color: white; 
+}
+
+tt, pre, code {
+font-family: "Courier", Monaco, monospace; 
+font-size: 14px; 
+}
+
+blockquote tt, blockquote code {
+font-family: "Courier", Monaco, monospace; 
+font-size: 12px; 
+}
+
+td {
+padding: 5px; 
+}
+
+blockquote {
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 11px;
+margin-left:50px;
+margin-right:50px;
+}
+
+blockquote p {
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 11px;
+}
+
+dl {
+margin-left: 10px; 
+}
+
+dt {
+font-style: italic; 
+}
+
+span.expandable:before { content:"+ "; }
+span.collapsable:before { content:"- "; }
+
+div.indent {
+padding-left: 20px;
+display: block;
+}
+
+div.breadcrumbs td {
+font-family: Verdana, Arial, Geneva, sans-serif; 
+}
+
+div.subs td.subs {
+background-color: #FFFFCC;
+ vertical-align: middle;
+padding: 10px; 
+}
+
+div.titlebar tr {
+background-color:  #FFCC66; 
+}
+
+div.nextprevs tr {
+background-color:white 
+}
