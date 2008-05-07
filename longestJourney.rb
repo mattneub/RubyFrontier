@@ -10,7 +10,7 @@ class String # convenience methods
   end
 end
 
-class JPEG # jpeg file size analysis, used by Pathname#image_size
+class JPEG # used by Pathname#image_size, stolen from the Internet :) http://snippets.dzone.com/posts/show/805
   attr_reader :width, :height, :bits
   def initialize(file)
     if file.kind_of? IO
@@ -116,7 +116,7 @@ end
     thus user can say @adrPageTable[:fname] to get current page's fname
   user is allowed to say certain words in abbreviated form:
     * "html." can mean Html class (html.getLink) or current PageMaker instance (html.getPref)
-      in latter case, no need to supply default params, since this is the current instance
+      in latter ca*se, no need to supply default params, since this is the current instance
     * "myTool()" can be myTool.rb in a #tools folder, defining method myTool()
     * "imageref()" can be StandardMacros method
       separated into StandardMacros for namespace clarity...
@@ -124,43 +124,37 @@ end
     * "fname" can be @adrPageTable[:fname] or @adrPageTable["fname"]
       good for getting, but doesn't work for setting, as Ruby will just create the name as local variable
       and not highly recommended for getting either, since confusing to read, and @adrPageTable is readily available
-      but it's a Frontier legacy so I've left it in (and I do use it)
+      but's a Frontier legacy so I've left it in (and I d*o use it)
 =end
 class BindingMaker
   # handle shortcut / bareword expressions in macro evaluation
   def method_missing(s, *args)
-    # if s begins with explicit "html.", macro is calling a built-in utility
-    if s == :html
-      return @theHtmlDispatcher
-    end
+    # if user's expression begins with explicit "html.", it is calling a built-in utility
+    return @theHtmlDispatcher if s == :html
+    
+    # test for user.html.macros - not needed! 
+    # if the user wants to inject something into UserLand::HTML via user.rb, that's fine
+    
     # try tools table
     # we have loaded tools method defs into this BindingMaker object already
     # if they are not seen automatically (in which case method_missing was never even called), we expose them like this
-    if self.respond_to?(s)
-      return self.send(s, *args)
-    end
-    # try user.html.macros (not yet written)
+    return self.send(s, *args) if self.respond_to?(s)
+
     # try html.standardMacros
-    if UserLand::Html::StandardMacros.method_defined? s
-      #return UserLand::Html::StandardMacros.send(s, *args)
-      return @thePageMaker.send(s, *args)
+    return @thePageMaker.send(s, *args) if UserLand::Html::StandardMacros.method_defined?(s)
+    
+    # try adrPageTable; unlike Frontier, and wisely I think, we allow implicit get but no implicit set
+    if 0 == args.length and result = (@adrPageTable[s] || @adrPageTable[s.to_s])
+      return result 
     end
-    # try adrPageTable
-    if 0 == args.length
-      if (result = @adrPageTable[s]) || (result = @adrPageTable[s.to_s])
-        return result 
-      end 
-    end
-    p self.methods
+    
     raise "BindingMaker unable to evaluate #{s}"
   end
-  def getBinding()
-    return binding()
-  end
+  def getBinding(); return binding(); end
   def initialize(thePageMaker)
     @thePageMaker = thePageMaker # so we can access it later
     @adrPageTable = thePageMaker.adrPageTable # so macros can get at it
-    @theHtmlDispatcher = HtmlDispatcher.new(self)
+    @theHtmlDispatcher = HtmlDispatcher.new(self) # assistant
   end
   attr_reader :thePageMaker
 end
@@ -181,11 +175,9 @@ class User::Renderers::SuperRenderer
   def initialize(thePageMaker, theBindingMaker)
     @thePageMaker = thePageMaker # so we can access it later
     @adrPageTable = thePageMaker.adrPageTable # so macros can get at it
-    # @theBindingMaker = BindingMaker.new(@thePageMaker)
-    @theBindingMaker = theBindingMaker
+    @theBindingMaker = theBindingMaker # to provide macro evaluation environment
   end
   def method_missing(s, *args)
-    #BindingMaker.new(@thePageMaker).method_missing(s, *args)
     @theBindingMaker.method_missing(s, *args)
   end
   def render
@@ -195,7 +187,7 @@ end
 
 # now that we've defined SuperRenderer, we can load "user.rb", which might contain renderers inheriting from it
 require 'opml'
-require 'user'
+begin; require 'user'; rescue; end # no penalty for not having a "user.rb" file 
 
 # our world beginneth! ================================================================================
 module UserLand
@@ -205,89 +197,67 @@ end
 # public interface for rendering a page
 # also general utilities without reference to any specific page being rendered
 module UserLand::Html
-  def self.releaseRenderedPage(adrObject, flPreview = true)
-    # object validity checks go here
-    # right now we just check existence
-    time = Time.new.to_f
+  def self.guaranteePageOfSite(adrObject)
     adrObject = Pathname.new(adrObject).expand_path
     raise "No such file #{adrObject}" unless adrObject.exist?
+    raise "File #{adrObject} not a site page" unless self.everyPageOfSite(adrObject).include?(adrObject)
+  end
+  def self.releaseRenderedPage(adrObject, flPreview = true)
+    time = Time.new.to_f
     
-    # omitting "extra templates" logic
+    adrObject = Pathname.new(adrObject).expand_path
+    self.guaranteePageOfSite(adrObject) # validity check
+    
+    # TODO: omitting "extra templates" logic
     
     adrStorage = Hash.new
     callFileWriterStartup(adrObject, adrStorage)
-    # p adrStorage
           
     pm = PageMaker.new
     pm.buildObject(adrObject)
-          
-    #pp adrPageTable
     
     pm.writeFile(adrStorage)
     
+    # TODO: omitting file writer shutdown mechanism
     # callFileWriterShutdown(adrObject, adrStorage)
     
-    # save out autoglossary if any
-    if pm.adrPageTable[:autoglossary]
-      adrGlossTable = pm.adrPageTable[:adrSiteRootTable] + "#autoglossary.yaml"
-      File.open(adrGlossTable, "w") {|io| YAML.dump(pm.adrPageTable[:autoglossary], io)}
+    pm.saveOutAutoglossary # save out autoglossary if any
+    
+    if flPreview && (File.extname(pm.adrPageTable[:fname]) =~ /\.htm/i) # supposed to be a test for browser displayability
+      `open 'file://#{ERB::Util::url_encode(pm.adrPageTable[:f]).gsub("%2F", "/")}'`
     end
     
-    if [".txt", ".opml"].include?(adrObject.extname)
-      # open file in browser
-      if flPreview
-        f = ERB::Util::url_encode(pm.adrPageTable[:f]).gsub("%2F", "/")
-        `open 'file://#{f}'`
-      end
-    end
     puts "#{Time.new.to_f - time} seconds"
   end
   def self.publishSite(adrObject, preflight=true)
     adrObject = Pathname.new(adrObject).expand_path
-    preflightSite(adrObject) if preflight
-    everyPageOfSite(adrObject).each {|p| puts "publishing #{p}"; releaseRenderedPage(p, (p == adrObject))}
+    self.preflightSite(adrObject) if preflight
+    self.everyPageOfSite(adrObject).each do |p|
+      puts "publishing #{p}"
+      self.releaseRenderedPage(p, (p == adrObject)) # the only one to open in browser is the one we started with
+    end
   end
   def self.everyPageOfSite(adrObject)
-    # todo: need a better way to determine what's a page table and what's not
-    result = Array.new
-    adrObject = Pathname.new(adrObject)
+    # a page is anything in the site table not starting with # or inside a folder starting with #
+    # that doesn't mean every page is a renderable; it might merely be a copyable, but it is still a page
     adrStorage = Hash.new
-    callFileWriterStartup(adrObject, adrStorage) # to get ftpsite
-    top = adrStorage[:adrFtpSite].dirname
-=begin
-    recurse = Proc.new do |p|
-      unless p.basename.to_s =~ /^[.#]/
-        if p.directory?
-          p.children.each {|f| recurse.call(f)}
-        else
-          if p.extname == ".txt"
-            # this a renderable page
-            result << p
-          end
-        end
-      end
-    end
-    top.children.each {|f| recurse.call(f)}
-=end
-    top.find do |p|
+    callFileWriterStartup(Pathname.new(adrObject), adrStorage) # to get ftpsite
+    result = Array.new
+    adrStorage[:adrFtpSite].dirname.find do |p|
       Find.prune if p.basename.to_s =~ /^[#.]/
-      #result << p if [".txt",".opml"].include?(p.extname)
-      result << p if (!p.directory? && p.extname != ".DS_Store")
+      result << p if (!p.directory? && p.simplename != "") # ignore invisibles
     end
     return result
   end
   def self.preflightSite(adrObject)
     # prebuild autoglossary using every page of table containing adrObject path
-    adrObject = Pathname.new(adrObject)
     glossary = Hash.new
-    adrPageTable = nil
-    everyPageOfSite(adrObject).each do |p|
-      adrPageTable = Hash.new
-      pm = PageMaker.new(adrPageTable)
+    pm = nil # so that we have a PageMaker object left over at the end
+    self.everyPageOfSite(Pathname.new(adrObject)).each do |p|
+      pm = PageMaker.new
       pm.buildPageTableFully(p)
       pm.addPageToGlossary(p)
-      # glossary = glossary.merge(adrPageTable[:autoglossary])
-      # no, too simple: must merge by hand watching for non-uniques
+      # merge by hand watching for non-uniques
       pm.adrPageTable[:autoglossary].each do |k,v|
         if glossary[k] && v != glossary[k]
           puts "----\nNon-unique autoglossary entry detected for #{k}\n#{v.inspect} vs.\n#{glossary[k].inspect}\nprocessing #{p}"
@@ -295,13 +265,11 @@ module UserLand::Html
         glossary[k] = v
       end
     end
-    # save out autoglossary if any
-    adrGlossTable = adrPageTable[:adrSiteRootTable] + "#autoglossary.yaml"
-    File.open(adrGlossTable, "w") {|io| YAML.dump(glossary, io)}
+    pm.saveOutAutoglossary(glossary) # save out resulting autoglossary
   end  
   def self.callFileWriterStartup(adrObject, adrStorage)
     # we require an #ftpSite file to mark the top of the site
-    # walk upwards until we find it
+    # walk upwards until we find it; fill in adrStorage
     ftpsite = nil
     catch :done do
       adrObject.dirname.ascend do |dir|
@@ -313,64 +281,24 @@ module UserLand::Html
         raise "Reached top level without finding #ftpsite" if dir.root?
       end
     end
-    ftpsiteHash = nil
-    File.open(ftpsite) {|io| ftpsiteHash = YAML.load(io)}
+    ftpsiteHash = File.open(ftpsite) {|io| ftpsiteHash = YAML.load(io)}
     adrStorage[:adrFtpSite] = ftpsite
     adrStorage[:method] = ftpsiteHash[:method]
-  end
-  def self.checkNextPrevs(adrObject)
-    # crude but effective check that nextprevs lists are valid
-    # get list of all pages; for each...
-    # if there is a next prevs list in the same folder, make sure it contains a way of getting at this page
-    # also make sure everything in it is in the same folder
-    # obviously this is only useful if that's how we've set up nextprevs, but I have not thought thru implications
-    adrObject = Pathname.new(adrObject).expand_path
-    adrPageTable = Hash.new
-    PageMaker.new(adrPageTable).buildPageTable(adrObject)
-    adrGlossTable = adrPageTable[:adrSiteRootTable] + "#autoglossary.yaml"
-    if adrGlossTable.exist?
-      adrPageTable[:autoglossary] = File.open(adrGlossTable) {|io| YAML.load(io)}
-    else
-      raise "No autoglossary table found, cannot proceed"
-    end
-
-    arr = self.everyPageOfSite(adrObject)
-    arr.each do |p|
-      folder = p.dirname
-      nextprevs = folder + "#nextprevs.txt"
-      sibs = folder.children
-      if (nextprevs.exist?)
-        File.open(nextprevs) do |io|
-          io.each do |id|
-            id.chomp!
-            puts "doing #{id}"
-            p2 = adrPageTable[:autoglossary][id][:adr] rescue raise("choked on #{id}")
-            puts "page #{id} not in same folder as page #{adrObject}" unless folder == p2.dirname
-            sibs = sibs.delete_if {|x| x == p2}
-          end
-        end
-        sibs = sibs.delete_if do |p| # eliminate false positives, i.e. non-pages
-          del = false
-          del = true if p.basename.to_s =~ /^[#\.]/
-          del = true if p.directory?
-          del
-        end
-        p sibs if sibs.length > 0
-      end
-    end
   end
   def self.getLink(linetext, url)
     return %{<a href="#{url}">#{linetext}</a>}
   end
   def self.newSite()
     s = `#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog filesave --title "New Web Site" --text "Specify a folder to create"`
-    exit if s == ""
+    exit if s == "" # user cancelled
     p = Pathname.new(s.chomp)
     p.mkpath
     FileUtils.cp_r($newsite.to_s + '/.', p)
     `mate '#{p}'`
   end
 end
+
+# GOT TO HERE
 
 # standard rendering utilities that macros can call without prefix
 # they are separate so I can determine whether a call is to one of them...
@@ -642,6 +570,21 @@ class UserLand::Html::PageMaker
     # but since you'd effectively never *not* want to do this, why force every site to have this pagefilter?
     # so I just call it explicitly
     addPageToGlossary(adrObject)
+    
+    # snippet support
+    # this is not a Frontier feature, and in fact Frontier suffered from the lack of it
+    # the idea is that you might want to do text substitution (like Frontier's glossary) *early*,
+    # so that the text is processed like everything else
+    # a snippet is a .txt file in a #tools folder
+    # you can have direct access to it, obviously, via adrPageTable...
+    # ...but here, as a shortcut, we substitute directly into [[...]]
+    adrPageTable[:bodytext].gsub!(/\[\[(.*?)\]\]/) do |match|
+      if adrPageTable["snippets"] && adrPageTable["snippets"][$1]
+        adrPageTable["snippets"][$1]
+      else
+        $&
+      end
+    end
           
     # pagefilter, handed adrPageTable, expected to access :bodytext
     if adrPageTable["filters"]
@@ -696,10 +639,9 @@ class UserLand::Html::PageMaker
       retval = ref # if nothing else, just return what we came in with
       href = $1
       rest = $2
-      if !(href =~ /[^\\]\./) && !(href =~ %r{[^\\]\://}) && !(href =~ /^#/)
-        # if contains dot or colon-slash-slash, or starts with #, assume this is a real URL, don't touch
-        # (but user can override the first two checks by escaping)
-        #puts href
+      # if contains dot or colon-slash-slash, or starts with #, assume this is a real URL, don't touch
+      # but user can override the first two checks by escaping
+      unless href =~ /[^\\]\./ || href =~ %r{[^\\]\://} || href =~ /^#/
         if href =~ /([^\\])\^/ # remote-site semantics
           begin
             id = $'
@@ -767,7 +709,7 @@ class UserLand::Html::PageMaker
     # outline rendering (in tenderrender) is being done unnecessarily soon here, but we have not implemented that yet anyway
   
     buildPageTable(adrObject)
-  
+    
     # publish binary object not yet written
   
     # firstfilter goes here; may be able to do without this
@@ -803,6 +745,7 @@ class UserLand::Html::PageMaker
     # init hashes for things that get gathered into one as we walk up the hierarchy
     adrPageTable["tools"] = Hash.new
     adrPageTable["glossary"] = Hash.new
+    adrPageTable["snippets"] = Hash.new
   
     # walk file hierarchy looking for things that start with "#"
     # add things only if they don't already exist; that way, closest has precedence
@@ -816,10 +759,15 @@ class UserLand::Html::PageMaker
         dir.each_entry do |f|
           if /^#/ =~ f
             case f.simplename.to_s.downcase
-            when "#tools" # gather tools into tools hash
+            when "#tools" # gather tools into tools hash; new feature (non-Frontier), .txt files go into snippets hash
               (dir + f).each_entry do |ff|
                 unless /^\./ =~ (tool_simplename = ff.simplename.to_s)
-                  adrPageTable["tools"][tool_simplename] ||= dir + f + ff
+                  case ff.extname
+                  when ".rb"
+                    adrPageTable["tools"][tool_simplename] ||= dir + f + ff
+                  when ".txt"
+                    adrPageTable["snippets"][tool_simplename] ||= File.read(dir + f + ff)
+                  end
                 end
               end
             when "#prefs" # flatten prefs out into top-level entries in adrPageTable
@@ -843,6 +791,14 @@ class UserLand::Html::PageMaker
         end
         throw :done if found_ftpsite
       end
+    end
+    # if we found an autoglossary, yaml-load it into :autoglossary
+    # (nothing like this in Frontier, we need this for our own autoglossary mechanism)
+    adrGlossTable = adrPageTable["autoglossary"]
+    adrPageTable[:autoglossary] = if adrGlossTable && adrGlossTable.exist?
+      File.open(adrGlossTable) {|io| YAML.load(io)}
+    else
+      Hash.new
     end
     # url-setting and some other stuff (fname, f) not yet written
     # there is an inefficiency in Frontier here: this is all done again after tenderRender
@@ -925,19 +881,8 @@ class UserLand::Html::PageMaker
   end
   def addPageToGlossary(adrObject, adrPageTable=@adrPageTable)
     # this is different from what Frontier does!
-    # we maintain an #autoglossary on disk
-    # if not already loaded, load as :autoglossary
+    # we maintain an #autoglossary on disk, loaded as :autoglossary hash
     # but we do not save out! that is the job of whoever calls us to do that eventually
-    unless adrPageTable[:autoglossary]
-      adrGlossTable = adrPageTable[:adrSiteRootTable] + "#autoglossary.yaml"
-      if adrGlossTable.exist?
-        glossary = nil
-        File.open(adrGlossTable) {|io| glossary = YAML.load(io)}
-        adrPageTable[:autoglossary] = glossary
-      else
-        adrPageTable[:autoglossary] = Hash.new
-      end
-    end
     linetext = adrPageTable[:title] # skip entityization problem for now
     path = adrPageTable[:subDirectoryPath] + adrPageTable[:fname]
     adr = adrObject
@@ -1127,6 +1072,14 @@ class UserLand::Html::PageMaker
     end
     return true
   end
+  def saveOutAutoglossary(g=nil, adrPageTable=@adrPageTable)
+    g ||= adrPageTable[:autoglossary]
+    if g
+      File.open(adrPageTable[:adrSiteRootTable] + "#autoglossary.yaml", "w") do |io| 
+        YAML.dump(g, io)
+      end
+    end
+  end
 end
 
 if __FILE__ == $0
@@ -1137,13 +1090,13 @@ if __FILE__ == $0
 # UserLand::Html::preflightSite(Pathname.new("./scriptde.txt").expand_path)
 # UserLand::Html::publishSite("/Users/mattleopard/anger/Word Process/jobs/dialectic/docs/appmodes.txt")
 # UserLand::Html::releaseRenderedPage("./scriptdefolder/develop.txt")
-#pp UserLand::Html::everyPageOfSite(Pathname.new("/Volumes/gromit/Users/matt2/anger/Word Process/emperorWebSite/site/default2.opml").expand_path)
+pp UserLand::Html::everyPageOfSite(Pathname.new("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml").expand_path)
 #UserLand::Html::newSite()
 #UserLand::Html::releaseRenderedPage("/Volumes/gromit/Users/matt2/anger/Word Process/emperorWebSite/site/default2.opml")
-require 'profiler'
-Profiler__::start_profile
-UserLand::Html::releaseRenderedPage("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml")
-Profiler__::print_profile($stdout)
+#require 'profiler'
+#Profiler__::start_profile
+#UserLand::Html::releaseRenderedPage("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml")
+#Profiler__::print_profile($stdout)
 
 
 end

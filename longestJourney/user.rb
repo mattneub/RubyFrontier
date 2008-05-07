@@ -1,5 +1,38 @@
 require 'enumerator'
 
+module UserLand
+end
+module UserLand::Html
+  def self.checkNextPrevs(adrObject)
+    # crude but effective check that nextprevs lists are valid
+    # get list of all pages; for each...
+    # if there is a next prevs list in the same folder, make sure it contains a way of getting at this page
+    # also make sure everything in it is in the same folder
+    # obviously this is only useful if that's how we've set up nextprevs, but I have not thought thru implications
+    adrObject = Pathname.new(adrObject).expand_path
+    adrPageTable = Hash.new
+    PageMaker.new(adrPageTable).buildPageTable(adrObject)
+    raise "No autoglossary table found, cannot proceed" unless adrPageTable["autoglossary"]
+    glossary = File.open(adrPageTable["autoglossary"]) {|io| YAML.load(io)}
+
+    self.everyPageOfSite(adrObject).each do |p|
+      folder = p.dirname
+      nextprevs = folder + "#nextprevs.txt"
+      sibs = folder.children.delete_if {|p| p.directory? || p.simplename.to_s =~ /^[#\.]/}
+      if (nextprevs.exist?)
+        IO.readlines(nextprevs).each do |id|
+          id.chomp!
+          puts "doing #{id}"
+          p2 = glossary[id][:adr] rescue raise("choked on #{id}")
+          puts "page #{id} not in same folder as page #{adrObject}" unless folder == p2.dirname
+          sibs = sibs.delete_if {|x| x == p2}
+        end
+        p sibs if sibs.length > 0
+      end
+    end
+  end
+end
+
 module User
   def self.glossary
     s = <<END
