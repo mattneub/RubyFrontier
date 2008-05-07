@@ -298,56 +298,68 @@ module UserLand::Html
   end
 end
 
-# GOT TO HERE
 
 # standard rendering utilities that macros can call without prefix
 # they are separate so I can determine whether a call is to one of them...
 # ...but then they are included in the PageMaker class for actual calling, so they can access the current page table
 # (see BindingMaker for the routing mechanism here)
 module UserLand::Html::StandardMacros
-  def metatags(htmlstyle=false, adrPageTable=@adrPageTable) 
+  GENERATOR = "RubyFrontier"
+  def metatags(htmlstyle=false, adrPageTable=@adrPageTable) # generate meta tags
     htmlText = ""
-    if adrPageTable[:meta] # TODO: needs revision so that more than one insertion is possible
-      htmlText += "\n" + adrPageTable[:meta]
-    end
+    
+    # charset, must be absolutely first
     if getPref("includeMetaCharset", adrPageTable)
-      charset = "utf-8" # should be a pref
-      htmlText += "\n<meta http-equiv=\"content-type\" content=\"text/html; charset=#{charset}\" />"
+      htmlText << %{\n<meta http-equiv="content-type" content="text/html; charset=#{getPref("charset", adrPageTable)}" />}
     end
+    
+    # generator
     if getPref("includeMetaGenerator", adrPageTable)
-      gen = "RubyFrontier" # or whatever
-      htmlText += "\n<meta name=\"generator\" content=\"#{gen}\" />"
+      htmlText << %{\n<meta name="generator" content="#{GENERATOR}" />}
     end
+    
+    # turn directives whose name starts with "meta" into meta tag
+    # e.g. directive metacool, value "RubyFrontier", generates <meta name="cool" content="RubyFrontier">
+    # directive metaequivcool, value "RubyFrontier", generates <meta http-equiv="cool" content="RubyFrontier">
     adrPageTable.each do |k,v|
       k = k.to_s
       if k =~ /^meta./i # key should start with "meta" but not *be* "meta"
-        type = "name"
-        metaName = k[4..-1]
-        if metaName =~ /^equiv/i
-          type = "http-equiv"
+        if k =~ /^metaequiv/i
+          type, metaName = "http-equiv", k[9..-1]
+        else
+          type, metaName = "name", k[4..-1]
         end
-        htmlText += "\n<meta #{type}=\"#{metaName}\" content=\"#{v}\" />"
+        htmlText << %{\n<meta #{type}="#{metaName}" content="#{v}" />}
       end
     end
+    
+    # opportunity to insert anything whatever into head section
+    # TODO: revise so that more than one insertion is possible?
+    htmlText << "\n" + adrPageTable[:meta] if adrPageTable[:meta]
+    
     # allow for possibility that <meta /> syntax is illegal, as in html
     htmlText = htmlText.gsub("/>",">") if htmlstyle
     return htmlText
   end
-  def bodytag(adrPageTable=@adrPageTable)
+  def bodytag(adrPageTable=@adrPageTable) # generate body tag
     htmltext = ""
-    attslist = ["bgcolor", "alink", "vlink", "link", 
-      "text", "topmargin", "leftmargin", "marginheight", 
-      "marginwidth", "onload", "onunload"
-    ]
-    # background image stuff, not yet written
+    
+    # background image, drawn from background directive
+    if s = adrPageTable["background"] or s = adrPageTable[:background]
+      htmltext += %{ background="#{getImageData(s, adrPageTable)[:url]}" } rescue ""
+    end
+
+    # other body tag attributes, drawn from directives
+    # really should not be using this feature! this is what CSS is for
+    # still, it's legal, and traditional in Frontier
+    attslist = %w{bgcolor alink vlink link 
+      text topmargin leftmargin marginheight 
+      marginwidth onload onunload
+    }
     attslist.each do |oneatt|
-      (s = adrPageTable[oneatt]) || (s = adrPageTable[oneatt.to_sym])
-      if !s.nil?
-        case oneatt
-        when *["alink", "bgcolor", "text", "link", "vlink"]
+      if s = adrPageTable[oneatt] or s = adrPageTable[oneatt.to_sym]
+        if %w{alink bgcolor text link vlink}.include?(oneatt)
           # colors should be hex and start with #
-          # much of the logic is omitted here
-          # okay, added a little more...
           unless s =~ /^#/
             if s.length == 6
               unless s =~ /[^0-9a-f]/i
@@ -356,75 +368,80 @@ module UserLand::Html::StandardMacros
             end
           end
         end
-        htmltext += " #{oneatt}=\"#{s}\""
+        htmltext += %{ #{oneatt}="#{s}"}
       end
     end 
     return "<body#{htmltext}>"
   end
-  def linkstylesheet(sheetName, adrPageTable=@adrPageTable)
+  def linkstylesheet(sheetName, adrPageTable=@adrPageTable) # link to one stylesheet
     # Frontier's logic for finding the style sheet is much more complex
-    # so far I just assume we have a #stylesheets folder containing .css files
+    # I just assume we have a #stylesheets folder containing .css files
     # and I also just assume we'll write it into a folder called "stylesheets" at top level
-    maxLen = getPref("maxFileNameLength", adrPageTable)
-    fname = sheetName[0,maxLen] + ".css"
+    # note that in my implementation, although you *can* call this in a macro, you shouldn't;
+    # use linkstylesheets (note final "s") mechanism instead, it calls this for you
+    fname = sheetName[0, getPref("maxFileNameLength", adrPageTable)] + ".css"
     sheetLoc = adrPageTable[:siteRootFolder] + Pathname.new("stylesheets/#{fname}")
-    pageToSheet = sheetLoc.relative_uri_from adrPageTable[:f]
-    s = "<link rel=\"stylesheet\" href=\"#{pageToSheet.to_s}\" type=\"text/css\" />"
     source = adrPageTable["stylesheets"] + Pathname.new("#{sheetName}.css")
     raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
-    # write out the stylesheet
+    # write out the stylesheet if necessary
     sheetLoc.dirname.mkpath
     if sheetLoc.needs_update_from(source)
-      puts "Writing css!"
-      source.open do |src|
-        sheetLoc.open("w") do |targ|
-          targ.write src.read
-        end
-      end
+      puts "Writing css (#{sheetName})!"
+      FileUtils.cp(source, sheetLoc, :preserve => true)
     end
-    return s
+    pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
+    return %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />}
   end
-  def embedstylesheet(sheetName, adrPageTable=@adrPageTable)
+  def embedstylesheet(sheetName, adrPageTable=@adrPageTable) # embed stylesheet
+    # as with linkstylesheet, unlike Frontier, my logic for finding the stylesheet is very simplified
+    # must be in #stylesheets folder as css file, end of story
     source = adrPageTable["stylesheets"] + Pathname.new("#{sheetName}.css")
     raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
     s = File.open(source) {|io| io.read}
-    return %{<style type="text/css">\n<!--\n#{s}\n-->\r</style>}
+    return %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
   end
-  def glossSub(text, id, adrPageTable=@adrPageTable)
-    return "#{refGlossary(id)}#{text}</a>"
-  end
-  def imageref(imagespec, options=nil, adrPageTable=@adrPageTable)
+  def imageref(imagespec, options=Hash.new, adrPageTable=@adrPageTable)
     imageTable = getImageData(imagespec, adrPageTable)
-    options = Hash.new if options.nil?
+    options = Hash.new if options.nil? # become someone might pass nil
     height = options[:height] || imageTable[:height]
     width = options[:width] || imageTable[:width]
     htmlText = %{<img src="#{imageTable[:url]}" width="#{width}" height="#{height}" }
     %w{name id alt hspace vscape align style class title border}.each do |what|
       htmlText += %{ #{what}="#{options[what.to_sym]}" } if options[what.to_sym]
     end
+    
     # some attributes get special treatment
-    # lowSrc, not written
     # usemap, must start with #
     if (usemap = options[:usemap])
       usemap = ("#" + usemap).squeeze("#")
       htmlText += %{ usemap="#{usemap}" }
     end
     if options[:ismap]
-      htmlText += " ismap=ismap "
+      htmlText += ' ismap="ismap" '
     end
+    # lowsrc, not supported (not valid HTML any more)
+    #if (lowsrc = options[:lowsrc])
+    #  htmlText += %{ lowsrc="#{getImageData(lowsrc, adrPageTable)[:url]}" }
+    #end
     if (rollsrc = options[:rollsrc])
       htmlText += %{ onmouseout="this.src='#{imageTable[:url]}'" }
-      rollData = getImageData(rollData, adrPageTable)
-      htmlText += %{ onmouseover="this.src='#{rollData[:url]}'" }
+      htmlText += %{ onmouseover="this.src='#{getImageData(rollsrc, adrPageTable)[:url]}'" }
     end
     # explanation, we now use "alt"; anyhow, there *must* be one
     unless options[:alt]
       htmlText += %{ alt="image" }
     end
     htmlText += " />"
-    # glossref goes here, not yet written
-    return htmlText.squeeze(" ")
+    # neaten
+    htmlText = htmlText.squeeze(" ")
+    # glossref, wrap whole thing in link ready for normal handling
+    # unlikely (manual <a> is way better) but someone might want to use it
+    if (glossref = options[:glossref])
+      htmlText = %{<a href="#{glossref}">#{htmlText}</a>}
+    end
+    return htmlText
   end
+  #GOT TO HERE
   def pageheader(adrPageTable=@adrPageTable)
     # if pageheader directive exists, assume macro was explicitly called in error
     # cool because template can contain pageheader() call with or without #pageheader directive elsewhere
@@ -1059,18 +1076,22 @@ class UserLand::Html::PageMaker
       result = false if result == "no"
       return result
     end
-    # should try to get it from user.html.prefs but that doesn't exist yet
+    # TODO: should try to get it from user.html.prefs but that doesn't exist yet
+    # return built-in defaults
     case s.to_s.downcase
     when "fileextension"
-      return ".html"
+      ".html"
     when "maxfilenamelength"
-      return 31
+      31
     when "defaulttemplate"
-      return "normal"
+      "normal"
     when "defaultfilename"
-      return "default"
+      "default"
+    when "charset"
+      "utf-8"
+    else
+      true
     end
-    return true
   end
   def saveOutAutoglossary(g=nil, adrPageTable=@adrPageTable)
     g ||= adrPageTable[:autoglossary]

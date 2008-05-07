@@ -1,0 +1,8 @@
+--- 
+default: &id001 
+  :path: !ruby/object:Pathname 
+    path: default.html
+  :linetext: My Cool Web Page
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/newsite/default.txt
+My Cool Web Page: *id001

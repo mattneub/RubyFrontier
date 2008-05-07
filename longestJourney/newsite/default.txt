@@ -1,3 +1,14 @@
 #title "My Cool Web Page"
   
-Wow, I made a cool Web page!
+<div align="center">
+
+<%= imageref("rubyFrontierLogo") %>
+
+<p>Wow, I made a cool Web page!</p>
+
+</div>
+
+<%#
+ To render this as a Web page and see it in your browser,
+ choose RubyFrontier > Publish Page.
+%>
