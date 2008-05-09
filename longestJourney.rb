@@ -81,7 +81,7 @@ end
 =begin make 'load' and 'require' include folder next to, and with same name as, this file 
 that is where supplementary files go:
 (1) stuff to keep this file from getting too big
-(2) user.rb, where the user can maintain the User class
+(2) user.rb, where the user can maintain the UserLand::User class
 =end
 p = Pathname.new(__FILE__)
 $: << (p.dirname + p.simplename).to_s
@@ -163,15 +163,17 @@ end
 this allows outline renderers to enjoy the same environment as macro evaluation (see on BindingMaker, above)
 (this is not a Frontier feature, but it sure should be! makes life a lot easier;
 e.g. you can reach @adrPageTable, tools, Html methods really easily)
-so, an outline renderer must be in module User::Renderers and must be a class deriving from SuperRenderer
+so, an outline renderer must be in module UserLand::Renderers and must be a class deriving from SuperRenderer
 subclasses should not override "initialize" without calling super or imitating
 subclasses must implement "render(op)" where "op" is an Opml object (see opml.rb)
 =end
-module User
+module UserLand
 end
-module User::Renderers
+module UserLand::User
 end
-class User::Renderers::SuperRenderer
+module UserLand::Renderers
+end
+class UserLand::Renderers::SuperRenderer
   def initialize(thePageMaker, theBindingMaker)
     @thePageMaker = thePageMaker # so we can access it later
     @adrPageTable = thePageMaker.adrPageTable # so macros can get at it
@@ -189,12 +191,7 @@ end
 require 'opml'
 begin; require 'user'; rescue; end # no penalty for not having a "user.rb" file 
 
-# our world beginneth! ================================================================================
-module UserLand
-end
-
-# class methods
-# public interface for rendering a page
+# public interface for rendering a page (class methods)
 # also general utilities without reference to any specific page being rendered
 module UserLand::Html
   def self.guaranteePageOfSite(adrObject)
@@ -210,13 +207,13 @@ module UserLand::Html
     
     # TODO: omitting "extra templates" logic
     
-    adrStorage = Hash.new
-    callFileWriterStartup(adrObject, adrStorage)
+    adrStorage = callFileWriterStartup(adrObject) # adrStorage is unused at present
           
     pm = PageMaker.new
     pm.buildObject(adrObject)
+    puts "page built in #{Time.new.to_f - time} seconds"
     
-    pm.writeFile(adrStorage)
+    pm.writeFile
     
     # TODO: omitting file writer shutdown mechanism
     # callFileWriterShutdown(adrObject, adrStorage)
@@ -227,7 +224,6 @@ module UserLand::Html
       `open 'file://#{ERB::Util::url_encode(pm.adrPageTable[:f]).gsub("%2F", "/")}'`
     end
     
-    puts "#{Time.new.to_f - time} seconds"
   end
   def self.publishSite(adrObject, preflight=true)
     adrObject = Pathname.new(adrObject).expand_path
@@ -240,10 +236,8 @@ module UserLand::Html
   def self.everyPageOfSite(adrObject)
     # a page is anything in the site table not starting with # or inside a folder starting with #
     # that doesn't mean every page is a renderable; it might merely be a copyable, but it is still a page
-    adrStorage = Hash.new
-    callFileWriterStartup(Pathname.new(adrObject), adrStorage) # to get ftpsite
     result = Array.new
-    adrStorage[:adrFtpSite].dirname.find do |p|
+    (callFileWriterStartup(Pathname.new(adrObject)))[:adrFtpSite].dirname.find do |p|
       Find.prune if p.basename.to_s =~ /^[#.]/
       result << p if (!p.directory? && p.simplename != "") # ignore invisibles
     end
@@ -267,9 +261,9 @@ module UserLand::Html
     end
     pm.saveOutAutoglossary(glossary) # save out resulting autoglossary
   end  
-  def self.callFileWriterStartup(adrObject, adrStorage)
+  def self.callFileWriterStartup(adrObject, adrStorage=Hash.new)
     # we require an #ftpSite file to mark the top of the site
-    # walk upwards until we find it; fill in adrStorage
+    # walk upwards until we find it; fill in adrStorage and return it
     ftpsite = nil
     catch :done do
       adrObject.dirname.ascend do |dir|
@@ -284,6 +278,7 @@ module UserLand::Html
     ftpsiteHash = File.open(ftpsite) {|io| ftpsiteHash = YAML.load(io)}
     adrStorage[:adrFtpSite] = ftpsite
     adrStorage[:method] = ftpsiteHash[:method]
+    return adrStorage
   end
   def self.getLink(linetext, url)
     return %{<a href="#{url}">#{linetext}</a>}
@@ -374,11 +369,11 @@ module UserLand::Html::StandardMacros
     return "<body#{htmltext}>"
   end
   def linkstylesheet(sheetName, adrPageTable=@adrPageTable) # link to one stylesheet
+    # you really ought to use linkstylesheets instead, it calls this for you
     # Frontier's logic for finding the style sheet is much more complex
     # I just assume we have a #stylesheets folder containing .css files
     # and I also just assume we'll write it into a folder called "stylesheets" at top level
     # note that in my implementation, although you *can* call this in a macro, you shouldn't;
-    # use linkstylesheets (note final "s") mechanism instead, it calls this for you
     fname = sheetName[0, getPref("maxFileNameLength", adrPageTable)] + ".css"
     sheetLoc = adrPageTable[:siteRootFolder] + Pathname.new("stylesheets/#{fname}")
     source = adrPageTable["stylesheets"] + Pathname.new("#{sheetName}.css")
@@ -397,10 +392,12 @@ module UserLand::Html::StandardMacros
     # must be in #stylesheets folder as css file, end of story
     source = adrPageTable["stylesheets"] + Pathname.new("#{sheetName}.css")
     raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
-    s = File.open(source) {|io| io.read}
+    s = File.read(source)
     return %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
   end
-  def imageref(imagespec, options=Hash.new, adrPageTable=@adrPageTable)
+  def imageref(imagespec, options=Hash.new, adrPageTable=@adrPageTable) # create img tag
+    # finding the image, copying it out, and obtaining its height and width and relative url...
+    # is the job of getImageData
     imageTable = getImageData(imagespec, adrPageTable)
     options = Hash.new if options.nil? # become someone might pass nil
     height = options[:height] || imageTable[:height]
@@ -441,8 +438,7 @@ module UserLand::Html::StandardMacros
     end
     return htmlText
   end
-  #GOT TO HERE
-  def pageheader(adrPageTable=@adrPageTable)
+  def pageheader(adrPageTable=@adrPageTable) # generate standard page header from html tag to body tag
     # if pageheader directive exists, assume macro was explicitly called in error
     # cool because template can contain pageheader() call with or without #pageheader directive elsewhere
     return "" if ( adrPageTable[:pageheader] || adrPageTable["pageheader"] )
@@ -454,6 +450,7 @@ module UserLand::Html::StandardMacros
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<biteme>
 <%= metatags() %>
 <%= linkstylesheets() %>
 <%= linkjavascripts() %>
@@ -463,10 +460,12 @@ module UserLand::Html::StandardMacros
 '
     return ""
   end
-  def pagefooter(t="")
+  def pagefooter(t="") # generate standard page footer, just closing body and html tags
+    # t param is in case extra material needs to be inserted between the tags
+    # for example, might want a comment to delimit things for dreamweaver or something
     return "</body>\n#{t}\n</html>\n"
   end
-  def linkjavascripts(adrPageTable=@adrPageTable)
+  def linkjavascripts(adrPageTable=@adrPageTable) # link to all javascripts requested in directives
     # not in Frontier at all, but clearly a mechanism like this is needed
     # works like "meta", allowing multiple javascriptXXX directives to ask that we link to XXX
     s = ""
@@ -480,8 +479,9 @@ module UserLand::Html::StandardMacros
     end
     return s
   end
-  def linkstylesheets(adrPageTable=@adrPageTable)
-    # just like linkjavascripts
+  def linkstylesheets(adrPageTable=@adrPageTable) # link to all stylesheets requested in directives
+    # call this, not linkstylesheet; it lets you link to multiple stylesheets
+    # works just like linkjavascripts
     s = ""
     adrPageTable.keys.each do |k|
       k = k.to_s
@@ -493,96 +493,102 @@ module UserLand::Html::StandardMacros
     end
     return s
   end
-  def linkjavascript(sheetName, adrPageTable=@adrPageTable)
-    # as with linkstylesheet, my logic is very simplified for now
+  def linkjavascript(sheetName, adrPageTable=@adrPageTable) # link to one javascript
+    # you really ought to use linkjavascripts instead, it calls this for you
+    # as with linkstylesheet, my logic is very simplified:
     # I just assume we have a #javascripts folder and we write to top-level "javascripts"
-    maxLen = getPref("maxFileNameLength", adrPageTable)
-    fname = sheetName[0,maxLen] + ".js"
+    fname = sheetName[0, getPref("maxFileNameLength", adrPageTable)] + ".js"
     sheetLoc = adrPageTable[:siteRootFolder] + Pathname.new("javascripts/#{fname}")
-    pageToSheet = sheetLoc.relative_uri_from adrPageTable[:f]
-    s = "<script src=\"#{pageToSheet.to_s}\" type=\"text/javascript\" ></script>\n"
     source = adrPageTable["javascripts"] + Pathname.new("#{sheetName}.js")
     raise "javascript #{sheetName} does not seem to exist" unless source.exist?
-    # write out the javascript
+    # write out the javascript if necessary
     sheetLoc.dirname.mkpath
     if sheetLoc.needs_update_from(source)
-      puts "Writing javascript #{sheetName}!"
-      source.open do |src|
-        sheetLoc.open("w") do |targ|
-          targ.write src.read
-        end
-      end
+      puts "Writing javascript (#{sheetName})!"
+      FileUtils.cp(source, sheetLoc, :preserve => true)
     end
-    return s
+    pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
+    return %{<script src="#{pageToSheet}" type="text/javascript" ></script>\n}
   end
 end
+
 
 # actual page renderer; maintains state, so it's a class, PageMaker
 # includes standard macros so they can access its ivars
 class UserLand::Html::PageMaker
+  class Sandbox # class for reading a ruby file into (file's methods become methods of this object)
+    def initialize(adrObject)
+      instance_eval(File.read(adrObject))
+    end
+  end
   include UserLand::Html::StandardMacros
   attr_reader :adrPageTable
   def initialize(adrPageTable = Hash.new)
     @adrPageTable = adrPageTable
   end
-  def writeFile(adrStorage, s=@adrPageTable[:renderedtext], adrPageTable=@adrPageTable)
-    f = adrPageTable[:f] # target file
+  def renderable?(adrObject)
+    # no error-checking; we assume this object is in a site
+    [".txt", ".opml", ".rb"].include?(Pathname.new(adrObject).extname)
+  end
+  def writeFile(adrStorage=nil, s=@adrPageTable[:renderedtext], adrPageTable=@adrPageTable)
     # eventually we might support ftp like Frontier, but right now we just write to disk
+    # so the adrStorage parameter isn't being used for anything yet
+    f = adrPageTable[:f] # target file
     f.dirname.mkpath
-    if [".txt", ".opml"].include?(adrPageTable[:adrObject].extname)
+    if renderable?(adrPageTable[:adrObject])
       File.open(f,"w") do |io|
         io.write s
       end
       puts "Rendered #{adrPageTable[:adrObject]}"
-    else # this is not a renderable at all, just copy it
+    else # just copy it
       if f.needs_update_from(adrPageTable[:adrObject])
         FileUtils.cp(adrPageTable[:adrObject], f, :preserve => true)
         puts "Copied #{adrPageTable[:adrObject]}"
       end
     end
   end
+  def callFilter(filter_name, adrPageTable=@adrPageTable)
+    if adrPageTable["filters"]
+      adrFilter = adrPageTable["filters"] + "#{filter_name}.rb"
+      if adrFilter.exist?
+        Sandbox.new(adrFilter).send(filter_name, adrPageTable)
+      end
+    end
+  end
   def buildObject(adrObject, adrPageTable=@adrPageTable)
+    # construct entire page table
     buildPageTableFully(adrObject)
     
     # if this is not a renderable, that's all
-    return "" unless [".txt", ".opml"].include?(adrObject.extname)
+    return "" unless renderable?(adrObject)
     
-    # okay, if we've reached this point we're going to need a BindingMaker object
-    # this provides an environment in which to deal with outline renderers and macro processing
-    theBindingMaker = BindingMaker.new(self)
+    # if we've reached this point we're going to need a BindingMaker object
+    # it provides an environment in which to deal with outline renderers and macro processing
     # load all tools into BindingMaker instance as sandbox
     # all method defs in tools become methods of BindingMaker
     # all outline renderers in tools spring into life
+    theBindingMaker = BindingMaker.new(self)
     adrPageTable["tools"].each { |k,v| theBindingMaker.instance_eval(File.read(v)) }
   
-    # if the page is an outline, now render it (unlike Frontier which did it earlier, unnecessarily)
-    # renderer is expected to be a class of User::Renderers
-    # can be in User::Renderers in user.rb, or in tools (latter searched first) 
-    # it must accept new with 1 arg (optional page table) and render with 1 arg (an Opml object)
-    if adrPageTable[:bodytext].kind_of?(Opml)
-      renderer = adrPageTable[:renderoutlinewith]
-      #if (renderer_file = adrPageTable["tools"][renderer.downcase]) # tools file names are lowercase
-        #load renderer_file.to_s
-      #end
+    # if the page is an outline or script, now render it (unlike Frontier which did it earlier, unnecessarily)
+    case adrPageTable[:bodytext]
+    when Opml # outline!
+      # renderer is expected to be a subclass of SuperRenderer within module UserLand::Renderers
+      # can be defined in user.rb, or as an .rb file in tools 
+      # it should not override initialize, and must accept render with 1 arg (an Opml object)
       begin
-        renderer_klass = User::Renderers.module_eval(renderer) 
+        renderer_klass = UserLand::Renderers.module_eval(adrPageTable[:renderoutlinewith]) 
       rescue 
-        raise "Renderer #{renderer} not found!"
+        raise "Renderer #{adrPageTable[:renderoutlinewith]} not found!"
       end
-      #renderer = renderer_klass.send :new, adrPageTable
-      #renderer = renderer_klass.new(adrPageTable)
-      renderer = renderer_klass.new(self, theBindingMaker)
-      #require 'ruby-prof'
-      #RubyProf.start
-      adrPageTable[:bodytext] = renderer.render(adrPageTable[:bodytext])
-      #result = RubyProf.stop
-      #printer = RubyProf::GraphPrinter.new(result)
-      #printer.print(STDOUT, 40)
+      adrPageTable[:bodytext] = renderer_klass.new(self, theBindingMaker).render(adrPageTable[:bodytext])
+    when Sandbox # script!
+      # must have a render() method, we call it in a sandbox, handing it the whole PageMaker object
+      # after that, dude, you're on your own!
+      adrPageTable[:bodytext] = adrPageTable[:bodytext].render(self)
     end
   
-    # create all folders containing our page - OOOPS, seem to be doing this twice, see writeFile
-    # adrPageTable[:f].dirname.mkpath
-
+    # update autoglossary
     # in Frontier, pagefilter includes html.addPageToGlossary
     # but since you'd effectively never *not* want to do this, why force every site to have this pagefilter?
     # so I just call it explicitly
@@ -595,7 +601,7 @@ class UserLand::Html::PageMaker
     # a snippet is a .txt file in a #tools folder
     # you can have direct access to it, obviously, via adrPageTable...
     # ...but here, as a shortcut, we substitute directly into [[...]]
-    adrPageTable[:bodytext].gsub!(/\[\[(.*?)\]\]/) do |match|
+    adrPageTable[:bodytext].gsub!(/\[\[(.*?)\]\]/) do
       if adrPageTable["snippets"] && adrPageTable["snippets"][$1]
         adrPageTable["snippets"][$1]
       else
@@ -604,18 +610,10 @@ class UserLand::Html::PageMaker
     end
           
     # pagefilter, handed adrPageTable, expected to access :bodytext
-    if adrPageTable["filters"]
-      adrPageFilter = adrPageTable["filters"] + "pageFilter.rb"
-      if adrPageFilter.exist?
-        # load into sandbox object and call
-        o = Object.new
-        o.instance_eval(File.read(adrPageFilter))
-        o.pageFilter(adrPageTable)
-      end
-    end
+    callFilter("pageFilter")
 
     #template
-    # no support yet for indirect template
+    # TODO: no support yet for indirect template
     # named template supported, assumed to be in #templates or user/templates
     # if named, it will be :template, a string; if found, it will be "template", a Pathname
     raise "No template found or specified" unless (adrTemplate = (adrPageTable[:template] || adrPageTable["template"]))
@@ -635,23 +633,23 @@ class UserLand::Html::PageMaker
       raise "Template #{adrTemplate} named but not found" unless adrTemplate.kind_of?(Pathname)
     end
     s = runDirectives(adrTemplate)
-    # omitting stuff about revising if #fileExtension was changed by template
+    # TODO: omitting stuff about revising if #fileExtension was changed by template
       
-    # embed page into template, also do <title> if there is one
-    # no, I've cut the <title> substitution feature, it saves nothing and leads to error
     # if we have no title by now, that's an error
     raise "You forgot to give this page a title!" unless adrPageTable[:title]
-    # s = s.sub(/<bodytext>/i, adrPageTable[:bodytext])
-    # no, important to write it as follows or we get possibly unwanted \\, \1 substitution
+    
+    # embed page into template at <bodytext>
+    # I've cut Frontier's <title> substitution feature, it saves nothing and leads to error
+    # important to write it as follows or we get possibly unwanted \\, \1 substitution
     s = s.sub(/<bodytext>/i) {|x| adrPageTable[:bodytext]}
-    #.sub(/<title>/i, adrPageTable[:title])
       
-    # macros etc.
+    # macros
     s = processMacros(s, theBindingMaker.getBinding) unless !getPref("processmacros")
   
-    # glossary expansion; my equivalent is to look for already existing href tags
-    # refGlossary will create a complete new <a> tag (not sure if that's wise, but it's what I'm doing)...
-    # ...so, if they have stuff after the href, hang on to it, restore it after 
+    # glossary expansion; my equivalent is to look for already existing <a href...> tags
+    # ...generated no matter how, e.g. manually, with getLink, with markdown [](), whatever
+    # to count as a candidate, must be clearly "local"
+    # we can resolve identifiers in user glossary or our autoglossary (see refGlossary)... 
     s = s.gsub /<a href="(.*?)"(.*?)>/i do |ref|
       retval = ref # if nothing else, just return what we came in with
       href = $1
@@ -660,14 +658,14 @@ class UserLand::Html::PageMaker
       # but user can override the first two checks by escaping
       unless href =~ /[^\\]\./ || href =~ %r{[^\\]\://} || href =~ /^#/
         if href =~ /([^\\])\^/ # remote-site semantics
+          # we look up id in autoglossary of another "site" 
+          # (use site^id to specify, where "site" is relative filepath in glossary)
           begin
             id = $'
             path = refGlossary($` + $1).match(/href="(.*?)"/)[1]
             path = (adrPageTable[:adrSiteRootTable] + Pathname.new(path)).cleanpath + "#autoglossary.yaml"
-            if path.exist?
-              h = File.open(path) {|io| YAML.load(io)}
-              url = %{<a href="#{h[id.gsub('\\','')][:url]}">}
-            end
+            h = File.open(path) {|io| YAML.load(io)}
+            url = %{<a href="#{h[id.gsub('\\','')][:url]}">}
           rescue
             puts "Remote glossary lookup failed on #{href}, apparently while processing #{adrPageTable[:adrObject]}"
           end
@@ -680,93 +678,77 @@ class UserLand::Html::PageMaker
         else # refGlossary failed, insert dummy but legal URL
           retval = "<a href=\"errorRefGlossaryFailedHere\">"
         end
+        # refGlossary will create a complete new <a> tag (not sure if that's wise, but it's what I'm doing)...
+        # ...so, if they have stuff after the href, we have hung on to it, restore it now 
         retval[-1] = rest + ">" # restore stuff after href tag, if any
       end
       retval
     end
   
-    # pageHeader attribute 
-    # or could have pageheader() standardmacro call instead
-    # either way, we don't deal with pageheader until now, so that other stuff...
-    # ...can influence things that happen when the page header is formed, such as the title or bgcolor
-    # might be named (symbol key) or found (string key)
-    # might be direct string or indirect pathname
-    ph = ( adrPageTable[:pageheader] || adrPageTable["pageheader"] )
-    if ph
-      if ph.kind_of?(Pathname)
-        ph = File.open(adrPageTable["pageheader"]) { |io| io.read }
-      end
+    # pageHeader attribute or result of pageheader() standardmacro call instead
+    # we don't handle this until now, because other stuff might need to influence title or bgcolor or something
+    # might be named (symbol key) or found (string key); might be direct string or indirect pathname
+    if ph = adrPageTable[:pageheader] or ph = adrPageTable["pageheader"]
+      ph = File.read(adrPageTable["pageheader"]) if ph.kind_of?(Pathname)
       s = processMacros(ph, theBindingMaker.getBinding) + s
     end
   
     # linefeed thing, not implemented
     # fatpages, not implemented
   
-    # finalfilter, handed adrPageTable, expected to access :renderedtext
-    if adrPageTable["filters"]
-      adrFinalFilter = adrPageTable["filters"] + "finalFilter.rb"
-      if adrFinalFilter.exist?
-        adrPageTable[:renderedtext] = s
-        # load into sandbox object and call
-        o = Object.new
-        o.instance_eval(File.read(adrFinalFilter))
-        o.finalFilter(adrPageTable)
-        s = adrPageTable[:renderedtext]
-      end
-    end
-  
     adrPageTable[:renderedtext] = s
-    return s
+    
+    # finalfilter, handed adrPageTable, expected to access :renderedtext
+    callFilter("finalFilter")
+  
   end
   def buildPageTableFully(adrObject, adrPageTable=@adrPageTable)
     # this has no exact Frontier analog; it's the first few lines of buildObject
     # the point is that Frontier's buildPageTable does not really finish building the page table...
     # ...but we need a routine that *does* fully finish (without rendering), so we can pull out directives properly
     # idea is to be lightweight but complete, so that resulting adrPageTable can be used for other purposes
-    # outline rendering (in tenderrender) is being done unnecessarily soon here, but we have not implemented that yet anyway
   
+    # walk hierarchy collecting directives
     buildPageTable(adrObject)
+      
+    # firstfilter
+    callFilter("firstFilter")
+  
+    # obtain directives from within page object
+    # insert page object, in some form, into page table
+    adrPageTable[:bodytext] = tenderRender(adrObject)
     
-    # publish binary object not yet written
-  
-    # firstfilter goes here; may be able to do without this
-  
-    ro = tenderRender(adrObject)
-    
-    adrPageTable[:bodytext] = ro # unlike Frontier; we need a way to hand this back for now
-  
-    if [".txt", ".opml"].include?(adrObject.extname)
+    # work out :fname, :siteRootFolder, :subDirectoryPath, :f  
+    if renderable?(adrObject)
       adrPageTable[:fname] = getFileName(adrObject.simplename)
     else
       adrPageTable[:fname] = adrObject.basename
     end
-  
     folder = getSiteFolder() # sets :siteRootFolder and returns it
-
     relpath = (adrObject.relative_path_from(adrPageTable[:adrSiteRootTable])).dirname
     adrPageTable[:subDirectoryPath] = relpath
-  
     adrPageTable[:f] = folder + relpath + adrPageTable[:fname]
   
     # insert user glossary
-    if User.respond_to?(:glossary)
+    if UserLand::User.respond_to?(:glossary)
       g = adrPageTable["glossary"]
-      User.glossary().each do |k,v|
+      UserLand::User.glossary().each do |k,v|
         g[k] = v unless g[k]
       end
     end
   end
   def buildPageTable(adrObject, adrPageTable=@adrPageTable)
-    # record what object is being rendered (may need mods later)
+    # record what object is being rendered
     adrPageTable[:adrObject] = adrObject
-    # init hashes for things that get gathered into one as we walk up the hierarchy
+    
+    # init hashes to gather stuff into as we walk up the hierarchy
     adrPageTable["tools"] = Hash.new
     adrPageTable["glossary"] = Hash.new
     adrPageTable["snippets"] = Hash.new
   
     # walk file hierarchy looking for things that start with "#"
     # add things only if they don't already exist; that way, closest has precedence
-    # if it is a #tools folder, hash pathnames under simple filenames so we can call later
+    # if it is a #tools folder, hash pathnames under simple filenames
     # if it is #prefs or #glossary, load as a yaml hash and merge with existing hash
     # if it is #ftpsite, determine root etc.
     # else, just hash pathname under simple filename
@@ -788,19 +770,17 @@ class UserLand::Html::PageMaker
                 end
               end
             when "#prefs" # flatten prefs out into top-level entries in adrPageTable
-              prefsHash = nil
-              File.open(dir + f) {|io| prefsHash = YAML.load(io)}
+              prefsHash = File.open(dir + f) {|io| YAML.load(io)}
               prefsHash.each_key {|key| adrPageTable[key] ||= prefsHash[key]}
             when "#glossary" # gather glossary entries into glossary hash: NB these are *user* glossary entries
               # (different from Frontier: automatically generated glossary entries for linking live in #autoglossary)
-              glossHash = nil
-              File.open(dir + f) {|io| glossHash = YAML.load(io)}
+              glossHash = File.open(dir + f) {|io| YAML.load(io)}
               adrPageTable["glossary"] = glossHash.merge(adrPageTable["glossary"]) # note order: what's in adrPageTable overrides
             when "#ftpsite"
               found_ftpsite = true
               adrPageTable[:ftpsite] ||= dir + f
               adrPageTable[:adrSiteRootTable] ||= dir
-              adrPageTable[:subDirectoryPath] ||= (adrObject.relative_path_from(dir)).dirname
+              #adrPageTable[:subDirectoryPath] ||= (adrObject.relative_path_from(dir)).dirname
             else
               adrPageTable[f.simplename.to_s[1..-1]] ||= (dir + f) # pathname
             end
@@ -821,15 +801,16 @@ class UserLand::Html::PageMaker
     # there is an inefficiency in Frontier here: this is all done again after tenderRender
     # so I'm just omitting it here for now
   end
+  # GOT TO HERE
   def tenderRender(adrObject, adrPageTable=@adrPageTable)
     case File.extname(adrObject)
     when ".txt"
       return runDirectives(adrObject)
     when ".opml"
       return runOutlineDirectives(adrObject)
+    when ".rb"
+      return Sandbox.new(adrObject)
     else
-      # other cases not yet written
-      # raise "We don't render non-txt files yet"
       return ""
     end
   end

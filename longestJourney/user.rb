@@ -2,6 +2,7 @@ require 'enumerator'
 
 module UserLand
 end
+
 module UserLand::Html
   def self.checkNextPrevs(adrObject)
     # crude but effective check that nextprevs lists are valid
@@ -33,7 +34,7 @@ module UserLand::Html
   end
 end
 
-module User
+module UserLand::User
   def self.glossary
     s = <<END
 Frontier
@@ -66,7 +67,8 @@ END
     return h
   end
 end
-module User::Renderers
+
+module UserLand::Renderers
   class Halo < SuperRenderer
     def visit(op)
       while true
