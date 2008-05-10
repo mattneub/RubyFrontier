@@ -275,7 +275,7 @@ module UserLand::Html
         raise "Reached top level without finding #ftpsite" if dir.root?
       end
     end
-    ftpsiteHash = File.open(ftpsite) {|io| ftpsiteHash = YAML.load(io)}
+    ftpsiteHash = YAML.load_file(ftpsite)
     adrStorage[:adrFtpSite] = ftpsite
     adrStorage[:method] = ftpsiteHash[:method]
     return adrStorage
@@ -587,7 +587,7 @@ class UserLand::Html::PageMaker
       # after that, dude, you're on your own!
       adrPageTable[:bodytext] = adrPageTable[:bodytext].render(self)
     end
-  
+    
     # update autoglossary
     # in Frontier, pagefilter includes html.addPageToGlossary
     # but since you'd effectively never *not* want to do this, why force every site to have this pagefilter?
@@ -664,7 +664,7 @@ class UserLand::Html::PageMaker
             id = $'
             path = refGlossary($` + $1).match(/href="(.*?)"/)[1]
             path = (adrPageTable[:adrSiteRootTable] + Pathname.new(path)).cleanpath + "#autoglossary.yaml"
-            h = File.open(path) {|io| YAML.load(io)}
+            h = YAML.load_file(path) 
             url = %{<a href="#{h[id.gsub('\\','')][:url]}">}
           rescue
             puts "Remote glossary lookup failed on #{href}, apparently while processing #{adrPageTable[:adrObject]}"
@@ -718,13 +718,18 @@ class UserLand::Html::PageMaker
     # insert page object, in some form, into page table
     adrPageTable[:bodytext] = tenderRender(adrObject)
     
-    # work out :fname, :siteRootFolder, :subDirectoryPath, :f  
+    # work out :fname, :siteRootFolder, :subDirectoryPath, :f
+    # :fname => name of file we will write out
+    # :siteRootFolder => folder into which all pages will be written
+    # :adrSiteRootTable => folder containing #ftpsite marker, in which whole site object lives
+    # :f => full pathname of file we will write out
+    # :subDirectoryPath => relative path from :siteRootFolder to :f, or from :adrSiteRootTable to :adrObject
     if renderable?(adrObject)
       adrPageTable[:fname] = getFileName(adrObject.simplename)
     else
       adrPageTable[:fname] = adrObject.basename
     end
-    folder = getSiteFolder() # sets :siteRootFolder and returns it
+    folder = getSiteFolder() # sets adrPageTable[:siteRootFolder] and returns it
     relpath = (adrObject.relative_path_from(adrPageTable[:adrSiteRootTable])).dirname
     adrPageTable[:subDirectoryPath] = relpath
     adrPageTable[:f] = folder + relpath + adrPageTable[:fname]
@@ -745,6 +750,7 @@ class UserLand::Html::PageMaker
     adrPageTable["tools"] = Hash.new
     adrPageTable["glossary"] = Hash.new
     adrPageTable["snippets"] = Hash.new
+    adrPageTable["images"] = Hash.new
   
     # walk file hierarchy looking for things that start with "#"
     # add things only if they don't already exist; that way, closest has precedence
@@ -769,16 +775,22 @@ class UserLand::Html::PageMaker
                   end
                 end
               end
+            when "#images" # gather references to images into images hash, similar to tools
+              (dir + f).each_entry do |ff|
+                unless /^\./ =~ (im_simplename = ff.simplename.to_s)
+                  adrPageTable["images"][im_simplename] ||= dir + f + ff
+                end
+              end
             when "#prefs" # flatten prefs out into top-level entries in adrPageTable
-              prefsHash = File.open(dir + f) {|io| YAML.load(io)}
+              prefsHash = YAML.load_file(dir + f)
               prefsHash.each_key {|key| adrPageTable[key] ||= prefsHash[key]}
             when "#glossary" # gather glossary entries into glossary hash: NB these are *user* glossary entries
               # (different from Frontier: automatically generated glossary entries for linking live in #autoglossary)
-              glossHash = File.open(dir + f) {|io| YAML.load(io)}
+              glossHash = YAML.load_file(dir + f)
               adrPageTable["glossary"] = glossHash.merge(adrPageTable["glossary"]) # note order: what's in adrPageTable overrides
             when "#ftpsite"
               found_ftpsite = true
-              adrPageTable[:ftpsite] ||= dir + f
+              adrPageTable[:ftpsite] ||= YAML.load_file(dir + f)
               adrPageTable[:adrSiteRootTable] ||= dir
               #adrPageTable[:subDirectoryPath] ||= (adrObject.relative_path_from(dir)).dirname
             else
@@ -793,7 +805,7 @@ class UserLand::Html::PageMaker
     # (nothing like this in Frontier, we need this for our own autoglossary mechanism)
     adrGlossTable = adrPageTable["autoglossary"]
     adrPageTable[:autoglossary] = if adrGlossTable && adrGlossTable.exist?
-      File.open(adrGlossTable) {|io| YAML.load(io)}
+      YAML.load_file(adrGlossTable)
     else
       Hash.new
     end
@@ -801,203 +813,154 @@ class UserLand::Html::PageMaker
     # there is an inefficiency in Frontier here: this is all done again after tenderRender
     # so I'm just omitting it here for now
   end
-  # GOT TO HERE
   def tenderRender(adrObject, adrPageTable=@adrPageTable)
+    # sorry about the name of this method, but this is what Frontier calls it...
+    # extract directives from page object and return suitable bodytext value
+    # further disposal is based on class
     case File.extname(adrObject)
     when ".txt"
-      return runDirectives(adrObject)
+      return runDirectives(adrObject) # String
     when ".opml"
-      return runOutlineDirectives(adrObject)
+      return runOutlineDirectives(adrObject) # Opml
     when ".rb"
-      return Sandbox.new(adrObject)
+      return Sandbox.new(adrObject) # Sandbox
     else
-      return ""
+      return "" # not a renderable, unimportant
     end
   end
   def runDirectives(adrObject, adrPageTable=@adrPageTable)
-    lines = []
+    # extract directives from start of text, return rest of text
     File.open(adrObject) do |io|
-      keep_looking = true
-      while io.gets
-        if keep_looking && $_[0,1] == "#"
-          runDirective($_[1..-1], adrPageTable)
-        else
-          lines << $_
-          keep_looking = false
-        end
+      while line = io.gets and line[0,1] == "#"
+        runDirective(line[1..-1], adrPageTable)
       end
+      line + (io.gets(nil) || "") # read all the rest
     end
-    return lines.join("")
   end
   def runOutlineDirectives(adrObject, adrPageTable=@adrPageTable)
-    #s = File.open(adrObject) {|io| io.read}
-    #op = Opml.new(s)
-    # hmmm, new LibXML implementation requires a different kind of "new..." Maybe I should fix this mismatch
+    # extract directives from start of outline, return rest of outline
     op = Opml.new(adrObject.to_s)
-    aline = op.getLineText
-    while aline[0,1] == "#"
+    while aline = op.getLineText and aline[0,1] == "#"
       runDirective(aline[1..-1], adrPageTable)
       op.deleteLine
-      aline = op.getLineText
     end
     return op
   end
   def runDirective(linetext, adrPageTable=@adrObject)
     k,v = linetext.split(" ",2)
-    adrPageTable[k.to_sym] = eval(v.chomp) # should error-check!
+    adrPageTable[k.to_sym] = eval(v.chomp) 
+  rescue SyntaxError
+    raise "Syntax error: Failed to evaluate directive #{v.chomp}"
   end
-  def getFileName(n, adrPageTable=@adrPageTable, adrObject=nil)
-    #fileExtension = ".html" # should in fact use getPref
-    fileExtension = getPref("fileextension")
-    return normalizeName(n) + fileExtension
+  def getFileName(n, adrPageTable=@adrPageTable)
+    return normalizeName(n) + getPref("fileextension", adrPageTable)
   end
-  def normalizeName(n, adrPageTable=@adrPageTable, adrObject=@adrPageTable[:adrObject])
-    #flDropNonAlphas = true # should in fact use getPref
-    flDropNonAlphas = getPref("dropnonalphas")
-    #flLowerCaseFileNames = true # ditto
-    flLowerCaseFileNames = getPref("lowercasefilenames")
-    #maxLength = 100 # ditto
-    maxLength = getPref("maxfilenamelength")
-    extension = getPref("fileextension")
+  def normalizeName(n, adrPageTable=@adrPageTable)
     n = n.to_s
-    n = n.dropNonAlphas if flDropNonAlphas
-    n = n.downcase if flLowerCaseFileNames
-    return n[0, maxLength - extension.length]
+    n = n.dropNonAlphas if getPref("dropnonalphas", adrPageTable)
+    n = n.downcase if getPref("lowercasefilenames", adrPageTable)
+    return n[0, getPref("maxfilenamelength", adrPageTable) - getPref("fileextension", adrPageTable).length]
   end
   def getSiteFolder(adrPageTable=@adrPageTable)
+    # where shall we render/copy pages into? set :siteRootFolder and return it as well
     return adrPageTable[:siteRootFolder] if adrPageTable[:siteRootFolder]
-    adrFtpSite = adrPageTable[:ftpsite]
-    folder = nil
-    File.open(adrFtpSite) {|io| folder = YAML.load(io)[:folder]}
-    folder = Pathname.new(folder).expand_path
+    folder = Pathname.new(adrPageTable[:ftpsite][:folder]).expand_path
     # ensure whole containing path exists; if not, use temp folder
     folder = Pathname.new(`mktemp -d /tmp/website.XXXXXX`) unless folder.dirname.exist?
-    # create the folder if necessary # no, I've commented this out for now, seems unnecessary as we mkpath later
-    # folder.mkdir unless folder.exist?
-    # set in adrPageTable and also return it
-    return (adrPageTable[:siteRootFolder] = folder)
+    return (adrPageTable[:siteRootFolder] = folder) # set in adrPageTable and also return it
   end
   def addPageToGlossary(adrObject, adrPageTable=@adrPageTable)
     # this is different from what Frontier does!
     # we maintain an #autoglossary on disk, loaded as :autoglossary hash
-    # but we do not save out! that is the job of whoever calls us to do that eventually
-    linetext = adrPageTable[:title] # skip entityization problem for now
-    path = adrPageTable[:subDirectoryPath] + adrPageTable[:fname]
-    adr = adrObject
-    changed = adrPageTable[:autoglossary][linetext] && (adrPageTable[:autoglossary][linetext][:adr] != adr)
-    puts "#{adr} changed position from #{adrPageTable[:autoglossary][linetext][:adr]}" if changed
-    # ready to store
-    # unlike Frontier, we make two entries (pointing to same object) keyed by title and by simple filename
+    # we do not save out; that is the job of whoever calls us to do that eventually
+    # unlike Frontier, we make *two* entries (pointing to same object) keyed by title and by simple filename
+    # thus, either of these is a legal "id" for refGlossary lookup
+    # we also calculate url if there is a base url in #ftpsite
     h = Hash.new
-    h[:linetext] = linetext
-    h[:path] = path
-    h[:adr] = adr
-    # calculate url if there is a base url in #ftpsite
+    h[:path] = adrPageTable[:subDirectoryPath] + adrPageTable[:fname]
+    h[:adr] = adrObject
+    # linetext is title; might be nil, e.g. this might be a non-renderable (see preflightSite)
+    if (linetext = adrPageTable[:title])
+      # issue warning if page object has changed location
+      changed = adrPageTable[:autoglossary][linetext] && (adrPageTable[:autoglossary][linetext][:adr] != adrObject)
+      puts "#{adr} changed position from #{adrPageTable[:autoglossary][linetext][:adr]}" if changed
+      h[:linetext] = linetext
+    end
+    # url in ftpsite might not exist
     begin
-      url = (File::open(adrPageTable[:ftpsite].to_s) {|io| YAML::load(io)})[:url]
+      url = adrPageTable[:ftpsite][:url]
       url += "/" unless url =~ %r{/$}
       uri = URI::join(url, URI::escape(path.to_s))
       h[:url] = uri.to_s
     rescue
     end
+    # put into autoglossary hash, possibly twice
     adrPageTable[:autoglossary][adrPageTable[:f].simplename.to_s] = h
     adrPageTable[:autoglossary][linetext] = h if linetext
   end
   def processMacros(s, theBinding, adrPageTable=@adrPageTable)
     # process macros; the Ruby equivalent is to use ERB, so we do
-    # we should also be handling autoparagraphs and activeURLs and isoFilter subs and quoted-text glossary subs
-    # but I'm not ready yet
-    # see html.data.processMacrosCallback for more about how this used to work
-    # the real work is done in the BindingMaker class, q.v.
-    # first put adrPageTable where utilities can see it
-    # @adrPageTable = adrPageTable
-    # now do the macros
-    #return ERB.new(s).result(BindingMaker.new(self).getBinding)
-    # b = BindingMaker.new(self)
-    # load all tools into BindingMaker instance as sandbox
-    # adrPageTable["tools"].each { |k,v| b.instance_eval(File.read(v)) }
+    # reference munging like Frontier's is done in the BindingMaker class
     return ERB.new(s).result(theBinding)
   end
   def refGlossary(name, adrPageTable=@adrPageTable)
     # return a complete <a> tag referring to the named target from where we are, or nil
     # Frontier merely substitutes a glossPath at this stage, but I don't see the need for that
-    # as usual I am leaving out a LOT of Frontier's logic here, just to get the base case written
+    # as usual I am leaving out a certain amount of Frontier's logic here
     # also I'm departing from Frontier's logic: we have two hashes to look in:
     # "glossary" is user glossary of name-substitution pairs
     # :autoglossary is our glossary of hashes pointing to pages we have built
-    # must look in both
     # new (non-Frontier) logic: if name contains #, split into name and anchor, search, reassemble
-    name, anchor = name.split("#")
-    if anchor.nil?
-      anchor = ""
-    else
-      anchor = "#" + anchor
-    end
-    g = adrPageTable[:autoglossary] # try autoglossary
+    name, anchor = name.split("#", 2)
+    anchor = anchor ? "#" + anchor : ""
+    # autoglossary
+    g = adrPageTable[:autoglossary]
     if g && g[name] && g[name][:path]
-      path = g[name][:path] # relative pathname to target
-      path = adrPageTable[:siteRootFolder] + path # now it's absolute, matching :f, ready to form link
+      path = adrPageTable[:siteRootFolder] + g[name][:path]
       return %{<a href="#{path.relative_uri_from(adrPageTable[:f])}#{anchor}">} 
     end
-    g = adrPageTable["glossary"] # try user glossary
+    # user glossary
+    g = adrPageTable["glossary"]
     if g && g[name]
       return %{<a href="#{g[name]}#{anchor}">}
     end
+    # report failure
     puts "RefGlossary failed on #{name}, apparently while processing #{adrPageTable[:adrObject]}"
     return nil
   end
   def getOneDirective(directiveName, adrObject)
     # simple-mindedly pull a directive out of a page's contents
     d = Hash.new
-    if adrObject.extname == ".txt"
+    case adrObject.extname
+    when ".txt"
       runDirectives(adrObject, d)
-    elsif adrObject.extname == ".opml"
+    when ".opml"
       runOutlineDirectives(adrObject, d)
     end
     return d[directiveName] # value or nil
   end
   def getTitleAndPath(id, adrPageTable=@adrPageTable)
-    # grab title (linetext) and path from autoglossary
+    # grab title (linetext) and path from autoglossary; useful for macros
     return [nil,nil] unless adrPageTable[:autoglossary] && adrPageTable[:autoglossary][id]
-    return [adrPageTable[:autoglossary][id][:linetext], adrPageTable[:autoglossary][id][:path]]
+    return adrPageTable[:autoglossary][id][:linetext], adrPageTable[:autoglossary][id][:path]
   end
   def getNextPrev(obj, adrPageTable=@adrPageTable)
+    # useful for macros
     # return array of two identfiers, namely the prev and next renderable page at this level
     # ids suitable for use in autoglossary consultation
-    # if there is a #nextprevs, we just use that
+    # if there is a #nextprevs listing ids in order, we just use that
     # otherwise we use the physical file system
     # either or both element of the array can be nil to signify none
     result = [nil, nil]
-=begin
-    npt = obj.dirname + "#nextprevs"
-    if npt.exist?
-      #  not yet written
-      raise "error, nextprevs routine not yet written"
-    else
-      # just use alphabetical order
-      sibs = obj.dirname.children.delete_if do |p|
-        p.basename.to_s =~ /^[#.]/ || p.extname != ".txt"
-      end
-      us = sibs.index(obj)
-      s = ""
-      if us > 0
-        result[0] = sibs[us-1].simplename.to_s
-      end
-      if us < sibs.length - 1
-        result[1] = sibs[us+1].simplename.to_s
-      end
-      return result
-    end
-=end
     sibs = pagesInFolder(obj.dirname)
-    id = obj.simplename.to_s
-    us = sibs.index(id)
+    us = sibs.index(obj.simplename.to_s)
     result[0] = sibs[us-1] if us > 0
     result[1] = sibs[us+1] if us < sibs.length - 1
     return result
   end
   def pagesInFolder(folder, adrPageTable=@adrPageTable)
-    # return array of identifiers of renderable pages in folder
+    # utility, also useful to macros
+    # return array of identifiers of renderables in folder
     # these identifiers are suitable for use in getTitleAndPath and other autoglossary consultation
     # if there is a #nextprevs, the array is ordered as in the nextprevs
     # otherwise we just use alphabetical order (filesystem)
@@ -1005,45 +968,30 @@ class UserLand::Html::PageMaker
     arr = Array.new
     nextprevs = folder + "#nextprevs.txt"
     if (nextprevs.exist?)
-      File.open(nextprevs) do |io|
-        io.each do |id|
-          arr << id.chomp
-        end
-      end
+      arr = File.readlines(nextprevs).map {|line| line.chomp}
     else
       # if not, just use alphabetical order
-      # TODO, need to regularise how we decide if something is a page
-      # we are doing this in different places
       folder.children.each do |p|
         next if p.basename.to_s =~ /^[#.]/
-        arr << p.simplename.to_s if [".txt", ".opml"].include?(p.extname)
+        arr << p.simplename.to_s if renderable?(p)
       end
     end
     return (arr.length > 0 ? arr : nil)
   end
-  def getSubs(obj, adrPageTable=@adrPageTable)
-    # return array of identifiers of renderable pages in the "downfolder" from obj
-    downfolder = obj.dirname + (obj.simplename.to_s + "folder")
-    return nil unless (downfolder.directory?)
-    return pagesInFolder(downfolder)
-  end
   def getImageData(imageSpec, adrPageTable=@adrPageTable)
-    # Frontier has fu for seeking the image, but I will assume an "images" folder for now
+    # find image, get relative path, write out the image, get height and width
+    # Frontier has fu for seeking the image, but I assume a single "images" hash gathered as we build page table
     raise "No 'images' folder found" unless adrPageTable["images"]
-    imagePath = nil
-    adrPageTable["images"].children.each do |im|
-      if im.simplename.to_s == imageSpec
-        imagePath = im; break
-      end
-    end
+    imagePath = adrPageTable["images"][imageSpec]
     raise "Image #{imageSpec} not found" unless imagePath
-    imagesFolder = adrPageTable[:siteRootFolder] + "images" # should be a pref
+    # I also assume single folder at top level (but I leave folder name as a pref)
+    imagesFolder = adrPageTable[:siteRootFolder] + getPref("imageFolderName", adrPageTable)
     # actually write the image; I've always thought this is an inappropriate place to do this...
     # ... and would eventually like to change it
     imagesFolder.mkpath
     imageTarg = imagesFolder + imagePath.basename
     FileUtils.cp(imagePath, imageTarg, :preserve => true) if imageTarg.needs_update_from(imagePath)
-    # determine image dimensions
+    # determine image dimensions, see Pathname mods
     width, height = imageTarg.image_size
     # construct and return image data table
     url = imageTarg.relative_uri_from(adrPageTable[:f])
@@ -1051,7 +999,7 @@ class UserLand::Html::PageMaker
   end
   def getPref(s, adrPageTable=@adrPageTable)
     # look for pref value
-    # first try page table
+    # first try page table; must write like this, we specifically want the nil test since false is a different case
     if !(result = adrPageTable[s]).nil? || !(result = adrPageTable[s.to_s]).nil? || !(result = adrPageTable[s.to_sym]).nil?
       result = true if result == "yes"
       result = false if result == "no"
@@ -1070,6 +1018,8 @@ class UserLand::Html::PageMaker
       "default"
     when "charset"
       "utf-8"
+    when "imagefoldername"
+      "images"
     else
       true
     end

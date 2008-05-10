@@ -34,6 +34,16 @@ module UserLand::Html
   end
 end
 
+class UserLand::Html::PageMaker
+  def getSubs(obj, adrPageTable=@adrPageTable)
+    # return array of identifiers of renderable pages in the "downfolder" from obj
+    # useful structuring a site this way
+    downfolder = obj.dirname + (obj.simplename.to_s + "folder")
+    return nil unless (downfolder.directory?)
+    return pagesInFolder(downfolder)
+  end
+end
+
 module UserLand::User
   def self.glossary
     s = <<END
