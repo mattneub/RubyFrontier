@@ -1,0 +1,9 @@
+<%= pageheader() %>
+<div class="logobar">
+	<%= imageref("rubyFrontierLogo") %>
+	<p>RubyFrontier Documentation</p>
+</div>
+<div class="meat">
+<bodytext>
+</div>
+<%= pagefooter() %>

@@ -1,0 +1,25 @@
+#title "Hierarchy"
+#markdown true
+
+## What the Hierarchy Means
+
+The hierarchy structure of non-directive folders and files has two simultaneous meanings in a RubyFrontier source folder.
+
+<%= imageref("structure") %>
+
+* As I [already said](types), the hierarchy of non-directive folders and files in the source folder will be mirrored into an identical hierarchy in the resulting Web site.
+
+* When a page object is processed, the first thing that happens is that RubyFrontier walks the hierarchy *upwards* from the page object, looking for directives, starting with the folder that contains the page object. Most directives can be located anywhere in the source folder. So, as RubyFrontier walks the hierarchy upwards, it might encounter the same directive more than once (because the directive is present both in a folder and in another folder that contains it).
+
+  Indeed, you can see that this will happen in the screen shot above. When the file `executet.txt` is processed, no directives are found in the folder that contains it (`breakpoifolder`). But as RubyFrontier walks up the hierarchy, a `#nextprevs.txt` directive will be found in the folder containing *that* (`debugfolder`). And than *another* `#nextprevs.txt` directive will be found in the folder containing *that* (`developfolder`). And so on until we reach the top level and encounter all the rest of the directives.
+
+  Now, if RubyFrontier encounters just one copy of a directive as it walks the hierarchy, there's no problem. But you need to understand what happens if RubyFrontier encounters *more* than one copy of a directive. There are actually two different rules for what happens:
+
+  * In most cases, the *first* copy of a directive encountered will be the one that counts. So, for example, in the above screen shot, the only `#nextprevs.txt` that will apply when `executet.txt` is rendered is the one in `debugfolder`; copies of `#nextprevs.txt` higher up the hierarchy will be ignored. In other words, the directive that counts is the one *closest* to the page object being rendered. This means that you can use the folder hierarchy to give different renderable page objects different behavior. Thinking about it, you can see that all page objects in any folder at any depth share all the directives at the top level, *unless* a directive is overshadowed by a same-named directive at a lower level closer to a particular page object. For instance, in the screen shot above, all page objects share certain behavior dictated by the directives at top level, but some page objects at lower levels have a `#nextprevs.txt` directive that overshadows the `#nextprevs.txt` directive at higher levels. In general, you can use a folder and directives to give a set of Web pages a similar appearance, as opposed to other pages outside that folder.
+
+  * In certain special cases, a directive is "folded" into same-named directives encountered higher up. This means that the directive's *contents* override the *contents* of same-named higher directives, but the directive *itself* does not override. To see what I mean, let's consider two opposing examples.
+
+    First, consider the standard case, without folding. For instance, you seen the `#stylesheets` folder at top level? If there were a `#stylesheets` folder at the bottom, inside `breakpoifolder`, then when `executet.txt` is processed, the `#stylesheets` folder at top level will be completely ignored. There will be just one `#stylesheets` directive, and it will be the one found inside `breakpoifolder`.
+
+    So how does the folding case differ? Well, for example, an `#images` folder has folding behavior. Suppose there were an `#images` folder inside `breakpoifolder`. Then any image files *inside* it would be incorporated into the `images` directive, but higher-level `#images` folders, like the one at top level, will *not* be ignored: any image files inside *them* will be incorporated into the `images` directive too. That's "folding". However there is still overshadowing, in this sense: if the `#images` folder inside `breakpoifolder` contains an image file called `picture.png` and the `#images` folder at top level *also* contains an image file called `picture.png`, the second one (at top level) will be ignored.
+

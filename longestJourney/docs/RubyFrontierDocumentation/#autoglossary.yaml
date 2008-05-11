@@ -1,0 +1,29 @@
+--- 
+structure: &id004 
+  :path: !ruby/object:Pathname 
+    path: howrf/structure.html
+  :linetext: Structure
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/structure.txt
+My Cool Web Page: &id001 
+  :path: !ruby/object:Pathname 
+    path: default.html
+  :linetext: My Cool Web Page
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/default.txt
+default: *id001
+Types: &id003 
+  :path: !ruby/object:Pathname 
+    path: howrf/types.html
+  :linetext: Types
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/types.txt
+Starting: &id002 
+  :path: !ruby/object:Pathname 
+    path: howrf/start.html
+  :linetext: Starting
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/start.txt
+start: *id002
+types: *id003
+Structure: *id004

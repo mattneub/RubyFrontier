@@ -1,0 +1,15 @@
+#title "My Cool Web Page"
+#markdown true
+#stylesheetnormal true
+  
+## What Is RubyFrontier?
+
+Explain what it is.
+
+## Why RubyFrontier?
+
+That's a big subject, so I deal with it on a [different page](whyrf).
+
+## How Do I Use RubyFrontier?
+
+Ah. I thought you'd never ask. Let's [get started](start).

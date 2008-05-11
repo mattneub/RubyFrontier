@@ -883,7 +883,7 @@ class UserLand::Html::PageMaker
     if (linetext = adrPageTable[:title])
       # issue warning if page object has changed location
       changed = adrPageTable[:autoglossary][linetext] && (adrPageTable[:autoglossary][linetext][:adr] != adrObject)
-      puts "#{adr} changed position from #{adrPageTable[:autoglossary][linetext][:adr]}" if changed
+      puts "#{adrObject} changed position from #{adrPageTable[:autoglossary][linetext][:adr]}" if changed
       h[:linetext] = linetext
     end
     # url in ftpsite might not exist

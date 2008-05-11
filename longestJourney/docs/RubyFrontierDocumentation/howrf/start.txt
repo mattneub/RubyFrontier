@@ -1,0 +1,34 @@
+#title "Starting"
+#markdown true
+
+## Starting
+
+You're going to make a Web site. In particular, you're going to make the **source folder** for a Web site; RubyFrontier will generate the Web site from this. The easiest way to start is to begin with a copy of an existing source folder. RubyFrontier includes one.
+
+Here's what I suggest you do.
+
+1. Create a new folder somewhere. Let's call it `wrapper`.
+
+2. In TextMate, choose RubyFrontier > New Site. You'll be asked, in a dialog, for the location and name of a folder to create. Navigate *inside* `wrapper` and type a name for the source folder. Let's call it `mySourceFolder`. Click "Save."
+
+  <%= imageref("newSiteDialog") %>
+
+3. The new folder source folder will be created inside `wrapper`...
+
+  <%= imageref("sourceFolderCreated") %>
+
+4. ...and a TextMate project window will open, displaying the source folder.
+
+  <%= imageref("sourceFolderProject") %>
+
+5. Okay, so far this is great. You've got a new source folder, and you've got a TextMate project for navigating and working with it. But there's just one problem. You need to *save* this project. And in particular, you really should save it at the top level of `wrapper`. So do that right now! Let's call the project `mySourceFolder` as well (that's its name by default).
+
+  <%= imageref("savingSourceFolderProject") %>
+
+The resulting hierarchy in `wrapper` should look like this:
+
+<%= imageref("wrapperReady") %>
+
+From now on, when you want to work on your Web site, just open this TextMate project and work from there.
+
+

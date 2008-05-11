@@ -1,0 +1,21 @@
+body {
+	font: 13px "Lucida Grande", Arial, Verdana;
+	margin: 0px;
+}
+.logobar {
+	background: #e1e4ec;
+	height: 110px;
+	padding: 5px;
+}
+.logobar img {
+	width: 100px;
+	height: auto;
+	float: left;
+}
+.logobar p {
+	font-size: 50px;
+	text-align: right;
+}
+.meat {
+	margin: 10px;
+}
