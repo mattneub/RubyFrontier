@@ -71,6 +71,8 @@ MacTech
 http://www.mactech.com
 XPlain
 http://www.xplain.com
+Ruby
+http://www.ruby-lang.org/en/
 END
     h = Hash.new
     s.split("\n").each_slice(2) {|a| h[a[0]] = a[1]}

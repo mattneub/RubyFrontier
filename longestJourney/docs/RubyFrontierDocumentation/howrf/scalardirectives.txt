@@ -1,0 +1,89 @@
+#title "Scalar Directives"
+
+A *scalar directive* is a directive whose value is a "scalar", a simple datatype such as a string or a number — as opposed to a [directive object](directiveobjects), which is a file or a folder in your source folder.
+
+You can use any scalar directives for any purpose you like; but RubyFrontier also expects and hopes to find certain scalar directives defined for each page object that it renders, and you should be a little careful not to misuse these.
+
+### How Scalar Directives Are Supplied
+
+Your source folder supplies scalar directives to RubyFrontier in three places:
+
+* **In the page object**. As a page object is rendered, and RubyFrontier walks up the hierarchy looking for directives, it looks *in* the page object itself. A directive in the page object must be one of the first lines of the page object, and it must begin with "#". RubyFrontier looks through the lines of the page object file, and as soon as it encounters a line that does *not* begin with "#", it breaks the page object file into two parts: everything that precedes that point is a series of scalar directives, everything after that point is the content of the page.
+
+  Following the "#", with no space, is the name of the directive. This name will be translated into a symbol. So, for example, the word "#title" will be taken to define a `:title` directive. Then there is a space. Then everything on the rest of the line will be evaluated (using `eval`), and the result of this evaluation will be the value of the directive.
+
+  So, for example, the page object from which this Web page is generated starts like this:
+
+        #title "Scalar Directives"
+
+  RubyFrontier sees this and creates a `:title` directive whose value is the string `"Scalar Directives"`.
+
+* **In the template**. The mechanism here is just like the mechanism for the page object: as RubyFrontier pours the page object into the template, it splits the template into the initial directives and everything else, and creates the directives. I don't actually use this mechanism myself, but it's part of Frontier so RubyFrontier does it.
+
+* **In a `#prefs.yaml` file**. As a page object is rendered, and RubyFrontier walks up the hierarchy looking for directives, it looks for files call `#prefs.yaml`. If it encounters one, it loads it, expecting it to be a hash, and adds the elements of that hash into the list of directives (following the usual override rules: a directive defined in the page object overrides any same-named directives found in a `#prefs.yaml` file, and a directive defined in a `#prefs.yaml` file overrides a same-named directive found in a `#prefs.yaml` file higher up the hierarchy). Keys in this hash are expected to be symbols.
+
+  So, for example, the source folder from which this Web page is rendered contains a `#prefs.yaml` file that looks like this:
+
+        --- 
+        :bgcolor: FFFFEE
+        :stylesheetnormal: true
+        :markdown: true
+
+  These directives specify that by default a page should have a background color of `#FFFFEE`, should link to the stylesheet called `normal.css`, and should be rendered through markdown.
+
+### List of Known Scalar Directives
+
+The following scalar directives are "known" to RubyFrontier: they are meaningful to RubyFrontier out of the box, and will be obeyed if defined.
+
+#### Pageheader
+
+The pageheader is all the HTML up to and including the <code>&lt;body></code> tag. It can be supplied in any of three different ways; one way is as the value of a **:pageheader** directive. This directive's value can be the actual content of the pageheader (a string) or a Pathname for a text file to read and use as the content of the pageheader.
+
+#### Meta tags
+
+The standard way of generating the pageheader involves inserting certain `<meta>` tags into the <code>&lt;head></code> region of the document.
+
+* **:includeMetaCharset**. A boolean (the default is `true`): should a `<meta>` tag of the following form be inserted?
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+* **:charset**. The charset value for the above `<meta>` tag. The default is `"utf-8"`.
+* **:includeMetaGenerator**. A boolean (the default is `true`): should the following `<meta>` tag be inserted?
+
+        <meta name="generator" content="RubyFrontier" />
+
+#### Title
+
+* **:title**. The value for the `<title>` tag. Usually defined in the page object, since it is unusual for two pages to have the same title. Also, the `:title` value is usable as an id for linking from one page to another within the site, so it's a very good idea for every `:title` to be unique, and if two pages have the same `:title`, you'll get a warning. It is an error for a page to have no `:title` (i.e. you *must* define this directive).
+
+#### Body tag attributes
+
+Body tag attributes are mostly superseded by CSS in good HTML practice, but they do still work.
+
+* **:background**. The name (with no extension) of a file in an `#images` folder.
+* **:bgcolor, :text, :link, :alink, :vlink**. A color string; if hex, you may omit the initial "#".
+* **:topmargin, :leftmargin, :marginheight, :marginwidth**.
+* **:onload, :onunload**.
+
+#### File name rules
+
+If a page object file is a renderable, RubyFrontier uses the page object file's name to derive the name for the Web page file that will be created. In doing this, it consults certain directives.
+
+* **:fileextension**. The suffix to be added to the name. This will replace the current suffix. The default is `".html"`.
+* **:maxFileNameLength**. The maximum number of characters that the name may contain, including the suffix. The default is 31. This limit is also applied to stylesheet and javascript file names.
+
+#### Outline objects
+
+* **:renderoutlinewith**. The name of the outline renderer to be used if the page object is an outline (`.opml`).
+
+#### Image files
+
+* **:imageFolderName**. The name of the folder at the top level of the Web site folder into which all image files will be written. The default is `"images"`.
+
+#### Template
+
+* **:template**. The name of the template into which the page object should be poured. If not defined, the file `#template.txt` will be used. If defined, the file in question will be sought by appending ".txt" and looking in the source folder's `#templates` folder and in the User Templates folder.
+
+#### Macro processing
+
+* **:processmacros**. A boolean (the default is `true`): should macro (ERB) expressions be processed? It would be a very rare thing to turn this off.

@@ -1,5 +1,4 @@
 #title "Hierarchy"
-#markdown true
 
 ## What the Hierarchy Means
 

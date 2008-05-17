@@ -1,5 +1,4 @@
 #title "Types"
-#markdown true
 
 ## The Types of Thing in a RubyFrontier Source Folder
 
@@ -9,7 +8,7 @@ RubyFrontier expects to encounter certain items in certain places within a sourc
 
 Everything in a RubyFrontier source folder is one of the following:
 
-* A **directive**. A directive is a file or folder whose name begins with `#` (number-sign). Directives are used to instruct RubyFrontier about certain settings, and are also just a convenient way for the source folder to contain files and folders that are not copied into the Web site.
+* A **directive object**. A directive object is a file or folder whose name begins with `#` (number-sign). Directive objects are used to supply RubyFrontier with certain needed resources, and to instruct RubyFrontier about certain settings, and are also just a convenient way for the source folder to contain files and folders that are not copied into the Web site.
 
 * A **page object**. A page object is a file that is not a directive and is not inside a directive folder. RubyFrontier will turn every page object into a file in the Web site. There are two main ways this can happen:
 

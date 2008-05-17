@@ -3,7 +3,7 @@
 	<%= imageref("rubyFrontierLogo") %>
 	<p>RubyFrontier Documentation</p>
 </div>
-<div class="meat">
+<div class="heart">
 <bodytext>
 </div>
 <%= pagefooter() %>

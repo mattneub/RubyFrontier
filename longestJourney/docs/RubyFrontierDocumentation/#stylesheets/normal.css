@@ -6,6 +6,7 @@ body {
 	background: #e1e4ec;
 	height: 110px;
 	padding: 5px;
+	position: relative;
 }
 .logobar img {
 	width: 100px;
@@ -13,9 +14,15 @@ body {
 	float: left;
 }
 .logobar p {
+	margin: 0px;
+	padding: 0px;
 	font-size: 50px;
 	text-align: right;
+	position: absolute;
+	right:0px;
+	bottom:0px;
+	width: 80%;
 }
-.meat {
+.heart {
 	margin: 10px;
 }

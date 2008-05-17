@@ -1,4 +1,6 @@
 start
 types
 hierarchy
-directive
+directiveobjects
+scalardirectives
+pagetable

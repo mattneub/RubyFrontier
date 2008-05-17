@@ -1,0 +1,23 @@
+#title "The Page Table"
+
+When RubyFrontier starts to render a page object, it walks the hierarchy gathering directives. When it finishes that process, all the directives are gathered into a hash called the **page table**. This hash is tremendously important; the whole rendering process revolves around it.
+
+In addition to the [directive objects](directiveobjects) and [scalar directives](scalardirectives) already described, RubyFrontier works out and stores some other pieces of information in the page table. It is well to be aware of these, since they can be useful to your scripts, and also because you should not accidentally tromp on them.
+
+* **:adrSiteRootTable**. Pathname of the source folder (discovered by looking for `#ftpSite.yaml`).
+
+* **:adrObject**. Pathname of the page object being rendered.
+
+* **:subDirectoryPath**: Relative path from the :adrSiteRootTable to the folder containing :adrObject.
+
+* **:siteRootFolder**. Pathname of the Web site folder into which rendering will be performed. It is derived from the value of the `:folder` key in the hash represented by `#ftpSite.yaml`. You *must* set this value in order for RubyFrontier to know where to save your Web site!
+
+* **:fname**. Name of the Web page file to be created.
+
+* **:f**. Pathname of the Web page file to be created; derived by applying :subDirectoryPath to the :siteRootFolder and adding :fname.
+
+* **:bodytext**. Temporary holding tank for the contents of the page object, stripped of any internal directives, *before* insertion into the template. In general it should be left untouched, but your pageFilter, if implemented, is *expected* to modify it.
+
+* **:renderedtext**. Ultimate text to be written to `:f`. In general it should be left untouched, but your finalFilter, if implemented, is *expected* to modify it.
+
+* **:autoglossary**. The contents of the `#autoglossary.yaml` file, loaded as a hash. Used when forming links between pages within the site.

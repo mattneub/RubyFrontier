@@ -1,2 +1,50 @@
 #title "Why RubyFrontier?"
 
+## Why RubyFrontier?
+
+There are plenty of Web site frameworks and generators out there, from the massive [Dreamweaver](http://www.adobe.com/products/dreamweaver/) or [FrontPage](http://office.microsoft.com/en-us/frontpage/default.aspx) down to alternative Ruby-based systems such as [Webby](http://webby.rubyforge.org/), so who needs another one?
+
+I do. RubyFrontier was written for *me*. It does what I want it to do. I had a particular problem and RubyFrontier solves it.
+
+My problem was this. It all goes back (harp music here) to 1996 when I started using [UserLand Frontier](Frontier)'s ability to make Web sites. Frontier was way ahead of its time. I liked it so much that I wrote a tutorial about it, and eventually a [book](http://pages.sbcglobal.net/mattneub/frontierDef/ch00.html) about Frontier that was published by O'Reilly (here's the [chapter](http://pages.sbcglobal.net/mattneub/frontierDef/ch41.html) about the Web site framework). More about all that [here](http://www.tidbits.com/matt/defaultfrontier.html).
+
+Flash forward to something more like the present. Frontier has gone from free to insanely expensive. But then an [open-source version](http://frontierkernel.org/) starts up. Hope springs eternal! But the open-source version isn't going anywhere - on Leopard, it barfs, it crashes, it can't do Apple events. Hope falls on its face. Also, I've made many tweaks and improvements in my copy of the Frontier Web-site framework code, and every time I update Frontier I run the risk of these being overwritten if I'm not careful; it's become a maintenance nightmare.
+
+Okay, hold that thought. Now, at the same time I've written a book about [AppleScript](http://www.tidbits.com/matt/default.html#applescriptthings). AppleScript is useful for sending Apple events to scriptable Mac applications, but it's not a very good language; in fact, Frontier remains my favorite way to do that. But that's not working on Leopard, remember? Meanwhile, Hamish Sanderson produces [rb-appscript](http://appscript.sourceforge.net/rb-appscript/index.html), which means that the *other* main thing I use Frontier for, namely as an alternative to AppleScript for sending Apple events, no longer requires Frontier.
+
+So since Ruby has solved that problem, why shouldn't Ruby solve the other problem? Perhaps it would be possible to clone Frontier's Web-site-making functionality, using Ruby.
+
+## Why a Clone?
+
+But why a clone? Why not just adopt some existing Web site framework? Well, there's the problem: I've got numerous Web sites and hundreds of Web pages that I already maintain through Frontier. I don't want to start over on these. I want to use the material I've already got, with a minimum of fuss, effort, or change. That's why I want a Ruby utility that effectively imitates what Frontier already does.
+
+## Thinking About the Problem
+
+Now, at first this entire prospect seemed an improbable one. Frontier, after all, is much more than a language. It's a kind of hierarchical database. All the materials from which a Web site is generated, including scripts and texts, are kept inside that database. Objects in the database are referred to as variables through a sort of namespace notation. Furthermore, the database makes use of "tables" whose entries are "scalar" values such as strings and numbers.
+
+True, but then I got to thinking: For Web site generation, the database isn't really necessary. Scripts are just scripts; it doesn't matter how they are stored, so they can just as well be methods in one or more Ruby script files. Texts can be represented by text files, and the hierarchical arrangement of texts and tables in the Frontier database can be represented by the hierarchical arrangement of files and folders on disk. This, after all, is how most Web site frameworks work these days (e.g. Rails); and there was once even a variant of the Frontier Web site framework that worked this way (the so-called "BBSite suite"). In the distant past, repeated reading from files would have been considered "thrashing the disk", but modern virtual memory and disk usage patterns have outmoded such concerns. Furthermore, thanks to TextMate, viewing and navigating a big hierarchy of files and folders was just as easy as navigating Frontier's object hierarchy.
+
+And what about Frontier's "tables" of "scalars"? Well, Ruby has internal "tables" (hashes), they are a lot more efficient than Frontier's, and they have an on-disk human-readable representation — [YAML](http://yaml4r.sourceforge.net/cookbook/).
+
+Still I hesitated, worried about one final piece of the puzzle — outlines. [Outlining](http://www.outliners.com/) is one of Frontier's great strengths, and not something I wanted to lose. But then, once more, I got to thinking: Where in the Web site framework are outlines *really* needed? The outline representation of scripts is taken care of by TextMate's code folding feature. The outline representation of the hierarchy of file and folders on disk is handled by the TextMate project drawer. The one place where outlines are important is this: in Frontier, an object to be turned into a Web page can *be* an outline, where a "renderer" transforms the outline into HTML. After some hesitation over this issue, I decided that I could use OmniOutliner to open and save outlines as OPML, which Ruby could then parse. This introduces an inconvenience in the writing/editing process: if a Web page is constructed as an outline, it must be edited using OmniOutliner (not TextMate directly). This, however, seemed insufficiently inconvenient to bar usability.
+
+## A Voyage of Discovery
+
+Having finished the thought process, I started coding. Remember the goal here: to clone Frontier's Web-site-making functionality in Ruby. So I began walking through Frontier's code (most of which, fortunately, is open to view as UserTalk source), following the process by which a source object is transformed into a Web page, turning each Frontier script into a Ruby method. It took several weeks before I achieve the satisfaction of being able to render a single source object, complete, to a Web page. After that, things started to pick up steam.
+
+Now, the process is effectively finished, in first-round anyway. All my Frontier-based Web sites have been migrated out of Frontier; they all live in TextMate projects and are generated with RubyFrontier.
+
+Along the way, I got a lot of surprises. In particular, again and again I was brought up sharply to a realization of how bad UserTalk is. Now, don't get me wrong: for a long time, UserTalk was one of my favorite languages, and for what it did, especially back around 1990 or so, it was very slick; indeed, one of the things I like about Ruby is that it has some modes of expression that remind me of UserTalk. But things that were difficult or wordy in UserTalk turned out to be easy, compact, and simple in Ruby. For example:
+
+* Ruby has vastly better string handling (including regular expressions, of course).
+
+* Ruby hashes are more efficient than Frontier tables.
+
+* Ruby is object-oriented. It's difficult to express all the advantages this brings with it over Frontier's problems of addressing, reference-passing, and namespaces. 
+
+* Ruby is heavily stocked with extra third-party libraries, so many problems are already solved and require just a line or two of code. For instance, to derive the relative path or relative URL from one Web page to another is easy in Ruby; the corresponding code in Frontier is hacky and terrifying.
+
+Also, it turned out that there were a lot of inefficiencies in the Frontier Web-page building process. This is partly because of the language and partly because of the way the Frontier Web framework grew by accretion over time. Thus I was able not only to do the same thing with a lot less code, I was able to do it a lot more efficiently and clearly. As a result, RubyFrontier not only does what Frontier did, it does it better.
+
+Of course, I've also cheated by leaving out, for now, all the Frontier functionality I wasn't actually using. But that's only "for now". Now that I have a clear, maintainable, well-structured Frontier clone in Ruby, I can always add missing functionality later.
+

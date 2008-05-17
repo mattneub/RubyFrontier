@@ -4,6 +4,22 @@ require "erb"
 require "pp"
 require "uri"
 
+class Hash # implement pseudo-case-insensitive fetching
+  # if your key is lowercase (symbol or string), then incorrectly cased fetch requests will find it
+  alias :"old_fetch" :"[]"
+  def [](k)
+    return old_fetch(k) if key?(k)
+    return old_fetch(k) unless [Symbol, String].include?(k.class)
+    old_fetch(k.downcase)
+  end
+end
+
+class Symbol # convenience methods
+  def downcase
+    self.to_s.downcase.to_sym
+  end
+end
+
 class String # convenience methods
   def dropNonAlphas
     return self.gsub(/[^a-zA-Z0-9_]/, "")
@@ -256,7 +272,7 @@ module UserLand::Html
         if glossary[k] && v != glossary[k]
           puts "----\nNon-unique autoglossary entry detected for #{k}\n#{v.inspect} vs.\n#{glossary[k].inspect}\nprocessing #{p}"
         end
-        glossary[k] = v
+        glossary[k.downcase] = v
       end
     end
     pm.saveOutAutoglossary(glossary) # save out resulting autoglossary
@@ -276,7 +292,7 @@ module UserLand::Html
       end
     end
     ftpsiteHash = YAML.load_file(ftpsite)
-    adrStorage[:adrFtpSite] = ftpsite
+    adrStorage[:adrftpsite] = ftpsite
     adrStorage[:method] = ftpsiteHash[:method]
     return adrStorage
   end
@@ -450,7 +466,6 @@ module UserLand::Html::StandardMacros
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<biteme>
 <%= metatags() %>
 <%= linkstylesheets() %>
 <%= linkjavascripts() %>
@@ -731,20 +746,20 @@ class UserLand::Html::PageMaker
     end
     folder = getSiteFolder() # sets adrPageTable[:siteRootFolder] and returns it
     relpath = (adrObject.relative_path_from(adrPageTable[:adrSiteRootTable])).dirname
-    adrPageTable[:subDirectoryPath] = relpath
+    adrPageTable[:subdirectorypath] = relpath
     adrPageTable[:f] = folder + relpath + adrPageTable[:fname]
   
     # insert user glossary
     if UserLand::User.respond_to?(:glossary)
       g = adrPageTable["glossary"]
       UserLand::User.glossary().each do |k,v|
-        g[k] = v unless g[k]
+        g[k.downcase] = v unless g[k]
       end
     end
   end
   def buildPageTable(adrObject, adrPageTable=@adrPageTable)
     # record what object is being rendered
-    adrPageTable[:adrObject] = adrObject
+    adrPageTable[:adrobject] = adrObject
     
     # init hashes to gather stuff into as we walk up the hierarchy
     adrPageTable["tools"] = Hash.new
@@ -766,7 +781,7 @@ class UserLand::Html::PageMaker
             case f.simplename.to_s.downcase
             when "#tools" # gather tools into tools hash; new feature (non-Frontier), .txt files go into snippets hash
               (dir + f).each_entry do |ff|
-                unless /^\./ =~ (tool_simplename = ff.simplename.to_s)
+                unless /^\./ =~ (tool_simplename = ff.simplename.to_s.downcase)
                   case ff.extname
                   when ".rb"
                     adrPageTable["tools"][tool_simplename] ||= dir + f + ff
@@ -777,13 +792,13 @@ class UserLand::Html::PageMaker
               end
             when "#images" # gather references to images into images hash, similar to tools
               (dir + f).each_entry do |ff|
-                unless /^\./ =~ (im_simplename = ff.simplename.to_s)
+                unless /^\./ =~ (im_simplename = ff.simplename.to_s.downcase)
                   adrPageTable["images"][im_simplename] ||= dir + f + ff
                 end
               end
             when "#prefs" # flatten prefs out into top-level entries in adrPageTable
               prefsHash = YAML.load_file(dir + f)
-              prefsHash.each_key {|key| adrPageTable[key] ||= prefsHash[key]}
+              prefsHash.each_key {|key| adrPageTable[key.downcase] ||= prefsHash[key]}
             when "#glossary" # gather glossary entries into glossary hash: NB these are *user* glossary entries
               # (different from Frontier: automatically generated glossary entries for linking live in #autoglossary)
               glossHash = YAML.load_file(dir + f)
@@ -791,7 +806,7 @@ class UserLand::Html::PageMaker
             when "#ftpsite"
               found_ftpsite = true
               adrPageTable[:ftpsite] ||= YAML.load_file(dir + f)
-              adrPageTable[:adrSiteRootTable] ||= dir
+              adrPageTable[:adrsiteroottable] ||= dir
               #adrPageTable[:subDirectoryPath] ||= (adrObject.relative_path_from(dir)).dirname
             else
               adrPageTable[f.simplename.to_s[1..-1]] ||= (dir + f) # pathname
@@ -848,7 +863,7 @@ class UserLand::Html::PageMaker
   end
   def runDirective(linetext, adrPageTable=@adrObject)
     k,v = linetext.split(" ",2)
-    adrPageTable[k.to_sym] = eval(v.chomp) 
+    adrPageTable[k.downcase.to_sym] = eval(v.chomp) 
   rescue SyntaxError
     raise "Syntax error: Failed to evaluate directive #{v.chomp}"
   end
@@ -867,7 +882,7 @@ class UserLand::Html::PageMaker
     folder = Pathname.new(adrPageTable[:ftpsite][:folder]).expand_path
     # ensure whole containing path exists; if not, use temp folder
     folder = Pathname.new(`mktemp -d /tmp/website.XXXXXX`) unless folder.dirname.exist?
-    return (adrPageTable[:siteRootFolder] = folder) # set in adrPageTable and also return it
+    return (adrPageTable[:siterootfolder] = folder) # set in adrPageTable and also return it
   end
   def addPageToGlossary(adrObject, adrPageTable=@adrPageTable)
     # this is different from what Frontier does!
@@ -895,8 +910,8 @@ class UserLand::Html::PageMaker
     rescue
     end
     # put into autoglossary hash, possibly twice
-    adrPageTable[:autoglossary][adrPageTable[:f].simplename.to_s] = h
-    adrPageTable[:autoglossary][linetext] = h if linetext
+    adrPageTable[:autoglossary][adrPageTable[:f].simplename.to_s.downcase] = h
+    adrPageTable[:autoglossary][linetext.downcase] = h if linetext
   end
   def processMacros(s, theBinding, adrPageTable=@adrPageTable)
     # process macros; the Ruby equivalent is to use ERB, so we do

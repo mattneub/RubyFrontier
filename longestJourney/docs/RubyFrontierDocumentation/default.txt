@@ -1,10 +1,16 @@
-#title "My Cool Web Page"
-#markdown true
-#stylesheetnormal true
+#title "RubyFrontier Documentation"
   
 ## What Is RubyFrontier?
 
-Explain what it is.
+It's a way of maintaining and generating Web sites. 
+
+It imitates [UserLand Frontier](Frontier), but it's written in [Ruby](Ruby).
+
+It presently uses [TextMate](http://macromates.com/) (a superb writing / programming tool, and very nimble when dealing with a big hierarchy of files). In a sense that means RubyFrontier is Mac-only, though there isn't any *a priori* reason for this (since Ruby is platform-agnostic).
+
+You might like to watch this [screencast](http://www.apeth.com/whatisrubyfrontier.mov) showing RubyFrontier in action.
+
+More description of what RubyFrontier is [here](what).
 
 ## Why RubyFrontier?
 
