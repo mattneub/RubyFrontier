@@ -35,6 +35,8 @@ Your source folder supplies scalar directives to RubyFrontier in three places:
 
 The following scalar directives are "known" to RubyFrontier: they are meaningful to RubyFrontier out of the box, and will be obeyed if defined.
 
+> NOTE on capitalization of known scalar directive names: Frontier's UserTalk is case-insensitive, but Ruby is not. Accordingly, I have had to pick a capitalization rule. The minimal simplest convention is all-lowercase, and this requires the least effort in migrating from Frontier (conversion to lowercase is a built-in TextMate command).
+
 #### Pageheader
 
 The pageheader is all the HTML up to and including the <code>&lt;body></code> tag. It can be supplied in any of three different ways; one way is as the value of a **:pageheader** directive. This directive's value can be the actual content of the pageheader (a string) or a Pathname for a text file to read and use as the content of the pageheader.
@@ -43,12 +45,12 @@ The pageheader is all the HTML up to and including the <code>&lt;body></code> ta
 
 The standard way of generating the pageheader involves inserting certain `<meta>` tags into the <code>&lt;head></code> region of the document.
 
-* **:includeMetaCharset**. A boolean (the default is `true`): should a `<meta>` tag of the following form be inserted?
+* **:includemetacharset**. A boolean (the default is `true`): should a `<meta>` tag of the following form be inserted?
 
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
 * **:charset**. The charset value for the above `<meta>` tag. The default is `"utf-8"`.
-* **:includeMetaGenerator**. A boolean (the default is `true`): should the following `<meta>` tag be inserted?
+* **:includemetagenerator**. A boolean (the default is `true`): should the following `<meta>` tag be inserted?
 
         <meta name="generator" content="RubyFrontier" />
 
@@ -70,7 +72,9 @@ Body tag attributes are mostly superseded by CSS in good HTML practice, but they
 If a page object file is a renderable, RubyFrontier uses the page object file's name to derive the name for the Web page file that will be created. In doing this, it consults certain directives.
 
 * **:fileextension**. The suffix to be added to the name. This will replace the current suffix. The default is `".html"`.
-* **:maxFileNameLength**. The maximum number of characters that the name may contain, including the suffix. The default is 31. This limit is also applied to stylesheet and javascript file names.
+* **:maxfilenamelength**. The maximum number of characters that the name may contain, including the suffix. The default is 31. This limit is also applied to stylesheet and javascript file names.
+* **:dropnonalphas**. A boolean (default `true`): Whether characters other than A through Z, 0 through 9, and underscore should be dropped from the name.
+* **:lowercasefilenames**. A boolean (default `true`): Whether the name should be downcased.
 
 #### Outline objects
 
@@ -78,7 +82,7 @@ If a page object file is a renderable, RubyFrontier uses the page object file's 
 
 #### Image files
 
-* **:imageFolderName**. The name of the folder at the top level of the Web site folder into which all image files will be written. The default is `"images"`.
+* **:imagefoldername**. The name of the folder at the top level of the Web site folder into which all image files will be written. The default is `"images"`.
 
 #### Template
 

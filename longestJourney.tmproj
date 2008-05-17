@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>longestJourney/docs/RubyFrontierDocumentation/whyrf/whyrf.txt</string>
+	<string>longestJourney/docs/RubyFrontierDocumentation/howrf/howsapage.txt</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -49,6 +49,34 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#filters/finalFilter.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#filters/pageFilter.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>longestJourney/docs/RubyFrontierDocumentation/#ftpSite.yaml</key>
 		<dict>
 			<key>caret</key>
@@ -63,12 +91,26 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/#prefs.yaml</key>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#glossary.yaml</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>23</integer>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#template.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>4</integer>
 				<key>line</key>
 				<integer>2</integer>
 			</dict>
@@ -77,47 +119,103 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/default.txt</key>
+		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/#nextprevs.txt</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>9</integer>
 				<key>line</key>
-				<integer>2</integer>
+				<integer>6</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/whatrf/what.txt</key>
+		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/directiveobjects.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>585</integer>
+				<key>line</key>
+				<integer>24</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>221</integer>
+			<key>firstVisibleLine</key>
+			<integer>24</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/hierarchy.txt</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>23</integer>
+				<integer>1</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
-			<integer>69</integer>
+			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>7</integer>
+			<integer>11</integer>
 		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/whyrf/whyrf.txt</key>
+		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/howsapage.txt</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>299</integer>
+				<integer>593</integer>
 				<key>line</key>
-				<integer>49</integer>
+				<integer>18</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
-			<integer>723</integer>
+			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>29</integer>
+			<integer>1</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/pagetable.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>286</integer>
+				<key>line</key>
+				<integer>32</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>14</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/scalardirectives.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>92</integer>
+				<key>line</key>
+				<integer>76</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>61</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/types.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>1</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>longestJourney/opml.rb</key>
 		<dict>
@@ -136,15 +234,23 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>longestJourney/docs/RubyFrontierDocumentation/default.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/#prefs.yaml</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/whatrf/what.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/whyrf/whyrf.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/scalardirectives.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/#nextprevs.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/howsapage.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#glossary.yaml</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#filters/finalFilter.rb</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#filters/pageFilter.rb</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#autoglossary.yaml</string>
 		<string>longestJourney/docs/RubyFrontierDocumentation/#ftpSite.yaml</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/pagetable.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/types.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/hierarchy.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/directiveobjects.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#template.txt</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{442, 157}, {870, 769}}</string>
+	<string>{{788, 222}, {870, 769}}</string>
 </dict>
 </plist>

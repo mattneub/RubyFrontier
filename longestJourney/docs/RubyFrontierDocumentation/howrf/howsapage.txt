@@ -1,0 +1,19 @@
+#title "How a Page Object Gets Rendered"
+
+To get a sense of your options and techniques in RubyFrontier it helps to know the page-rendering sequence. Here are the steps by which a page object is rendered.
+
+So, you start with some renderable page object and choose RubyFrontier > Publish Page. Here's what happens.
+
+* Starting with the folder containing the page object, we *walk up the folder hierarchy gathering [directive objects](directiveobjects)*. Override rules are obeyed: a directive located closer to the page object takes priority over the same directive located further up the hierarchy. Contents of any `#tools` folders and `#images` folders are "folded"; contents of any `#prefs.yaml` and `#glossary.yaml` hash files are also "folded". 
+
+  When we find the `#ftpsite.yaml` file, we stop; we have reached the top of the source folder, and `:adrsiteroottable` (the top of the source folder) is now known. Obviously, we also know `:adrobject` (the pathname of the page object we are to render). We have now constructed most (but not all) of the [page table](pagetable).
+
+* If we found a `#filters` folder and there is a `firstFilter.rb` file in it, we call that file's top-level *firstFilter* method with one parameter — the [page table](pagetable). I don't use this feature in any of my sites. The page object has not yet been read from disk, so I imagine you might use this moment to manipulate the directive contents of the page table in some tricky way. (For example, you could set the `:siterootfolder` dynamically if you didn't want to use the static `:folder` entry of `#ftpsite.yaml`.)
+
+* We now read the page object file and extract any [scalar directives](scalardirectives) if it is a `.txt` file or an `.opml` file. These scalar directives must be located, one per line, at the start of the file, in the form:
+
+        #directivename "some value"
+
+  where "#" is the first character on the line, and everything after the name is a valid Ruby expression. (The value is evaluated using simple `eval`, but I can imagine that in the future, RubyFrontier might do something more sophisticated here, such as `instance_eval` within the PageMaker object that's rendering the page.) Scalar directive from within the page object override (replace) same-named directives already stored in the page table.
+
+  The remainder of the page object file (everything after the last directive at the start of the file), or, in the case of an `.rb` file, the entire file, is now stored in the page table as the `:bodytext`. Also, now that we've given the page object a chance to contribute to the pool of scalar directives, we can work out the [page table values](pagetable) `:fname`, `:subdirectorypath`, and `:f`. Plus, at this time, the `:folder` entry of `#ftpsite.yaml` tells us `:siterootfolder` (the folder into which the Web site will be rendered), if we have not acquired it already in some other way.

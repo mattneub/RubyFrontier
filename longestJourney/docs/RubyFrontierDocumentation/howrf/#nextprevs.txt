@@ -4,3 +4,4 @@ hierarchy
 directiveobjects
 scalardirectives
 pagetable
+howsapage

@@ -22,7 +22,9 @@ As a starting point, we'll use the above screen shot. Not all possible built-in 
 
 * **#pageheader.txt**. If RubyFrontier encounters a `#pageheader.txt` file, it will use the contents of this file at the point in the template where the `pageheader()` macro is called (usually the first line of the template). The pageheader is expected to supply all the HTML up to and including the `<body>` tag. This directive object is completely optional; there are two other ways to supply the pageheader (discussed later).
 
-* **#prefs.yaml**. If RubyFrontier encounters a `#prefs.yaml` file, it will load it, expecting it to represent a hash. The name-value pairs of this hash will be incorporated into the RubyFrontier's internal list of known directives for the page object being rendered. Names should be symbols! This provides a mechanism for setting scalar-valued directives that apply to multiple page objects. For example, you could set the `:bgcolor` directive to "FFFFEE" in a `#prefs.yaml` file. Scalar-valued directives considered by RubyFrontier are listed here.
+* **#prefs.yaml**. If RubyFrontier encounters a `#prefs.yaml` file, it will load it, expecting it to represent a hash. The name-value pairs of this hash will be incorporated into the RubyFrontier's internal list of known directives for the page object being rendered. Names should be symbols! This provides a mechanism for setting scalar-valued directives that apply to multiple page objects. For example, you could set the `:bgcolor` directive to "FFFFEE" in a `#prefs.yaml` file. Name-value pairs acquired in this way are sometimes called **prefs**. Scalar-valued directives (prefs) considered by RubyFrontier are listed [here](scalardirectives). 
+
+  This is a "folded" directive: the name-value pairs in all `#prefs.yaml` files encountered on the way up the hierarchy are available (except that name at a lower level overrides the same name at higher level).
 
 * **#stylesheets**. If RubyFrontier encounters a `#stylesheets` folder, it will look inside it for stylesheet (`.css`) files that you ask to embed into or link from your Web pages.
 

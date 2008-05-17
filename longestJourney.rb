@@ -320,12 +320,12 @@ module UserLand::Html::StandardMacros
     htmlText = ""
     
     # charset, must be absolutely first
-    if getPref("includeMetaCharset", adrPageTable)
+    if getPref("includemetacharset", adrPageTable)
       htmlText << %{\n<meta http-equiv="content-type" content="text/html; charset=#{getPref("charset", adrPageTable)}" />}
     end
     
     # generator
-    if getPref("includeMetaGenerator", adrPageTable)
+    if getPref("includemetagenerator", adrPageTable)
       htmlText << %{\n<meta name="generator" content="#{GENERATOR}" />}
     end
     
@@ -390,7 +390,7 @@ module UserLand::Html::StandardMacros
     # I just assume we have a #stylesheets folder containing .css files
     # and I also just assume we'll write it into a folder called "stylesheets" at top level
     # note that in my implementation, although you *can* call this in a macro, you shouldn't;
-    fname = sheetName[0, getPref("maxFileNameLength", adrPageTable)] + ".css"
+    fname = sheetName[0, getPref("maxfilenamelength", adrPageTable)] + ".css"
     sheetLoc = adrPageTable[:siteRootFolder] + Pathname.new("stylesheets/#{fname}")
     source = adrPageTable["stylesheets"] + Pathname.new("#{sheetName}.css")
     raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
@@ -512,7 +512,7 @@ module UserLand::Html::StandardMacros
     # you really ought to use linkjavascripts instead, it calls this for you
     # as with linkstylesheet, my logic is very simplified:
     # I just assume we have a #javascripts folder and we write to top-level "javascripts"
-    fname = sheetName[0, getPref("maxFileNameLength", adrPageTable)] + ".js"
+    fname = sheetName[0, getPref("maxfilenamelength", adrPageTable)] + ".js"
     sheetLoc = adrPageTable[:siteRootFolder] + Pathname.new("javascripts/#{fname}")
     source = adrPageTable["javascripts"] + Pathname.new("#{sheetName}.js")
     raise "javascript #{sheetName} does not seem to exist" unless source.exist?
@@ -798,7 +798,7 @@ class UserLand::Html::PageMaker
               end
             when "#prefs" # flatten prefs out into top-level entries in adrPageTable
               prefsHash = YAML.load_file(dir + f)
-              prefsHash.each_key {|key| adrPageTable[key.downcase] ||= prefsHash[key]}
+              prefsHash.each_key {|key| adrPageTable[key] ||= prefsHash[key]}
             when "#glossary" # gather glossary entries into glossary hash: NB these are *user* glossary entries
               # (different from Frontier: automatically generated glossary entries for linking live in #autoglossary)
               glossHash = YAML.load_file(dir + f)
@@ -809,7 +809,7 @@ class UserLand::Html::PageMaker
               adrPageTable[:adrsiteroottable] ||= dir
               #adrPageTable[:subDirectoryPath] ||= (adrObject.relative_path_from(dir)).dirname
             else
-              adrPageTable[f.simplename.to_s[1..-1]] ||= (dir + f) # pathname
+              adrPageTable[f.simplename.to_s[1..-1]] ||= (dir + f) # pathname TODO: should I lowercase this key?
             end
           end
         end
@@ -863,7 +863,7 @@ class UserLand::Html::PageMaker
   end
   def runDirective(linetext, adrPageTable=@adrObject)
     k,v = linetext.split(" ",2)
-    adrPageTable[k.downcase.to_sym] = eval(v.chomp) 
+    adrPageTable[k.to_sym] = eval(v.chomp) 
   rescue SyntaxError
     raise "Syntax error: Failed to evaluate directive #{v.chomp}"
   end
@@ -1000,7 +1000,7 @@ class UserLand::Html::PageMaker
     imagePath = adrPageTable["images"][imageSpec]
     raise "Image #{imageSpec} not found" unless imagePath
     # I also assume single folder at top level (but I leave folder name as a pref)
-    imagesFolder = adrPageTable[:siteRootFolder] + getPref("imageFolderName", adrPageTable)
+    imagesFolder = adrPageTable[:siteRootFolder] + getPref("imagefoldername", adrPageTable)
     # actually write the image; I've always thought this is an inappropriate place to do this...
     # ... and would eventually like to change it
     imagesFolder.mkpath
