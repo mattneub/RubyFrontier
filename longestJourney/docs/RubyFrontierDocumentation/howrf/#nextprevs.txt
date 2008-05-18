@@ -5,3 +5,6 @@ directiveobjects
 scalardirectives
 pagetable
 howsapage
+macros
+outlinerenderers
+user

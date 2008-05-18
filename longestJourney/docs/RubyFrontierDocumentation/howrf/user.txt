@@ -1,0 +1,31 @@
+#title "User Settings"
+
+Frontier provided a way to let you make settings that would be in common for rendering *all* your Web sites (unless overridden by a setting within a site). For example, if you know that in a lot of different sites you'd like to say "apple" as a shortcut for "http://www.apple.com" in links, it seems silly to make you redefine this in a `#glossary` hash for every source folder. So you need a place where you can define "apple" to mean "http://www.apple.com" just once, and have this definition available in every page in every Web site you render.
+
+To handle the need for such **user settings**, RubyFrontier provides the following mechanism:
+
+The primary location for RubyFrontier's own code is a file called `longestJourney.rb`. In the same folder, side by side with this file, is a folder called `longestJourney`. Inside the folder `longestJourney` you are permitted to keep two things: a file called `user.rb`, and a folder called `user`. At the moment, the only use of the `user` folder is to keep a folder called `templates` in which named templates can be stored.
+
+<%= imageref("userfolder") %>
+
+When file `user.rb` is loaded, here are the sorts of thing it can do:
+
+* **Supply a user glossary**. If `user.rb` defines a class method `glossary` of a module `UserLand::User`, that method will be called. It should return a hash of name-value pairs to be used in links. How you do this is up to you; here's how I do it:
+
+		module UserLand::User
+		  def self.glossary
+		    s = <<END
+		Frontier
+		http://frontier.userland.com
+		thebookontheweb
+		http://pages.sbcglobal.net/mattneub/frontierDef/ch00.html
+		END
+		    h = Hash.new
+		    s.split("\n").each_slice(2) {|a| h[a[0]] = a[1]}
+		    return h
+		  end
+		end
+
+* **Supply outline renderers**. If `user.rb` defines any subclasses of SuperRenderer within a module `UserLand::Renderers`, those classes will be available as outline renderers (that is, the name of such a class can be used as the value of the `:renderoutlinewith` directive).
+
+* **Inject code into RubyFrontier**. For example, if `user.rb` defines an instance method of UserLand::Html::PageMaker, then that method can be conveniently called from a macro. So if you find yourself needing to keep a utility method in the `#tools` folder of more than one source folder, you can save yourself the trouble and keep it in `user.rb` instead.

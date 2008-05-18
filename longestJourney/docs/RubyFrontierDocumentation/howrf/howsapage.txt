@@ -10,10 +10,18 @@ So, you start with some renderable page object and choose RubyFrontier > Publish
 
 * If we found a `#filters` folder and there is a `firstFilter.rb` file in it, we call that file's top-level *firstFilter* method with one parameter — the [page table](pagetable). I don't use this feature in any of my sites. The page object has not yet been read from disk, so I imagine you might use this moment to manipulate the directive contents of the page table in some tricky way. (For example, you could set the `:siterootfolder` dynamically if you didn't want to use the static `:folder` entry of `#ftpsite.yaml`.)
 
-* We now read the page object file and extract any [scalar directives](scalardirectives) if it is a `.txt` file or an `.opml` file. These scalar directives must be located, one per line, at the start of the file, in the form:
+* We now read the page object file and *extract any [scalar directives](scalardirectives)* if it is a `.txt` file or an `.opml` file. These scalar directives must be located, one per line, at the start of the file, in the form:
 
         #directivename "some value"
 
   where "#" is the first character on the line, and everything after the name is a valid Ruby expression. (The value is evaluated using simple `eval`, but I can imagine that in the future, RubyFrontier might do something more sophisticated here, such as `instance_eval` within the PageMaker object that's rendering the page.) Scalar directive from within the page object override (replace) same-named directives already stored in the page table.
 
   The remainder of the page object file (everything after the last directive at the start of the file), or, in the case of an `.rb` file, the entire file, is now stored in the page table as the `:bodytext`. Also, now that we've given the page object a chance to contribute to the pool of scalar directives, we can work out the [page table values](pagetable) `:fname`, `:subdirectorypath`, and `:f`. Plus, at this time, the `:folder` entry of `#ftpsite.yaml` tells us `:siterootfolder` (the folder into which the Web site will be rendered), if we have not acquired it already in some other way.
+
+* The [user glossary](user), if any, is loaded and melded into the page table's glossary hash.
+
+* The :bodytext is now *rendered*, as follows:
+
+  * If the page object is an `.rb` file, meaning that it consists of a script, that script is now *run*. In particular, the script is expected to define a top-level method, `render()`, taking one parameter; that method is called, supplying one parameter — the PageMaker object that's rendering the page. The script is thus in a very powerful position. It can obtain the page table (if the PageMaker object is called `pm`, the page table is `pm.adrPageTable`) and can do whatever it wishes. At the very least, it should probably define `pm.adrPageTable[:title]`, since it is an error for a renderable to have no title. The result of the script becomes the new value of `:bodytext`.
+
+  * If, on the other hand, the page is an `.opml` file, meaning that it consists of an outline (expressed as XML), you must supply an *outline renderer* to transform it into text. This is usually provided as an `.rb` file in a `#tools` folder; or, if you want an outline renderer to be available to all your Web sites, you can keep it in [the `user.rb` file](user). You must, prior to this point, have defined `:renderoutlinewith`, giving it, as a value, the string name of the outline renderer class (which, as for any class name, must begin with a capital letter). The requirements for an outline renderer are described [here](outlinerenderers). The rendering is performed under [macro scoping](macroscoping). The result of the rendering process becomes the new value of `:bodytext`.

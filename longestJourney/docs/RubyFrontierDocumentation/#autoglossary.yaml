@@ -1,77 +1,98 @@
 --- 
-Why RubyFrontier?: &id010 
+user: &id002 
+  :linetext: User Settings
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/user.txt
   :path: !ruby/object:Pathname 
-    path: whyrf/whyrf.html
-  :linetext: Why RubyFrontier?
+    path: howrf/user.html
+Why RubyFrontier?: &id012 
   :adr: !ruby/object:Pathname 
     path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/whyrf/whyrf.txt
-What is RubyFrontier?: &id006 
+  :linetext: Why RubyFrontier?
   :path: !ruby/object:Pathname 
-    path: whatrf/what.html
-  :linetext: What is RubyFrontier?
+    path: whyrf/whyrf.html
+outline renderers: &id007 
   :adr: !ruby/object:Pathname 
-    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/whatrf/what.txt
-RubyFrontier Documentation: &id001 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/outlinerenderers.txt
+  :linetext: Outline Renderers
   :path: !ruby/object:Pathname 
-    path: default.html
-  :linetext: RubyFrontier Documentation
+    path: howrf/outlinerenderers.html
+default: &id001 
   :adr: !ruby/object:Pathname 
     path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/default.txt
-Expected Directives: &id002 
+  :linetext: RubyFrontier Documentation
   :path: !ruby/object:Pathname 
-    path: howrf/directive.html
-  :linetext: Expected Directives
+    path: default.html
+My Cool Web Page: 
   :adr: !ruby/object:Pathname 
-    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/directive.txt
-structure: &id007 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/default.txt
+  :linetext: My Cool Web Page
   :path: !ruby/object:Pathname 
-    path: howrf/structure.html
-  :linetext: Structure
+    path: default.html
+structure: &id008 
   :adr: !ruby/object:Pathname 
     path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/structure.txt
-My Cool Web Page: 
+  :linetext: Structure
   :path: !ruby/object:Pathname 
-    path: default.html
-  :linetext: My Cool Web Page
+    path: howrf/structure.html
+Expected Directives: &id003 
   :adr: !ruby/object:Pathname 
-    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/default.txt
-default: *id001
-hierarchy: &id009 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/directive.txt
+  :linetext: Expected Directives
   :path: !ruby/object:Pathname 
-    path: howrf/hierarchy.html
-  :linetext: Hierarchy
+    path: howrf/directive.html
+RubyFrontier Documentation: *id001
+What is RubyFrontier?: &id009 
   :adr: !ruby/object:Pathname 
-    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/hierarchy.txt
-Types: &id005 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/whatrf/what.txt
+  :linetext: What is RubyFrontier?
   :path: !ruby/object:Pathname 
-    path: howrf/types.html
-  :linetext: Types
-  :adr: !ruby/object:Pathname 
-    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/types.txt
-Directive Objects: &id003 
-  :path: !ruby/object:Pathname 
-    path: howrf/directiveobjects.html
-  :linetext: Directive Objects
+    path: whatrf/what.html
+user settings: *id002
+Directive Objects: &id004 
   :adr: !ruby/object:Pathname 
     path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/directiveobjects.txt
-directive: *id002
-Starting: &id004 
+  :linetext: Directive Objects
   :path: !ruby/object:Pathname 
-    path: howrf/start.html
-  :linetext: Starting
+    path: howrf/directiveobjects.html
+Types: &id006 
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/types.txt
+  :linetext: Types
+  :path: !ruby/object:Pathname 
+    path: howrf/types.html
+hierarchy: &id013 
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/hierarchy.txt
+  :linetext: Hierarchy
+  :path: !ruby/object:Pathname 
+    path: howrf/hierarchy.html
+Starting: &id005 
   :adr: !ruby/object:Pathname 
     path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/start.txt
-directiveobjects: *id003
-Scalar Directives: &id008 
+  :linetext: Starting
   :path: !ruby/object:Pathname 
-    path: howrf/scalardirectives.html
-  :linetext: Scalar Directives
+    path: howrf/start.html
+directive: *id003
+directiveobjects: *id004
+start: *id005
+Scalar Directives: &id011 
   :adr: !ruby/object:Pathname 
     path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/scalardirectives.txt
-start: *id004
-types: *id005
-what: *id006
-Structure: *id007
-scalardirectives: *id008
-Hierarchy: *id009
-whyrf: *id010
+  :linetext: Scalar Directives
+  :path: !ruby/object:Pathname 
+    path: howrf/scalardirectives.html
+macros: &id010 
+  :linetext: Macros and Macro Scoping
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/howrf/macros.txt
+  :path: !ruby/object:Pathname 
+    path: howrf/macros.html
+types: *id006
+outlinerenderers: *id007
+Structure: *id008
+what: *id009
+macros and macro scoping: *id010
+scalardirectives: *id011
+whyrf: *id012
+Hierarchy: *id013
