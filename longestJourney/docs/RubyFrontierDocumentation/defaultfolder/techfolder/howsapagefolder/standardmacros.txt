@@ -1,0 +1,37 @@
+#title "Standard Macros and Other Convenience Methods"
+
+RubyFrontier includes a number of convenience methods, to be called as needed during [macros](macros) to assist with common tasks.
+
+> <span style="font-size:80%">NOTE: Where these methods are located in RubyFrontier's code, and how they are called, depends in part upon how Frontier did these things (since I wanted to make my own transition from Frontier to RubyFrontier as easy as possible). Not all Frontier convenience methods have been provided, and RubyFrontier does some things differently from Frontier. But this could all evolve further in future, and meanwhile, since this is Ruby, it's very easy to add your own methods and inject them into the relevant classes (the [`user.rb`](user) file is a good place to do this).</span>
+
+The macros are shown as they might be called in a macro under the rules of [macro scoping](macros).
+
+###Typically used in the template
+
+* **pageheader()**. Asks for the default [page header](pageheader). If used, usually appears at the start of the template (but can actually appear anywhere).
+
+* **pagefooter()**. Generates the default page footer, which consists solely of the closing `</body>` and `</html>` tags. Usually appears at the end of the template.
+
+* **html.getNextPrev()**. Returns identifiers for the next and previous pages, good for forming navigation links. For further discussion, see [here](nextprevs).
+
+###Typically used in the page header
+
+* **metatags(), linkstylesheets(), linkjavascripts(), bodytag()**. See on the default [page header](pageheader) for full discussion.
+
+* **linkjavascript()**. Called by `linkjavascripts()`. Takes one parameter, the simple name of the javascript file. Finds that javascript file (in the [`#javascripts` folder](directiveobjects)), copies it out to disk, and returns a link to it from the page currently being rendered.
+
+* **linkstylesheet()**. Called by `linkstylesheets()`. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in the `#stylesheets` folder), copies it out to disk, and returns a link to it from the page currently being rendered.
+
+* **embedstylesheet()**. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in the `#stylesheets` folder) and returns its text, wrapped up in a proper `<script>` tag.
+
+###Typically used in the page body (or template)
+
+* **imageref()**. Writes an image to disk and returns an `<img>` tag referring to it. See on [images](images) for full discussion.
+
+* **html.getOneDirective()**. Takes two parameters, a string name of a directive (such as `"title"`) and a Pathname pointing to a page object. Reads the page object (only if it is a `.txt` or an `.opml` file) and extracts and returns the value of the [scalar directive](scalardirectives) at its start with that name (or nil). 
+
+* **html.getTitleAndPath()**. Given a single parameter, uses that parameter as a key into the [autoglossary](autoglossary) to retrieve information about a page of the site, and returns an array of two values, the page's title (as a string) and its pathname (as a Pathname object). Either or both of those can be nil. This is useful when, for example, what you have is a page object's simple name and you want to form a link to it whose text includes the title of the Web page the page object generates.
+
+
+
+

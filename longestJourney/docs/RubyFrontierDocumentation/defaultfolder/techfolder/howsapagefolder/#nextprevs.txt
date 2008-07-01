@@ -1,0 +1,12 @@
+images
+outlinerenderers
+snippets
+template
+macros
+autoglossary
+glossary
+filters
+pageheader
+standardmacros
+nextprevs
+user

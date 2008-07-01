@@ -1,0 +1,33 @@
+#title "Links to the Next and Previous Page"
+
+A common problem in a Web site is forming navigation links, especially to the next and previous pages in a series. RubyFrontier doesn't exactly solve this for you; but it does give you the tools you need to construct solutions for your particular Web site structure and navigation needs.
+
+###Page Order and the NextPrevs List 
+
+The chief issue here is that the order of page objects within a folder, which is alphabetic, is rarely the order in which you want navigation of the Web site to proceed. It is therefore necessary to maintain a separate file, called by convention `#nextprevs.txt` (and known as the **nextprevs list**). Because this file's name starts with a pound-sign, it is treated as a directive object and is not rendered as a Web page. The purpose of the file is simply to list pages in their proper navigation order. That way, a macro that forms navigation links can consult the list to figure out what to do.
+
+The members of the nextprevs list should be identifiers suitable for lookup in the [autoglossary](autoglossary). That way, you can use further method calls to form the actual links. For example, the nextprevs list for the folder containing this page looks like this:
+
+		images
+		outlinerenderers
+		snippets
+		template
+		macros
+		autoglossary
+		glossary
+		pageheader
+		standardmacros
+		nextprevs
+		user
+
+If you examine this page, you can see the nextprevs list being used. The second navigation bar at the top of the page consists of the titles of the pages in this folder, in exactly the order of the nextprevs list. And at the bottom right of the page is a "next" link; since this page is the one coded as `nextprevs`, the "next" page should be the one coded as `users`, and so, indeed, it is.
+
+This solution is far from ideal, but I haven't found a better way. The main drawback with this approach is that it requires you to remember to maintain this separate list. If you add or remove a page from the source folder, you need to add or remove it from the nextprevs list. It is easy to forget to do this.
+
+###Use of the NextPrevs List
+
+No rules tell you how to use a nextprevs list; indeed, no law requires that you use one at all. You can handle navigation in any way that suits you. Nor need a nextprevs list be structured like the one shown above. It is up to you to come up with a system, and to write a [macro](macros) that will read the list and return the desired information.
+
+RubyFrontier does provide one built-in method for forming navigation links. In this approach, it is assumed that navigation to the next and previous page takes place always within a single folder. The built-in method, which you can call in a macro by saying **`html.getNextPrev()`**, forms a list of all the files in the same folder as the file currently being rendered. The list is simply the folder's nextprevs list if there is one (or, the files in alphabetical order if there is not). It then returns an array of two items — the members of the list just before and after the page currently being rendered (or nil if the page currently being rendered is first or last in the list). You could then use these values as keys into the [autoglossary](autoglossary) to form links.
+
+Another helpful method, mentioned [earlier](standardmacros), is **`html.getTitleAndPath()`**. It takes as parameter an identifier that keys into the [autoglossary](autoglossary) and returns an array of two items, the title and pathname of that page object. For example, at the bottom right of this page is a link to the next page in the nextprevs list, which, as you can see, is `user`. But the link does not say "user"; it says "<%= "Next: " + html.getTitleAndPath("user")[0] %>". The text of the link was formed by calling `html.getTitleAndPath("user")[0]` to obtain the title of the `user.txt` page object.

@@ -24,5 +24,58 @@ body {
 	width: 80%;
 }
 .heart {
-	margin: 10px;
+	margin: 30px;
+}
+.heart h2,h3,h4,h5 {
+	margin-left: -10px;
+}
+h1 {
+	text-align: center;
+}
+.navbar {
+	background-image: url("../images/background.gif");
+	background-repeat: repeat-x;
+	padding: 10px;
+	text-align: center;
+	line-height: 180%;
+}
+.heart a:visited {
+	text-decoration:underline;
+	color:blue;
+}
+.heart a:link {
+	text-decoration:underline;
+	color:blue;
+}
+.navbar a:link {
+	text-decoration:none;
+	color:red;
+}
+.navbar a:visited {
+	text-decoration:none;
+	color:red;
+}
+.parent {
+	font-weight:bold;
+}
+a:hover {
+	background-color:#e1e4ec;
+}
+a:active {
+	background-color:purple;
+}
+.pic {
+	background:lightgrey; 
+	padding:10px; 
+	border:2px black solid;
+	text-align:center
+}
+.caption {
+	text-align:center;
+	font-size:80%;
+	border:1px black solid;
+}
+.nextbar {
+	text-align:right;
+	margin: 5px 30px 20px 5px;
 }

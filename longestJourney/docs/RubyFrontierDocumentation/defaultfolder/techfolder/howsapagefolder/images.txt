@@ -1,0 +1,35 @@
+#title "Images and IMG Tags"
+
+On this page, I talk about how to do images in your Web pages. Images involve [macros](macros), and I haven't formally discussed macros yet, but you don't actually need to understand the details of macros in order to do images, and users are naturally anxious to start using images right away; hence this independent discussion.
+
+###Image Basics
+
+To generate references to images within the site, you do two things, as follows:
+
+1. First, you have to have an image file. Place it in an [`#images` folder](directiveobjects) in your source folder, in a location such that it will be found when the [page table](pagetable) is [built](howsapage). (Personally, I usually just keep all images in a single top-level `#images` folder.)
+
+* Second, in the page body or template, use the `imageref()` call in a [macro](macros). For example, you might say this:
+
+        \<%= imageref("myimage") %>
+
+  If the image file's simple name (without the extension) is `myimage` (for instance, it might be `myimage.png`), it will be located (in the `#images` folder) and copied out into the Web site folder. The macro call then returns an `<img>` tag whose `src` attribute is a relative URL from the page being built to the image file. The `<img>` tag will also have a `height`, `width`, and `alt` attribute.
+
+All image files copied out in this way are placed, by default, in a folder at the top level of the Web site called `images`. To use a folder by a different name, set the value of the `:imagefoldername` [scalar directive](scalardirectives). There is no provision, at present, for writing out image files to any location other than a folder at the top level of the Web site (even though Frontier had the ability to do this).
+
+###Optional IMG Tag Attributes
+
+An optional second parameter in the `imageref()` call is a hash of names and values that you can use to set additional attributes of the `<img>` tag that will be generated. You may supply as many as you like of the following:
+
+* `:height`, `:width`. It is *not* usual to supply these; if you don't, they will be supplied for you. RubyFrontier knows how to get the height and width of a `jpeg`, `gif`, or `png` by examination of the file.
+
+* `:alt`. The `alt` attribute. This is required by the XHTML standard, so if you don't supply any value, RubyFrontier will include an `alt` attribute for you, supplying a value of `"image"`.
+
+* `:name`, `:id`, `:hspace`, `:vspace`, `:align`, `:style`, `:class`, `:title`, `:border`. These are all standard `<img>` attributes, and they work just as you would expect: if you supply one, RubyFrontier will use the value that you give as that value for that attribute in the `<img>` tag.
+
+* `:ismap`. The value doesn't matter; `true` is a good choice.
+
+* `:rollsrc`. Use this as a simple way to get the image to toggle to a different image when the mouse is hovering over it (as in a "rollover button"). The value should be the simple name (with no extension) of the second image, which will be found in the `#images` folder and written out to disk in the Web site folder. The `<img>` tag will be given appropriate `onmouseover` and `onmouseout` attributes, using JavaScript to alter the displayed image. (Note: Good little JavaScripters will probably also want the page to include code to pre-cache the alternate image. RubyFrontier does not presently do this for you.)
+
+So, for example, an `imageref()` call that includes some of these optional values might look like this:
+
+        \<%= imageref("myimage", {:border => "1", :alt => "A great image"}) %>

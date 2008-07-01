@@ -1,0 +1,62 @@
+#title "The Template"
+
+As I have said about a [zillion times](what) already, when RubyFrontier [processes](howsapage) [a renderable page object](types), it will attempt to embed such an object into a template. I have already shown you a [screen shot](what) of the same page object passed through three different templates, to give you the general idea.
+
+The template is usually how a Web page gets its overall appearance. A template can contain literal HTML as well as [macro](macros) calls, and it usually contains both. In particular, it usually determines what goes in the document's `<head>` area (including its CSS) as well as common content such as unifying navigation to appear on multiple pages. 
+
+Thus, you need to know how the template is located and how this insertion is performed.
+
+###How the Template is Located
+
+The template associated with any given renderable page object can either be a [directive object](directiveobjects) or specified through a [scalar directive](scalardirectives).
+
+* If the template is a [directive object](directiveobjects), that means that, as the [page table](pagetable) is [being built](howsapage) and RubyFrontier starts walking up the folder [hierarchy](hierarchy) from the [page object](types) being rendered, if it encounters a file called `#template.txt`, that's the template.
+
+  It should not escape your attention that this fact immediately suggests a simple way of using the folder structure within your source folder as a way to group together page objects that share a common template. I have [already](hierarchy) made this point in a general way, but it is worth making again, explicity and with regard to templates specifically.
+
+  For example, suppose page A and page B look alike and are united by one kind of navigation, and page C and page D look alike and are united by a different kind of navigation. So you'd like A and B to share a template, and you'd like C and D to share a template. Then you might put A and B together with their template in a folder, and C and D together with their template in another folder, like this:
+
+        	#template.txt
+        	folder1
+            	#template.txt
+            	A
+            	B
+        	folder2
+            	#template.txt
+            	C
+            	D
+        	E
+
+  In the above schema, pages `A` and `B` will be handled by the `#template.txt` that is together with them in `folder1`, and pages `C` and `D` will be handled by the `#template.txt` that is together with them in `folder2`. In both cases, the top-level `#template.txt` is overshadowed and ignored. The page object `E`, on the other hand, will be handled by the top-level `#template.txt`.
+
+* If the template is specified through the [scalar directive](scalardirectives) `:template`, then the value of this directive should be the simple string name of a `.txt` file that is to function as the template. This file will be sought in the first [`#templates` folder](directiveobjects) discovered on the way up the [hierarchy](hierarchy), or, if that search fails, in the [`user/templates` folder](user). (Note that `#templates` is not a "folded" directive; the usual approach is to have just one `#templates` folder, at the top level of the site.)
+
+  So, for example, imagine in a text page object this line appears at the start:
+
+        #template "mytemplate"
+
+  This causes the directive `:template` to be defined with the value `"mytemplate"`, and so when the [time comes](howsapage) to embed this page object in a template, a file `mytemplate.txt` will be sought, first in the `#templates` folder, then in the `user/templates` folder.
+
+  The [`user/templates` folder](user) includes by default two templates brought over from Frontier; their purpose will be discussed in a moment.
+
+###What's in a Template
+
+A template is a flexible beast, but certain features of templates are quite common, so here is a quick guide.
+
+* There *must* be a template. It is an error if there isn't one.
+
+* The template should contain the pseudo-tag `<bodytext>`. This is the point at which the page object will be substituted — that is to say, the page object, as rendered [up to that point](howsapage) in the `:bodytext` entry of the [page table](pagetable), will replace the `<bodytext>` tag. There is no law requiring the template to contain this tag, but if it doesn't, the page object will effectively be thrown away, so a template without a `<bodytext>` tag would be stupid.
+	
+  Indeed, the minimum template would consist of *only* the pseudo-tag `<bodytext>`. There are times when this strategy is useful, and so such a template is included in [the `user/templates` folder](user): it is called (for Frontier-related historical reasons) `bbedit`. You would use this template if your page object itself consists of *all* the HTML required for your Web page, the use of the template being a superfluous (though necessary) formality.
+
+* Apart from the `<bodytext>` tag, the template should consist of, or should contain macros to generate, literal HTML. The typical strategy is to have the template generate, at least, all the HTML from the start of the page up to and including the `<body>` tag, and, at the end of the page, the closing `</body>` and `</html>` tags.
+	
+  And, again, this strategy is sufficiently common that such a template is included in [the `user/templates` folder](user): it is called (for Frontier-related historical reasons) `white`. It goes like this:
+
+            \<%= pageheader() %>
+		    <bodytext>
+		    \<%= pagefooter() %>
+
+  To understand what that does, read up on the [pageheader](pageheader) and [pagefooter](standardmacros) macros. That is also the default template when you [create a new site](startrf) in RubyFrontier, and it packs enough power that it should be sufficient for most purposes initially (as I've [already mentioned](howsapage)).
+
+* A template may also contain [scalar directives](scalardirectives). As with a page object, these should be clumped together at the very start of the template. This is actually quite a useful mechanism because of the fact (made clear by the narrative of [how a page gets rendered](howsapage)) that by the time the template's directives are handled, the page object's directives have been handled already; the one can thus depend upon the results of the other. 

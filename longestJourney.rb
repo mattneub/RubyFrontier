@@ -266,9 +266,10 @@ module UserLand::Html
     self.everyPageOfSite(Pathname.new(adrObject)).each do |p|
       pm = PageMaker.new
       pm.buildPageTableFully(p)
-      pm.addPageToGlossary(p)
+      tempGlossary = Hash.new
+      pm.addPageToGlossary(p, tempGlossary)
       # merge by hand watching for non-uniques
-      pm.adrPageTable[:autoglossary].each do |k,v|
+      tempGlossary.each do |k,v|
         if glossary[k] && v != glossary[k]
           puts "----\nNon-unique autoglossary entry detected for #{k}\n#{v.inspect} vs.\n#{glossary[k].inspect}\nprocessing #{p}"
         end
@@ -419,7 +420,7 @@ module UserLand::Html::StandardMacros
     height = options[:height] || imageTable[:height]
     width = options[:width] || imageTable[:width]
     htmlText = %{<img src="#{imageTable[:url]}" width="#{width}" height="#{height}" }
-    %w{name id alt hspace vscape align style class title border}.each do |what|
+    %w{name id alt hspace vspace align style class title border}.each do |what|
       htmlText += %{ #{what}="#{options[what.to_sym]}" } if options[what.to_sym]
     end
     
@@ -620,6 +621,7 @@ class UserLand::Html::PageMaker
       if adrPageTable["snippets"] && adrPageTable["snippets"][$1]
         adrPageTable["snippets"][$1]
       else
+        puts "Ignoring snippet substitution for #{$&}"
         $&
       end
     end
@@ -680,7 +682,12 @@ class UserLand::Html::PageMaker
             path = refGlossary($` + $1).match(/href="(.*?)"/)[1]
             path = (adrPageTable[:adrSiteRootTable] + Pathname.new(path)).cleanpath + "#autoglossary.yaml"
             h = YAML.load_file(path) 
+            #puts "h:"
+            #pp h
             url = %{<a href="#{h[id.gsub('\\','')][:url]}">}
+            #puts "url:"
+            #p url
+            #TODO: failing to notice/barf if there is no url entry in the hash
           rescue
             puts "Remote glossary lookup failed on #{href}, apparently while processing #{adrPageTable[:adrObject]}"
           end
@@ -884,7 +891,7 @@ class UserLand::Html::PageMaker
     folder = Pathname.new(`mktemp -d /tmp/website.XXXXXX`) unless folder.dirname.exist?
     return (adrPageTable[:siterootfolder] = folder) # set in adrPageTable and also return it
   end
-  def addPageToGlossary(adrObject, adrPageTable=@adrPageTable)
+  def addPageToGlossary(adrObject, glossary=adrPageTable[:autoglossary], adrPageTable=@adrPageTable)
     # this is different from what Frontier does!
     # we maintain an #autoglossary on disk, loaded as :autoglossary hash
     # we do not save out; that is the job of whoever calls us to do that eventually
@@ -905,13 +912,13 @@ class UserLand::Html::PageMaker
     begin
       url = adrPageTable[:ftpsite][:url]
       url += "/" unless url =~ %r{/$}
-      uri = URI::join(url, URI::escape(path.to_s))
+      uri = URI::join(url, URI::escape(h[:path].to_s))
       h[:url] = uri.to_s
     rescue
     end
     # put into autoglossary hash, possibly twice
-    adrPageTable[:autoglossary][adrPageTable[:f].simplename.to_s.downcase] = h
-    adrPageTable[:autoglossary][linetext.downcase] = h if linetext
+    glossary[adrPageTable[:f].simplename.to_s.downcase] = h
+    glossary[linetext.downcase] = h if linetext
   end
   def processMacros(s, theBinding, adrPageTable=@adrPageTable)
     # process macros; the Ruby equivalent is to use ERB, so we do

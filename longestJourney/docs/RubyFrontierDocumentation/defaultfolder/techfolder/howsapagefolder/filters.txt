@@ -1,0 +1,26 @@
+#title "Filters"
+
+At three points during the [rendering process](howsapage), RubyFrontier stops and turns control over to you, so that you can modify the outcome of the process. It does this via three "filter" scripts: the FirstFilter, the PageFilter, and the FinalFilter. These scripts are `.rb` files which, if they exist, will be sought in a [`#filters` folder](directiveobjects).
+
+The idea is to provide you with "hooks" or "callbacks" at key moments so that you can insert your own functionality into the rendering process.
+
+### The FirstFilter
+
+After the initial [building](hierarchy) of the [page table](pagetable), and before the [page object](types) itself has been examined, if there is a [`#filters` folder](directiveobjects) and it has a `firstFilter.rb` file in it, we call that file's top-level firstFilter() method with one parameter — the [page table](pagetable).
+
+I don't use this feature in any of my sites, so it's a little hard for me to suggest what you might use it for; but it's a Frontier feature so RubyFrontier does it. I imagine you might use this moment to manipulate the directive contents of the page table in some tricky way. For example, you could set the `:siterootfolder` dynamically if you didn't want to use the static `:folder` entry of [`#ftpsite.yaml`](pagetable).
+
+### The PageFilter
+
+Just before we locate the [template](template) and insert the page object into it, if there is a [`#filters` folder](directiveobjects) and it has a `pageFilter.rb` file in it, we call that file's top-level `pageFilter()` method with one parameter — the [page table](pagetable).
+
+This is your chance to modify the page table's `:bodytext` entry, which contains the [rendered page object](howsapage), not yet poured into its [template](template), and with [macros](macros) not yet processed nor [glossary expansion](autoglossary) yet performed.
+
+In my own sites, for example, this is the point at which I would pass a [Markdown](http://daringfireball.net/projects/markdown/) text page object through Markdown to turn it into HTML. There are various reasons why this is the correct moment for such a transformation. For example, Markdown lets me express a link like `[this](link)`. When we get to [glossary expansion](autoglossary), that link needs to have been re-expressed in the form expected by RubyFrontier, namely like `<a href="link">this<a>`. So clearly Markdown transformation needs to precede glossary expansion.
+	
+### The FinalFilter
+
+At the very end of the [rendering process](howsapage), just before we write the completely rendered HTML out to disk, if there is a [`#filters` folder](directiveobjects) and it has a `finalFilter.rb` file in it, we call that file's top-level `finalFilter()` method with one parameter — the [page table](pagetable).
+
+This is your chance to modify the page table's `:renderedtext` entry, which contains the completely rendered page object, ready to write out to disk. In my own sites, for example, this is the point at which I typically run [SmartyPants](http://daringfireball.net/projects/smartypants/) to turn the page's quotation marks into smart quotes. Why do I wait until the last moment to do this? Well, for one thing, it isn't necessary to do it any earlier. For another, events such as [macro processing](macros) and even insertion of the title into the [page header](pageheader) may generate text that SmartyPants needs to deal with, so clearly it makes sense for SmartPants to come into play later than these events.
+

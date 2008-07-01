@@ -1,0 +1,95 @@
+#title "The Autoglossary"
+
+The **autoglossary** is the mechanism by which pages in your Web site can refer easily to one another via links. The key to this mechanism is a file, `#autoglossary.yaml`, which RubyFrontier maintains at the top level of your [source folder](start).
+
+Links are not hard to make, and you could easily construct a relative link from one page to another manually. So what's the point of the autoglossary mechanism? Well:
+
+* Constructing a relative link manually is a labor-intensive, error-prone business, especially as your Web site becomes large and starts to consist of many pages. You have to get the relative path exactly right or the link will fail, and the path can become long and complicated.
+
+  But with the autoglossary mechanism, *the relative path is automatically constructed for you*. All you have to know is the name or title of the page you want to link to. Thus it's fast and easy to make links via the autoglossary mechanism. And when it's fast and easy to make links, you *will* make links; you won't hesitate on the grounds that it's "such a pain" to make them. So you'll heavily interlink your pages. And your Web site will be better because of that!
+
+* Hard-coded relative links are fragile. The relative path is written right into the link. This freezes the structure of your Web site. You dare not move a page to different folder within your site, or rename any folders, or anything, because all your relative links can break if you do so.
+
+  But with the autoglossary mechanism, *links don't break when you move pages around within your site*. That's because, even if the page moves, its title and/or filename stays the same. So the autoglossary mechanism finds the target page in its new location and constructs the relative path correctly for you. (And if you do change a title or filename so that an autoglossary-based link breaks, RubyFrontier notifies you so you can fix the link.)
+
+### Executive Summary of the Autoglossary Mechanism
+
+Every time you render (publish) a [page object](types), RubyFrontier automatically adds information about that page object into the `#autoglossary.yaml` file. It keys that information twice: under the *simple name* of the page object (the filename without the extension) and under the *title* of the page object if there is one (probably, the value of the page object's [`#title` scalar directive](scalardirectives)).
+
+Then, later, when you want to form a link from one page in your site to another page in your site, you create an `<a>` tag just as you would expect, but you do *not* hard-code a relative URL into its `href` attribute. Instead, for the `<a>` tag's `href` attribute, you use the target page's key in the `#autoglossary.yaml` file. As I just said, that can be either the *simple name* of the target source page file or the *title* of the target page. RubyFrontier then looks up that key in the `#autoglossary.yaml` file, calculates the relative URL, and substitutes it for your `href` value, [as the page is rendered](howsapage).
+	
+### How Stuff Gets Into the Autoglossary
+
+The autoglossary is maintained for you. You should never have to tweak it or edit it in any way. There are two ways in which the autoglossary gets built.
+
+* When you render a page, a hash of information about the page is constructed and is entered into the autoglossary under two entries, one keyed by the page's title, the other keyed by the page object's simple name. The autoglossary file is saved out after the page renders, so it's persistent. Thus, one way to make sure a page is listed in the autoglossary, so that you can refer to it in a link in another page, is to render it.
+
+* You can request that the `#autoglossary.yaml` file be erased and that *all* the page objects in the source folder be re-entered into it. To do so, choose RubyFrontier > Preflight Site. No pages are rendered out to disk; all that changes is the `#autoglossary.yaml` file. When you render your entire site by choosing RubyFrontier > Publish Site, the Preflight Site command is automatically called for you, first.
+
+The second way of getting info into the autoglossary is more important than you might think. For one thing, without it, the autoglossary can become "stale" (storing info about pages that no longer exist or whose title or filename you've changed). Also, it is the *only* way that information about *non-renderables* can get into the autoglossary. A [non-renderable](types) is, for example, a `.pdf` file included in your site. It's part of your site, and when you say Publish Site, non-renderables are simply copied from the source folder to the Web site folder. Clearly you might want to be able to link to a non-renderable (without a link, users of your site may never find the file). You can do so, via the autoglossary mechanism.
+
+### How Stuff Gets Out of the Autoglossary
+
+To get RubyFrontier to consult the autoglossary for you, in a renderable page object, form a link where the `href` attribute is the title or simple name of a page object file:
+
+		<a href="otherpage">Click me!</a>
+
+In that example, RubyFrontier looks up `otherpage` in the autoglossary and, if it finds it, it works out the relative URL from the page being rendered to that other page, and substitutes the resulting relative URL as the value of the `href` attribute.
+
+How you form the link is up to you. You can form it manually, or during [macro processing](macros), or through Markdown syntax:
+
+        [Click me!](otherpage)
+
+The only requirement is that it be transformed into a normal HTML link before [the moment during the rendering process](howsapage) when RubyFrontier deals with autoglossary links.
+
+If your link contains any other attributes, RubyFrontier will leave them alone. But it is essential that the `href` attribute be the first attribute. So, for example, this will work:
+
+        <a href="otherpage" class="someclass">Click me!</a>
+
+In that example, `otherpage` will be looked up in the autoglossary and the proper relative URL substituted for it in the `href` attribute, and the `class` attribute will remain present as part of the `<a>` tag.
+	
+If your link includes an anchor, the anchor will remain. So, for example, this will work:
+
+        <a href="otherpage#someanchor">Click me!</a>
+
+In that example, `otherpage` will be looked up in the autoglossary and the proper relative URL substituted for it in the `href` attribute, with `#someanchor` appended to it.
+
+How does RubyFrontier know whether to look up an `href` value in the autoglossary? The answer is that if the `href` value contains a dot (`.`), or a colon-slash-slash (`://`), or starts with a pound-sign (`#`), RubyFrontier assumes that this is an absolute URL and leaves it alone; it *won't* look up that `href` value in the autoglossary. But in the first two cases, you can signal to RubyFrontier that it *should* look up the `href` value in the autoglossary, by "escaping" the dot or the colon-slash-slash with a preceding backslash.  
+
+###What If Autoglossary Lookup Fails?
+
+If RubyFrontier looks up an `href` value in the autoglossary and doesn't find it, it then looks up the value in the normal [glossary](glossary).
+
+If lookup in both the autoglossary and the normal glossary fails, RubyFrontier assumes you've made an error. This error is not fatal; rendering of the page object continues. But an error message is issued, and RubyFrontier substitutes, as the value of the `href` attribute, `"errorRefGlossaryFailedHere"`. So you can find failed autoglossary substitutions in a generated Web page by searching for `"errorRefGlossaryFailedHere"` in the Web page's HTML.
+
+###Links to Other RubyFrontier Sites
+
+RubyFrontier can also use the autoglossary mechanism to generate URLs to other RubyFrontier-based sites that you maintain. For example, I maintain pages at www.tidbits.com and at www.apeth.com. What if a page in the TidBITS site wants to link to a page in the Apeth site? Of course I can do this with an absolute URL; but this means that I must get the URL right, plus if I move a page within the Apeth site I have to remember to change any links to it from within the TidBITS site. Instead, I let RubyFrontier's autoglossary mechanism help me.
+
+For this to work, two things are necessary:
+
+* The source folders for both RubyFrontier sites must be on the same computer and should be in known, stable locations. The simplest solution is for both source folders to live in the same folder together.
+
+* The ultimate URL at which the generated Web pages will be served online must be known, and must be provided as the value for the `:url` key in `#ftpsite.yaml`.
+
+For example, my Apeth source folder's `#ftpsite.yaml` file contains this line:
+
+        :url: http://www.apeth.com
+
+The result is that when the Apeth source folder's autoglossary entries are made in its `#autoglossary.yaml` file, they include a `:url` key whose value is the absolute URL of the individual Web page. Then, when I'm generating a page in the TidBITS site, if the page wants to link to a page of the Apeth site, RubyFrontier can look directly in the `#autoglossary.yaml` file for the Apeth site, and fetch the absolute URL for the page that I'm linking to.
+
+Clearly, then, the relative location of the Apeth site from the TidBITS site must be known, so that RubyFrontier can *find* the `#autoglossary.yaml` file for the Apeth site while it's building a page in the TidBITS site.
+
+Here's how this part of the mechanism works. An `href` value needs to be of the form `sitename^pagename` — the name of the site, followed by a caret, followed by the simple name of the page (the key that will be consulted in the other site's autoglossary). The sitename can be anything, because it isn't a real name; it is just a key in your [glossary](glossary). (For example, it might be in a `#glossary.yaml` file.) The *value* for that key must the relative filepath from the source folder of this site to the source folder of the other site.
+
+For example, here is how my source folders are arranged together in the Finder (the one called "site" is the TidBITS site):
+
+<%= caption("relativesites","Three source folders (and the TextMate project files that maintain them), as shown in the Finder on my computer.") %>
+
+So in the TidBITS site I have a glossary entry like this:
+
+        apeth: ../../apethWebSite/apeth/
+
+In this way, an `href` attribute value `"apeth^appleHelpTalk"` in the TidBITS site is translated into the absolute URL of the file `appleHelpTalk.mp3` within the Apeth Web site.
+
+[[glossary]]

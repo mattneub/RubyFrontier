@@ -9,7 +9,9 @@ def pageFilter(adrPageTable)
       adrPageTable[:bodytext] = io.read
     end
     # cool, but markdown substitutes &lt;% for <%, so if we have macros they've just been stripped
-    adrPageTable[:bodytext] = adrPageTable[:bodytext].gsub("&lt;%", "<%")
+    adrPageTable[:bodytext] = adrPageTable[:bodytext].gsub(/([^\\])&lt;%/, '\1<%')
+    # in the previous command, backslash escapes and protects literal &lt;% so now remove it
+    adrPageTable[:bodytext] = adrPageTable[:bodytext].gsub(/\\(&lt;%)/, '\1')
   end
   
 end

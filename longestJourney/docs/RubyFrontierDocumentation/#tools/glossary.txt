@@ -1,0 +1,7 @@
+> NOTE for Frontier users: The glossary mechanism in Frontier suffered from some problems: it was overloaded, and glossary resolution took place too late in the page rendering process for many purposes. In RubyFrontier, therefore, the Frontier glossary mechanism is split into three pieces: 
+
+> * the [snippets](snippets) mechanism, for simple text substitution
+
+> * the [autoglossary](autoglossary) mechanism, for substitution of automatically maintained relative URLs within the site;
+
+> * and the [glossary](glossary) mechanism, for substitution of manually maintained absolute URLs.

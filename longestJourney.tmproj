@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>longestJourney/docs/RubyFrontierDocumentation/howrf/macros.txt</string>
+	<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/tech.txt</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -35,103 +35,71 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/#tools/homelink.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>37</integer>
-				<key>line</key>
-				<integer>1</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/directiveobjects.txt</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>118</integer>
-				<key>line</key>
-				<integer>40</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>221</integer>
-			<key>firstVisibleLine</key>
-			<integer>24</integer>
-		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/macros.txt</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>25</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>556</integer>
-			<key>firstVisibleLine</key>
-			<integer>8</integer>
-		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/howrf/scalardirectives.txt</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>92</integer>
-				<key>line</key>
-				<integer>76</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>61</integer>
-		</dict>
-		<key>longestJourney/user.rb</key>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#template.txt</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>24</integer>
 				<key>line</key>
-				<integer>36</integer>
+				<integer>15</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/tech.txt</key>
+		<dict>
+			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>6</integer>
+				<integer>122</integer>
 				<key>line</key>
-				<integer>36</integer>
+				<integer>2</integer>
 			</dict>
-			<key>selectTo</key>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/standardmacros.txt</key>
+		<dict>
+			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>31</integer>
+				<integer>28</integer>
 				<key>line</key>
-				<integer>36</integer>
+				<integer>0</integer>
 			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/template.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>57</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>530</integer>
+			<key>firstVisibleLine</key>
+			<integer>31</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/macros.txt</string>
-		<string>longestJourney/user.rb</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/howrf/directiveobjects.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/#tools/homelink.rb</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#template.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/tech.txt</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{730, 259}, {870, 769}}</string>
+	<string>{{484, 72}, {1035, 853}}</string>
 </dict>
 </plist>

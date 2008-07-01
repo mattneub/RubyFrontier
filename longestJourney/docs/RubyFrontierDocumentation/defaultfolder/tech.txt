@@ -1,0 +1,3 @@
+#title "Technical Details"
+
+This section is about the technical details of using RubyFrontier. Start clicking links above (or click [here](start)) to start reading!

@@ -1,9 +1,22 @@
 <%= pageheader() %>
 <div class="logobar">
-	<%= imageref("rubyFrontierLogo") %>
+	<%= imageref("rubyFrontierLogo", (adrObject.simplename.to_s == "default" ? nil : {:glossref => "default"})) %>
 	<p>RubyFrontier Documentation</p>
 </div>
+<% html.getImageData("background") %>
+<%= navbars() %>
+<h1><%= title %></h1>
 <div class="heart">
 <bodytext>
 </div>
+<div class="nextbar">
+	<%= truenext() %>
+</div>
+<hr />
+<p style="font-size:80%; text-align:center">This documentation prepared
+	by Matt Neuburg, phd = matt at tidbits dot com 
+	(<a href="http://www.tidbits.com/matt/">http://www.tidbits.com/matt/</a>),
+	using <b><a href="default">RubyFrontier</a></b>. 
+</p>
+
 <%= pagefooter() %>

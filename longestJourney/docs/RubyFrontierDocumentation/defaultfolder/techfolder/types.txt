@@ -1,0 +1,23 @@
+#title "What's In a Source Folder"
+
+The very first thing to understand about a [source folder](start) is what kinds of thing can be inside it. Here's a typical example source folder:
+
+<%= caption("structure", "A typical source folder.") %>
+
+Everything in a RubyFrontier source folder is one of the following:
+
+* A **directive object**. A [directive object](directiveobjects) is a file or folder whose name begins with `#` (number-sign). Directive objects are used to supply RubyFrontier with certain needed resources, and to instruct RubyFrontier about certain settings, and are also just a convenient way for the source folder to contain files and folders that are not copied into the actual Web site. — In the above illustration, `#autoglossary.yaml` and `#filters` are directive objects.
+
+* A **page object**. A *page object* is a file that is not a directive and is not inside a directive folder. *RubyFrontier will turn every page object into a file in the Web site*. There are two main ways this can happen:
+
+  * If a page object has extension `.txt`, `.opml`, or `.rb`, it is considered a **renderable** object. This means that RubyFrontier will [process](howsapage) the file (*render* it), and the corresponding file that will be created in the Web site will be the result of that processing. — In the above illustration, `scriptde.txt` is a renderable.
+
+  * Otherwise, a page object is not renderable, and will simply be *copied* directly from the source folder into the Web site, unaltered. (For example, you might like to include a .pdf file for reading, or a .zip file for download, within your Web site. Traditionally [i.e. in Frontier], a non-renderable is called a **binary**.)
+
+* A normal **folder**. A normal folder is a folder which is not, and is not inside, a directive folder. If a folder contains any page objects, a folder by the same name and in the same relative location will be created in the Web site.
+
+  <%= caption("types", "Various kinds of thing inside a source folder: directive files, directive folders, and page objects.") %>
+
+  Thus, when RubyFrontier generates the actual Web site from the source folder, the [hierarchical](hierarchy) structure of the Web site will be essentially the same as that of the folders and page objects in the source folder. So, in the above screen shot, start at the top: The Web site will contain a Web page rendered from the file `scriptde.txt`, and it will also contain a folder called `scriptdefolder`, inside which will be a Web page rendered from the file `develop.txt`, and so on.
+
+  <%= caption("structureOutput", "The hierarchical structure of a Web site depends on the hierarchical structure of the source folder.") %>

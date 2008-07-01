@@ -1,0 +1,11 @@
+#title "Snippets"
+
+A **snippet** is a piece of text that is to be reused in more than one page object. In the [page object](types), you use the name of the snippet, and RubyFrontier substitutes the text.
+
+A snippet is a tool. Thus, to make a snippet, simply place a `.txt` file in a [`#tools` folder](directiveobjects). The simple name of the file is the name of the snippet. The contents of the `.txt` file is the text you want substituted into your pages.
+
+Early in the [rendering process](howsapage), as the [page table](pagetable) is [constructed](hierarchy), when RubyFrontier discovers a `.txt` file in a `#tools` folder, it creates a corresponding entry in the page table's `"snippets"` hash. The key is the simple name of the snippet file; the value is the text of the snippet (the contents of the snippet file).
+
+To use a snippet in a page object, enclose its name in double square brackets, like [[this]]. RubyFrontier, at the appropriate [moment](howsapage) during rendering, notices this, looks up the name in the `"snippets"` hash, and substitutes the value. If this lookup fails because the name is not the name of a known snippet, there is no error and no substitution takes place (so there should be no problem with using double square brackets for other purposes). 
+
+[[glossary]]

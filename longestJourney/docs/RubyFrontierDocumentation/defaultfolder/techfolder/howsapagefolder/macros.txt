@@ -1,0 +1,41 @@
+#title "Macros and Macro Scoping"
+
+A **macro** is an [ERB](ERB) expression in your page object or template. ERB is [called](howsapage) to process the page after the page object has been poured into the template (unless you specify that the [`:processmacros` scalar directive](scalardirectives) is `false`, which would be a very unusual thing to do).
+
+If you don't know about [ERB](ERB), you should study it in order to understand the syntax. Basically, a typical macro expression in a page object looks like this:
+
+        \<%= imageref("myimage") %>
+
+The thing to notice there is the equal-sign. That means that the result of evaluating the contents of the expression will be substituted for the expression. If the equal-sign were not there, the contents of the expression would be evaluated, with any side effects, but there would be no substitution; the expression is simply deleted from the output.
+
+Macros are evaluated under a special set of evaluation rules called **macro scoping**. (Also, [outline renderers](outlinerenderers) are run under macro scoping.) You will want to understand macro scoping in order to write your own macros (plus tools, plus outline renderers, etc.).
+
+###Macro Scoping
+
+In Frontier, when a macro runs, certain **abbreviated modes of expression** are enabled. This is mostly just a way of making things easier on the programmer writing the macro. For compatibility, RubyFrontier provides a similar mechanism. Linguistically, underneath the hood, the implementation is performed very differently: Frontier uses the dreaded `with`, whereas RubyFrontier, being Ruby, uses bindings, `method_missing`, introspection, and a lot of other cool stuff. But you don't need to worry about that. You just need to know the rules for these abbreviated modes of expression. So here they are.
+
+* **The [page table](pagetable)** is in scope, under the name `@adrPageTable`.
+
+* **Class methods of `UserLand::Html`** are in scope, as methods of the name `html`. 
+
+  So, for example, to call `UserLand::Html::everyPageOfSite()`, you can just say `html.everyPageOfSite(adr)` (where `adr` is the required parameter).
+
+* **Instance methods of the `UserLand::Html::PageMaker` object** that is rendering the page are in scope, also as methods of the name `html`.
+
+  So, for example, to call `UserLand::Html::PageMaker#getTitleAndPath`, you can just say `html.getTitleAndPath(id)` (where `id` is the required first parameter; this is the PageMaker object that is rendering the current page, so the page table is automatically supplied as the second parameter).
+
+* **Macro scripts** (scripts in the [`#tools` folder](directiveobjects)) are in scope, under the names of any top-level methods they may contain. So, for example, if a `#tools` folder contains a script (`.rb`) file that defines a top-level method `homelink`, you can call it by saying `homelink()`. How many parameters such a top-level method takes and what they mean is entirely up to you. Remember, the macro script *itself* is running under macro scoping, so it has access to the page table, other tools, and everything else listed here.
+
+  [Warning: Be careful to keep macro script top-level method names unique. The reason is that all macro scripts are loaded via `instance_eval` into a single object (a `BindingMaker` instance), so same-named top-level method names can trample one another.]
+
+* **[Standard macros](standardmacros) (instance methods of the `UserLand::Html::StandardMacros` module)** are in scope, under their unqualified method names. 
+
+  So, for example, a macro can say `bodytag()` and the method `UserLand::Html::StandardMacros#bodytag` will be called. Furthermore, the `StandardMacros` module is `include`d in the `PageMaker` instance that is rendering the page, so a standard macro has access to the page table and can directly call `PageMaker` instance methods.
+
+* Finally, as a last-ditch effort, **keys in the [page table hash](pagetable)** are themselves in scope, both as symbols and as strings. 
+
+  For example, if you say `title`, and there is no local variable or known method `title`, then (if we call the page table `pt`) `pt[:title]` will be sought, and if that isn't found, `pt["title"]` will be sought.
+
+  However, unlike Frontier, this works only for getting; you cannot set a key in the page table hash in this way. The reason is that the `with` mechanism that permitted this in Frontier was dangerous; it was all too easy to set a value in the page table (or elsewhere in the "database") accidentally. This limitation is no inconvenience, however, because if you want to set a key in the page table hash, you can do so easily through your access to the page table as `@adrPageTable`.
+
+Note that you can add your own methods to the repertory of things that can be accessed via macro scoping, by defining them in [`user.rb`](user). For example, `user.rb` could define a standard macro as an instance method of `UserLand::Html::StandardMacros`, and a macro could then call it directly by name. Or, `user.rb` could define a `PageMaker` method as an instance method of `UserLand::Html::PageMaker`, and a macro could then call it as a method of `html`.

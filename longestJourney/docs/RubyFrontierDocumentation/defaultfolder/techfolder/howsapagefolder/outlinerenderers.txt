@@ -1,0 +1,67 @@
+#title "Outline Renderers"
+
+A cool feature of Frontier is that it's an [outliner](http://www.outliners.com/). As part of the Frontier Web framework, therefore, it is possible for a [page object](types) to be an outline. RubyFrontier, on the other hand, is *not* an outliner (chiefly because RubyFrontier is not, itself, a GUI — it's just a script — and [TextMate](http://macromates.com/) is not an outliner). Nonetheless, an outliner is a very good editing tool, and many of my own Frontier page objects were outlines. In order to keep this feature in RubyFrontier, therefore, the following mechanism is used. A page object is allowed to be an `.opml` file — OPML is a form of XML, describing an outline. You can't really edit such a file with TextMate directly (well, you can, but you probably shouldn't, since it defeats the point, and anyhow it is all too easy to generate bad XML that way); instead, you are expected to edit an outline page object using an outliner application that can read and save OPML. My choice for this purpose is [OmniOutliner](http://www.omnigroup.com/applications/omnioutliner/).
+
+Okay, so let's say you decide to do this. Then you will also need an outline renderer. An **outline renderer** is a Ruby script that transforms an outline into text. Every outline page object must have a corresponding outline renderer, which will be called upon at the [appropriate moment](howsapage) during the rendering process; RubyFrontier will apply the outline renderer to the contents of the `:bodytext` entry of the [page table](pagetable), turning it from outline to text.
+
+###Supplying an Outline Renderer
+
+An outline renderer may be provided as an `.rb` file in a [`#tools` folder](directiveobjects); or, if you want an outline renderer to be available to all your Web sites, you can keep it in [the `user.rb` file](user).
+
+If the outline renderer is an `.rb` file in a `#tools` folder, the name of the file is not important; it is usual to give it the same name as the renderer class (see next section), but this is merely a convention, for convenience.
+
+For every outline page object, you *must* tell RubyFrontier what outline renderer to use. You do this by means of the [`:renderoutlinewith` scalar directive](scalardirectives) (see next section).
+
+###The Form of an Outline Renderer
+
+An outline renderer script *must* have, at the least, the following schema:
+
+		module UserLand::Renderers
+		  class Myrenderer < SuperRenderer
+		    def render(op)
+			  # do stuff, return result
+		    end
+		  end
+		end
+
+The name "Myrenderer" should be replaced by whatever you want to call this outline renderer. This class name is the value you will use when you specify the [`:renderoutlinewith` scalar directive](scalardirectives) so that RubyFrontier knows to apply this renderer to this particular outline page object.
+
+RubyFrontier will call your renderer's `render()` method, handing it one parameter, namely the OPML (XML) of `:bodytext`, which is your entire outline page object file stripped of its opening scalar directives.
+
+When your renderer runs, its code is subject to [macro scoping](macros). This will allow you to call back easily into the `PageMaker` object.
+
+###Outline Manipulation Methods
+
+To help you manipulate the outline, RubyFrontier defines a subset of the [Frontier `op` verbs](http://pages.sbcglobal.net/mattneub/frontierDef/ch18.html). (Consult the file `opml.rb`.) The outline, when you receive it in the `render()` method, is already expressed as an object of class `Opml`. (This object is the parameter called `op` in the above schema.) You are expected to use the `Opml` instance methods, which imitate the Frontier `op` verbs, to navigate the outline and extract the desired information.
+
+When using the `Opml` instance methods, there is always a "current line" of the outline to which we are pointing (because that's how Frontier did things). A brief description of the `Opml` instance methods follows.
+
+<%= %{<div style="margin-left:20px">} %>
+
+**firstSummit()**. Moves the current line pointer to the earliest, leftmost line of the outline. When the outline arrives at your renderer, `firstSummit()` has already been called. [Frontier users note: no verbs for expanding and collapsing are provided; the outline is completely expanded when it arrives at your renderer.]
+
+**level()**. Returns a positive integer stating how deep into the outline the current line is. Top level is `1`. Deprecated (it's rather slow); conventionally, you are expected to keep track of the level yourself as you navigate the outline, if you need this information.
+
+**go(dir, count)**. Attempts to reposition the current line pointer. `dir` specifies a direction to try to move, and can be one of the following: `:up`, `:down`, `:right`, `:left`, `:flatup`, `:flatdown`. (`:flatup` and `:flatdown` navigate without regard to the hierarchy structure of the outline.) `count` is how many steps in the given direction to try to take; it is optional, the default being `1`. The current line pointer will be moved as many steps as possible given the structure of the outline, up to the value of `count`. The result is `true` if the current line pointer was moved *at all*, `false` if it could not be moved even one step in the given direction.
+
+**getLineText()**. Returns the contents of the current line, as a string.
+
+**setLineText(s)**. Sets the contents of the current line to the string `s`.
+
+**countSubs()**. Returns the number of immediate children of the current line.
+
+**hasSubs()**. Returns a boolean reporting whether the current line has any children. 
+
+**insert(s, dir)**. Creates, adjacent to the current line, a new line whose contents are the string `s`, and sets the current line pointer to point to it. `dir` specifies the location of the new line relative to the current line, and can be `:down` or `:right`. (This is not a full implementation of the Frontier verb, but so far it's all I've needed.)
+
+**deleteLine()**. Deletes the current line. The line subsequently pointed to as the current line is sensible and correct for proper outline behavior: the previous sibling if there is one, otherwise the subsequent sibling if there is one, otherwise the parent (and if there is no parent, this must be the only line of the outline, so what is deleted is its text, as the outline must always have at least one line).
+
+**inspect(io)**. (Not a Frontier verb.) Returns `getLineText()` for every line of the outline, indenting with spaces to show hierarchical depth, and feeds each string to `io`, which should be something that understands the `<<` operator. If `io` is omitted, returns a string. Useful for debugging.
+
+**inspect_flat()**. (Not a Frontier verb.) Returns `getLineText()` for every line of the outline, as a string. Implemented to be fast; therefore, useful for obtaining the final result if your renderer works by manipulating the outline's contents in place.
+
+> NOTE: These are the only Frontier `op` verbs I have implemented because they are the only ones my renderers need. Others can be implemented in future if required.
+
+> ANOTHER NOTE: The `Opml` class is designed to be implemented either using the built-in Ruby library `REXML` or the Ruby gem `libxml`. To set which of the two is used, edit the value of the boolean constant `USELIBXML` in `opml.rb`. I find that `libxml` is a bit faster, but it has some memory bugs on my machine (though these do not prevent the `Opml` class from working properly). Since `libxml` may not be present on your machine, you will have to [install it](http://libxml.rubyforge.org/install.xml) if you want to use it.
+
+<%= %{</div>} %>

@@ -10,7 +10,7 @@ It presently uses [TextMate](http://macromates.com/) (a superb writing / program
 
 You might like to watch this [screencast](http://www.apeth.com/whatisrubyfrontier.mov) showing RubyFrontier in action.
 
-More description of what RubyFrontier is [here](what).
+Here is some [further description](what) of what RubyFrontier is.
 
 ## Why RubyFrontier?
 
@@ -18,4 +18,8 @@ That's a big subject, so I deal with it on a [different page](whyrf).
 
 ## How Do I Use RubyFrontier?
 
-Ah. I thought you'd never ask. Let's [get started](start).
+Ah. I thought you'd never ask. Here are [the technical details](tech).
+
+## Too Much Info. How Do I Just Get Started?
+
+My friend Johnny told me to include this section. Here's [how I actually start writing](startrf) a new Web site with RubyFrontier.

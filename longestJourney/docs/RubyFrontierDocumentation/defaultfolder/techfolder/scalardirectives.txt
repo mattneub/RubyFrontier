@@ -1,0 +1,108 @@
+#title "Scalar Directives"
+
+A *scalar directive* is a [directive](types) whose value is a "scalar", a simple datatype such as a string or a number — as opposed to a [directive object](directiveobjects), which is a file or a folder in your source folder. RubyFrontier gathers scalar directives as part of the same [process](howsapage) by which it gathers directive objects: as it begins to operate on a page object, it walks the [hierarchy](hierarchy) upwards from the page object, gathering directives (to construct the [page table](pagetable)). 
+
+You can use any scalar directives for any purpose you like; but RubyFrontier also expects and hopes to find certain scalar directives defined for each page object that it renders, and you should be a little careful not to misuse these.
+
+### How Scalar Directives Are Supplied
+
+Your source folder supplies scalar directives to RubyFrontier in three places:
+
+* **In a `#prefs.yaml` file**. I already [told you](directiveobjects) about this, but I'm going to tell you again here. As a [page object](types) is rendered, and RubyFrontier walks up the [hierarchy](hierarchy) looking for [directives](directiveobjects), it looks for files called `#prefs.yaml`. If it encounters one, it loads it, expecting it to be a hash, and adds the elements of that hash into the list of directives, following the usual rules for [folding](hierarchy). Keys in this hash are expected to be symbols.
+
+  So, for example, the source folder from which this Web page is rendered contains a `#prefs.yaml` file that looks like this:
+
+        --- 
+        :bgcolor: FFFFEE
+        :stylesheetnormal: true
+        :markdown: true
+
+  These directives specify that by default a page should have a background color of `"#FFFFEE"`, should link to the stylesheet called `normal.css`, and should be rendered through Markdown.
+
+  Scalar directives set through `#prefs.yaml` files follow the rules of [folding](hierarchy). This means that if there are multiple `#prefs.yaml` files encountered as RubyFrontier walks up the hierarchy from the page object being rendered, all scalar directives in all `#prefs.yaml` files encountered are obeyed, except that values encountered earlier in the walk (closer to the page object) *override* same-named values encountered later in the walk (higher up the hierarchy). So, for example, if the top-level `#prefs.yaml` file sets `:bgcolor` to `"#FFFFEE"`, then *all* page objects will have a `:bgcolor` value of `"#FFFFEE"`, except that this value can be overridden for any group of files in a lower-level folder by giving a different value in a `#prefs.yaml` file within that folder.
+
+* **In the page object**. As a [page object](types) is [rendered](howsapage), and RubyFrontier walks up the [hierarchy](hierarchy) looking for directives, it also looks *in* the page object itself. A directive in the page object must be one of the first lines of the page object, and it must begin with "#". RubyFrontier looks through the lines of the page object file, and as soon as it encounters a line that does *not* begin with "#", it breaks the page object file into two parts: everything that precedes that point is a series of scalar directives, everything after that point is the content of the page.
+
+  Following the "#", with no space, is the name of the directive. This name will be translated into a symbol. So, for example, the word "#title" will be taken to define a `:title` directive. Then there is a space. Then everything on the rest of the line will be evaluated (using `eval`), and the result of this evaluation will be the value of the directive.
+
+  So, for example, the page object from which this Web page is generated starts like this:
+
+        #title "Scalar Directives"
+
+  RubyFrontier sees this and creates a `:title` directive whose value is the string `"Scalar Directives"`.
+
+  A scalar directive supplied from the page object *overrides* a scalar directive with the same name supplied from a `#prefs.yaml` file. So, for example, if the `#prefs.yaml` file sets `:bgcolor` to `"#FFFFEE"`, then all page objects "below" that file will have a `:bgcolor` value of `"#FFFFEE"`, except that this value can be overridden for any particular file by giving a different value within that file, e.g.:
+
+        #bgcolor "FFFFFF"
+
+<%= caption("prefsoverride","Example of how scalar directives set in a top-level #prefs.yaml file are overridden through folding.") %>
+
+* **In the template**. The mechanism here is just like the mechanism for the page object: as RubyFrontier pours the page object into the [template](template), it splits the template into the initial directives and everything else, and creates the directives. This mechanism is useful chiefly because it takes place considerably later in the [rendering process](howsapage) than the gathering of directives from the page object, and can therefore depend upon directive values that have been set earlier. Scalar directives set in the template have the highest priority of all, in the sense that they are set even if same-named scalar directives have previously been set.
+
+### List of Known Scalar Directives
+
+The following scalar directives are "known" to RubyFrontier: they are meaningful to RubyFrontier out of the box, and will be obeyed if defined.
+
+> <span style="font-size:80%">NOTE on capitalization of known scalar directive names: Frontier's UserTalk is case-insensitive, but Ruby is not. Accordingly, I have had to pick a capitalization rule. The minimal simplest convention is all-lowercase, and this requires the least effort in migrating from Frontier (conversion to lowercase is a built-in TextMate command).</span>
+
+#### Pageheader
+
+The [pageheader](pageheader) is usually all the HTML up to and including the <code>&lt;body></code> tag. It can be supplied in any of three different ways; one way is as the value of a **:pageheader** directive. This directive's value can be the actual content of the pageheader (a string) or a Pathname for a text file to read and use as the content of the pageheader. The matter is discussed completely [here](pageheader).
+
+#### Meta tags
+
+The standard way of generating the [pageheader](pageheader) involves inserting certain `<meta>` tags into the <code>&lt;head></code> region of the document, through the `metatags()` [standard macro](standardmacros). The following directives govern the behavior of this macro:
+
+* **:includemetacharset**. A boolean (the default is `true`): should a `<meta>` tag of the following form be inserted?
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+* **:charset**. The charset value for the above `<meta>` tag. The default is `"utf-8"`.
+
+* **:includemetagenerator**. A boolean (the default is `true`): should the following `<meta>` tag be inserted?
+
+        <meta name="generator" content="RubyFrontier" />
+
+#### Title
+
+* **:title**. The value for the `<title>` tag. Usually defined in the page object, since it is unusual for two pages to have the same title. The `:title` value is usable as an id for [linking](autoglossary) from one page to another within the site, so it's a very good idea for every `:title` to be unique, and if two pages have the same `:title`, you'll get a warning. It is an error for a page to have no `:title` (i.e. you *must* define this directive).
+
+#### Body tag attributes
+
+Body tag attributes are mostly superseded by CSS in good HTML practice, but they do still work.
+
+* **:background**. The name (with no extension) of a file in an `#images` folder.
+
+* **:bgcolor, :text, :link, :alink, :vlink**. A color string; if hex, you may omit the initial "#".
+
+* **:topmargin, :leftmargin, :marginheight, :marginwidth**.
+
+* **:onload, :onunload**.
+
+#### File name rules
+
+If a [page object](types) file is a renderable, RubyFrontier uses the page object file's name to derive the name for the Web page file that will be created. In doing this, it consults certain directives.
+
+* **:fileextension**. The suffix to be added to the name. This will replace the current suffix. The default is `".html"`.
+
+* **:maxfilenamelength**. The maximum number of characters that the name may contain, including the suffix. The default is 31. This limit is also applied to stylesheet and javascript file names.
+
+* **:dropnonalphas**. A boolean (default `true`): Whether characters other than A through Z, 0 through 9, and underscore should be dropped from the name.
+
+* **:lowercasefilenames**. A boolean (default `true`): Whether the name should be downcased.
+
+#### Outline objects
+
+* **:renderoutlinewith**. The name of the [outline renderer](outlinerenderers) to be used if the page object is an outline (`.opml`).
+
+#### Image files
+
+* **:imagefoldername**. The name of the folder at the top level of the Web site folder into which all [image files](images) will be written. The default is `"images"`.
+
+#### Template
+
+* **:template**. The name of the [template](template) into which the page object should be poured. If not defined, the file `#template.txt` will be used. If defined, the file in question will be sought by appending ".txt" and looking in the source folder's `#templates` folder and in the [user templates](user) folder.
+
+#### Macro processing
+
+* **:processmacros**. A boolean (the default is `true`): should [macro](macros) ([ERB](ERB)) expressions be processed? It would be a very rare thing to turn this off.
