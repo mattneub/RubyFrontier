@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/tech.txt</string>
+	<string>longestJourney/opml.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -35,6 +35,48 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#ftpSite.yaml</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>35</integer>
+				<key>line</key>
+				<integer>1</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#glossary.yaml</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>68</integer>
+				<key>line</key>
+				<integer>2</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#prefs.yaml</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>longestJourney/docs/RubyFrontierDocumentation/#template.txt</key>
 		<dict>
 			<key>caret</key>
@@ -43,6 +85,34 @@
 				<integer>24</integer>
 				<key>line</key>
 				<integer>15</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/default.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>251</integer>
+				<key>line</key>
+				<integer>26</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/startrf.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>171</integer>
+				<key>line</key>
+				<integer>4</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -91,15 +161,35 @@
 			<key>firstVisibleLine</key>
 			<integer>31</integer>
 		</dict>
+		<key>longestJourney/opml.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>238</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>222</integer>
+		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
 		<string>longestJourney/docs/RubyFrontierDocumentation/#template.txt</string>
 		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/tech.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#prefs.yaml</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#ftpSite.yaml</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#glossary.yaml</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/default.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/startrf.txt</string>
+		<string>longestJourney/opml.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{484, 72}, {1035, 853}}</string>
+	<string>{{437, 42}, {1035, 853}}</string>
 </dict>
 </plist>

@@ -306,7 +306,8 @@ module UserLand::Html
     p = Pathname.new(s.chomp)
     p.mkpath
     FileUtils.cp_r($newsite.to_s + '/.', p)
-    `mate '#{p}'`
+    FileUtils.rm((p + "#autoglossary.yaml").to_s) # just causes errors if it's there
+    `/usr/local/bin/mate '#{p}'`
   end
 end
 

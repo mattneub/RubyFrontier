@@ -8,6 +8,8 @@ It imitates [UserLand Frontier](Frontier), but it's written in [Ruby](Ruby).
 
 It presently uses [TextMate](http://macromates.com/) (a superb writing / programming tool, and very nimble when dealing with a big hierarchy of files). In a sense that means RubyFrontier is Mac-only, though there isn't any *a priori* reason for this (since Ruby is platform-agnostic).
 
+It's *not* a GUI tool and it's *not* for non-programmers (it's about using Ruby to make the fancy stuff happen in the Web site, such as navigation bars and such).
+
 You might like to watch this [screencast](http://www.apeth.com/whatisrubyfrontier.mov) showing RubyFrontier in action.
 
 Here is some [further description](what) of what RubyFrontier is.
@@ -22,4 +24,4 @@ Ah. I thought you'd never ask. Here are [the technical details](tech).
 
 ## Too Much Info. How Do I Just Get Started?
 
-My friend Johnny told me to include this section. Here's [how I actually start writing](startrf) a new Web site with RubyFrontier.
+My friend Johnny told me to include this section. Here's [how I actually start writing](startrf) a new Web site with RubyFrontier. And here's a [movie](http://www.apeth.com/whatIsRubyFrontier2.mov) demonstrating the initial construction of a Web site.

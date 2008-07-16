@@ -2,6 +2,8 @@
 
 Personally, I think RubyFrontier is pretty simple, but that's because I've been using Frontier for so long that I'm used to it. If you're not acquainted with Frontier, you might choke at first on the [technical details](tech) of the RubyFrontier documentation. So here, in the interests of just getting you started by hook or by crook, are the *actual steps* that I take when I set out to write a new Web site with RubyFrontier.
 
+(Before reading, you really should watch [this movie](http://www.apeth.com/whatIsRubyFrontier2.mov). One moving picture with narration is worth a lot more than 1000 words!)
+
 1. **Think.** Plan ahead a little bit. Can you envision at least a few pages of the Web site and what each page will be about? This will be a more satisfying experience if you can start with at least two or three pages and have them refer to each other.
 
 1. **Create the source folder.** In TextMate, tell RubyFrontier to [make a new Web site](start).
