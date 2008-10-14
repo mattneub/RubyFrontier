@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>currentDocument</key>
-	<string>longestJourney/opml.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -176,20 +174,9 @@
 			<integer>222</integer>
 		</dict>
 	</dict>
-	<key>openDocuments</key>
-	<array>
-		<string>longestJourney/docs/RubyFrontierDocumentation/#template.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/tech.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/#prefs.yaml</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/#ftpSite.yaml</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/#glossary.yaml</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/default.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/startrf.txt</string>
-		<string>longestJourney/opml.rb</string>
-	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{437, 42}, {1035, 853}}</string>
+	<string>{{601, 82}, {1035, 853}}</string>
 </dict>
 </plist>

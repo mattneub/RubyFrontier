@@ -1,10 +1,45 @@
-require "pathname"
-require "yaml"
-require "erb"
-require "pp"
-require "uri"
+begin
+  require "pathname"
+  require "yaml"
+  require "erb"
+  require "pp"
+  require "uri"
+  require "rubygems"
+  require "exifr"
+  #require "ruby-prof"
+rescue
+  puts "Failed to locate a required library or gem! This could cause trouble later, or not... Here's the error message we got:"
+  puts $!
+end
 
-class Hash # implement pseudo-case-insensitive fetching
+module Memoizable # based on code by James Edward Gray
+  def memoizeORIGINAL( name, cache = Hash.new )
+    #return # testing, bypass
+    original = "__unmemoized_#{name}__"
+    ([Class, Module].include?(self.class) ? self : self.class).class_eval do
+      alias_method original, name
+      private      original
+      define_method(name) { |*args| cache[args] ||= send(original, *args) }
+    end
+  end
+  def memoize( name, cache = Hash.new )
+    #return # switch off, testing / profiling
+    original = "__unmemoized_#{name}__"
+    class_variable_set("@@memoized_#{name}", cache) # helps debug, etc.
+    ([Class, Module].include?(self.class) ? self : self.class).class_eval do
+      alias_method original, name
+      private original
+      define_method(name) do |*args|
+        # "nil" might not mean "not present", test explictly
+        cache[args] = send(original, *args) unless cache.key?(args)
+        # deep copy result
+        Marshal.load(Marshal.dump(cache[args]))
+      end
+    end
+  end
+end
+
+class LCHash < Hash # implement pseudo-case-insensitive fetching
   # if your key is lowercase (symbol or string), then incorrectly cased fetch requests will find it
   alias :"old_fetch" :"[]"
   def [](k)
@@ -90,8 +125,28 @@ class Pathname # convenience methods
     when ".jpg", ".jpeg"
       j = JPEG.new(self.to_s)
       return [j.width, j.height]
+    when ".tif", ".tiff"
+      t = EXIFR::TIFF.new(self.to_s)
+      return [t.width, t.height]
+    else
+      return [nil, nil]
     end
   end
+=begin
+  # also, memoize chop_basename because we seem to spend inordinate time there
+  @@chopbasenamecache = Hash.new()
+  alias :old_chop_basename :chop_basename
+  def chop_basename(p)
+    result = nil
+    unless (result = @@chopbasenamecache[p])
+      result = old_chop_basename(p)
+      @@chopbasenamecache[p] = result
+    end
+    result
+  end
+=end
+  extend Memoizable
+  memoize :chop_basename
 end
 
 =begin make 'load' and 'require' include folder next to, and with same name as, this file 
@@ -244,9 +299,10 @@ module UserLand::Html
   def self.publishSite(adrObject, preflight=true)
     adrObject = Pathname.new(adrObject).expand_path
     self.preflightSite(adrObject) if preflight
-    self.everyPageOfSite(adrObject).each do |p|
+    self.everyPageOfSite(adrObject).each_with_index do |p, i|
       puts "publishing #{p}"
       self.releaseRenderedPage(p, (p == adrObject)) # the only one to open in browser is the one we started with
+      #break if i > 5 # profiling
     end
   end
   def self.everyPageOfSite(adrObject)
@@ -295,6 +351,7 @@ module UserLand::Html
     ftpsiteHash = YAML.load_file(ftpsite)
     adrStorage[:adrftpsite] = ftpsite
     adrStorage[:method] = ftpsiteHash[:method]
+    adrStorage = LCHash.new.merge(adrStorage) # convert to an LCHash so lowercase keys work
     return adrStorage
   end
   def self.getLink(linetext, url)
@@ -308,6 +365,17 @@ module UserLand::Html
     FileUtils.cp_r($newsite.to_s + '/.', p)
     FileUtils.rm((p + "#autoglossary.yaml").to_s) # just causes errors if it's there
     `/usr/local/bin/mate '#{p}'`
+  end
+  def self.traverseLink(adrObject, linktext)
+    autoglossary = (callFileWriterStartup(Pathname.new(adrObject)))[:adrFtpSite].dirname + "#autoglossary.yaml"
+    if autoglossary.exist?
+      entry = (YAML.load_file(autoglossary.to_s))[linktext.downcase]
+      if entry && entry[:adr]
+        `mate '#{entry[:adr]}'`
+        exit
+      end
+    end
+    puts "Not found." # appears in tooltip in TM
   end
 end
 
@@ -420,7 +488,8 @@ module UserLand::Html::StandardMacros
     options = Hash.new if options.nil? # become someone might pass nil
     height = options[:height] || imageTable[:height]
     width = options[:width] || imageTable[:width]
-    htmlText = %{<img src="#{imageTable[:url]}" width="#{width}" height="#{height}" }
+    htmlText = %{<img src="#{imageTable[:url]}" }
+    htmlText += %{width="#{width}" height="#{height}" } unless (!width && !height)
     %w{name id alt hspace vspace align style class title border}.each do |what|
       htmlText += %{ #{what}="#{options[what.to_sym]}" } if options[what.to_sym]
     end
@@ -539,8 +608,9 @@ class UserLand::Html::PageMaker
     end
   end
   include UserLand::Html::StandardMacros
+  extend Memoizable
   attr_reader :adrPageTable
-  def initialize(adrPageTable = Hash.new)
+  def initialize(adrPageTable = LCHash.new)
     @adrPageTable = adrPageTable
   end
   def renderable?(adrObject)
@@ -766,14 +836,19 @@ class UserLand::Html::PageMaker
     end
   end
   def buildPageTable(adrObject, adrPageTable=@adrPageTable)
+   # puts "====", "buildPageTable called: #{self}", adrObject, "===="
+    # isolate this directory as parameter so we can memoize
+    adrPageTable.merge!(buildPageTableForDirectory(adrObject.dirname))
     # record what object is being rendered
     adrPageTable[:adrobject] = adrObject
-    
+  end
+  def buildPageTableForDirectory(adrObjectDir) # never call this directly unless you are buildPageTable!
+    adrPageTable = Hash.new # *this* adrPageTable is purely local, its only purpose is to be handed back to buildPageTable
     # init hashes to gather stuff into as we walk up the hierarchy
-    adrPageTable["tools"] = Hash.new
-    adrPageTable["glossary"] = Hash.new
-    adrPageTable["snippets"] = Hash.new
-    adrPageTable["images"] = Hash.new
+    adrPageTable["tools"] = LCHash.new
+    adrPageTable["glossary"] = LCHash.new
+    adrPageTable["snippets"] = LCHash.new
+    adrPageTable["images"] = LCHash.new
   
     # walk file hierarchy looking for things that start with "#"
     # add things only if they don't already exist; that way, closest has precedence
@@ -783,7 +858,7 @@ class UserLand::Html::PageMaker
     # else, just hash pathname under simple filename
     catch (:done) do
       found_ftpsite = false
-      adrObject.dirname.ascend do |dir|
+      adrObjectDir.ascend do |dir|
         dir.each_entry do |f|
           if /^#/ =~ f
             case f.simplename.to_s.downcase
@@ -835,7 +910,9 @@ class UserLand::Html::PageMaker
     # url-setting and some other stuff (fname, f) not yet written
     # there is an inefficiency in Frontier here: this is all done again after tenderRender
     # so I'm just omitting it here for now
+    return adrPageTable
   end
+  memoize :buildPageTableForDirectory
   def tenderRender(adrObject, adrPageTable=@adrPageTable)
     # sorry about the name of this method, but this is what Frontier calls it...
     # extract directives from page object and return suitable bodytext value
@@ -937,7 +1014,7 @@ class UserLand::Html::PageMaker
     name, anchor = name.split("#", 2)
     anchor = anchor ? "#" + anchor : ""
     # autoglossary
-    g = adrPageTable[:autoglossary]
+    g = LCHash.new.merge(adrPageTable[:autoglossary])
     if g && g[name] && g[name][:path]
       path = adrPageTable[:siteRootFolder] + g[name][:path]
       return %{<a href="#{path.relative_uri_from(adrPageTable[:f])}#{anchor}">} 
@@ -988,6 +1065,8 @@ class UserLand::Html::PageMaker
     # if there is a #nextprevs, the array is ordered as in the nextprevs
     # otherwise we just use alphabetical order (filesystem)
     # return nil if no result
+    # memoized, since #nextprevs and folder contents unlikely to change during a rendering
+    # third parameter gives a chance to cancel this (hard to see why you'd want to)
     arr = Array.new
     nextprevs = folder + "#nextprevs.txt"
     if (nextprevs.exist?)
@@ -1001,6 +1080,7 @@ class UserLand::Html::PageMaker
     end
     return (arr.length > 0 ? arr : nil)
   end
+  memoize :pagesInFolder
   def getImageData(imageSpec, adrPageTable=@adrPageTable)
     # find image, get relative path, write out the image, get height and width
     # Frontier has fu for seeking the image, but I assume a single "images" hash gathered as we build page table
@@ -1065,13 +1145,15 @@ if __FILE__ == $0
 # UserLand::Html::preflightSite(Pathname.new("./scriptde.txt").expand_path)
 # UserLand::Html::publishSite("/Users/mattleopard/anger/Word Process/jobs/dialectic/docs/appmodes.txt")
 # UserLand::Html::releaseRenderedPage("./scriptdefolder/develop.txt")
-pp UserLand::Html::everyPageOfSite(Pathname.new("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml").expand_path)
+# pp UserLand::Html::everyPageOfSite(Pathname.new("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml").expand_path)
 #UserLand::Html::newSite()
 #UserLand::Html::releaseRenderedPage("/Volumes/gromit/Users/matt2/anger/Word Process/emperorWebSite/site/default2.opml")
 #require 'profiler'
 #Profiler__::start_profile
 #UserLand::Html::releaseRenderedPage("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml")
 #Profiler__::print_profile($stdout)
-
+Profiler__::start_profile
+UserLand::Html::publishSite("/Volumes/gromit/Users/matt2/anger/Word Process/jobs/sd45/sd45docs/scriptde.txt")
+Profiler__::print_profile($stdout)
 
 end
