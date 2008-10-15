@@ -4,5 +4,7 @@ To read the RubyFrontier documentation:
 
 (2) Choose RubyFrontier > Publish Site.
 
-(3) Enjoy!
+(3) Wait a few seconds.
+
+(4) Enjoy!
 

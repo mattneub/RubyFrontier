@@ -369,7 +369,7 @@ module UserLand::Html
   def self.traverseLink(adrObject, linktext)
     autoglossary = (callFileWriterStartup(Pathname.new(adrObject)))[:adrFtpSite].dirname + "#autoglossary.yaml"
     if autoglossary.exist?
-      entry = (YAML.load_file(autoglossary.to_s))[linktext.downcase]
+      entry = LCHash.new.merge(YAML.load_file(autoglossary.to_s))[linktext.downcase]
       if entry && entry[:adr]
         `mate '#{entry[:adr]}'`
         exit
@@ -752,7 +752,7 @@ class UserLand::Html::PageMaker
             id = $'
             path = refGlossary($` + $1).match(/href="(.*?)"/)[1]
             path = (adrPageTable[:adrSiteRootTable] + Pathname.new(path)).cleanpath + "#autoglossary.yaml"
-            h = YAML.load_file(path) 
+            h = LCHash.new.merge(YAML.load_file(path))
             #puts "h:"
             #pp h
             url = %{<a href="#{h[id.gsub('\\','')][:url]}">}
@@ -884,7 +884,7 @@ class UserLand::Html::PageMaker
               prefsHash.each_key {|key| adrPageTable[key] ||= prefsHash[key]}
             when "#glossary" # gather glossary entries into glossary hash: NB these are *user* glossary entries
               # (different from Frontier: automatically generated glossary entries for linking live in #autoglossary)
-              glossHash = YAML.load_file(dir + f)
+              glossHash = LCHash.new.merge(YAML.load_file(dir + f))
               adrPageTable["glossary"] = glossHash.merge(adrPageTable["glossary"]) # note order: what's in adrPageTable overrides
             when "#ftpsite"
               found_ftpsite = true

@@ -5,3 +5,4 @@ directiveobjects
 scalardirectives
 pagetable
 howsapage
+commands
