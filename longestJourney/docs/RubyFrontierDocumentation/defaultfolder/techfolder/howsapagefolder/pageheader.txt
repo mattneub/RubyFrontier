@@ -2,7 +2,7 @@
 
 The **page header** is a feature that lets you prefix the HTML prologue onto the page, [after](howsapage) the page's body has been inserted into the [template](template) and [macros](macros) have been processed.
 
-You can pregix any page header you like, or you can accept RubyFrontier's default page header. The default page header is quite powerful and complete, and in many cases will be all you need. In any event, it is a good model for your own page header. So I'll start by describing the default page header; then I'll talk about how to supply your own page header instead.
+You can prefix any page header you like, or you can accept RubyFrontier's default page header. The default page header is quite powerful and complete, and in many cases will be all you need. In any event, it is a good model for your own page header. So I'll start by describing the default page header; then I'll talk about how to supply your own page header instead.
 
 ###The Default Page Header
 
