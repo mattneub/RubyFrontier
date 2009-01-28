@@ -292,7 +292,12 @@ module UserLand::Html
     pm.saveOutAutoglossary # save out autoglossary if any
     
     if flPreview && (File.extname(pm.adrPageTable[:fname]) =~ /\.htm/i) # supposed to be a test for browser displayability
-      `open 'file://#{ERB::Util::url_encode(pm.adrPageTable[:f]).gsub("%2F", "/")}'`
+      if pm.adrPageTable[:ftpsite][:apacheURL]
+        f = pm.adrPageTable[:f].relative_path_from(Pathname.new(pm.adrPageTable[:ftpsite][:apacheSite]).expand_path)
+        `open #{URI.escape(pm.adrPageTable[:ftpsite][:apacheURL] + f)}`
+      else
+        `open file://#{URI.escape(pm.adrPageTable[:f].to_s)}`
+      end
     end
     
   end
@@ -364,14 +369,16 @@ module UserLand::Html
     p.mkpath
     FileUtils.cp_r($newsite.to_s + '/.', p)
     FileUtils.rm((p + "#autoglossary.yaml").to_s) # just causes errors if it's there
-    `/usr/local/bin/mate '#{p}'`
+    sup = ENV['TM_SUPPORT_PATH']
+    `"#{sup}/bin/mate" '#{p}'`
   end
   def self.traverseLink(adrObject, linktext)
     autoglossary = (callFileWriterStartup(Pathname.new(adrObject)))[:adrFtpSite].dirname + "#autoglossary.yaml"
     if autoglossary.exist?
       entry = LCHash.new.merge(YAML.load_file(autoglossary.to_s))[linktext.downcase]
       if entry && entry[:adr]
-        `mate '#{entry[:adr]}'`
+        sup = ENV['TM_SUPPORT_PATH']
+        `"#{sup}/bin/mate" '#{entry[:adr]}'`
         exit
       end
     end
@@ -471,7 +478,7 @@ module UserLand::Html::StandardMacros
       FileUtils.cp(source, sheetLoc, :preserve => true)
     end
     pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
-    return %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />}
+    return %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />\n}
   end
   def embedstylesheet(sheetName, adrPageTable=@adrPageTable) # embed stylesheet
     # as with linkstylesheet, unlike Frontier, my logic for finding the stylesheet is very simplified
@@ -489,7 +496,8 @@ module UserLand::Html::StandardMacros
     height = options[:height] || imageTable[:height]
     width = options[:width] || imageTable[:width]
     htmlText = %{<img src="#{imageTable[:url]}" }
-    htmlText += %{width="#{width}" height="#{height}" } unless (!width && !height)
+    # added :nosize to allow suppression of width and height
+    htmlText += %{width="#{width}" height="#{height}" } unless (!width && !height) || options[:nosize]
     %w{name id alt hspace vspace align style class title border}.each do |what|
       htmlText += %{ #{what}="#{options[what.to_sym]}" } if options[what.to_sym]
     end
@@ -575,6 +583,13 @@ module UserLand::Html::StandardMacros
         if k.downcase != "stylesheets"
           s += linkstylesheet(k[10..-1], adrPageTable)
         end
+      end
+    end
+    # new functionality, we accept a directive "linkstylesheets" whose value might be an array
+    # reason: with CSS, order matters
+    if adrPageTable[:linkstylesheets]
+      adrPageTable[:linkstylesheets].each do |name|
+        s += linkstylesheet(name, adrPageTable)
       end
     end
     return s
