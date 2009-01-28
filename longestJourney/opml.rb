@@ -5,14 +5,7 @@ Simulate some Frontier op.* verbs using OPML as the outline source.
 # superclass's "new" factory method lets us substitute different subclass implementations at will
 # also container for methods that don't vary between implementations
 class Opml
-  H = {:down => :godownone,
-    :up => :goupone,
-    :right => :gorightone,
-    :left => :goleftone,
-    :flatdown => :goflatdownone,
-    :flatup => :goflatupone
-  }
-  
+
   MAXINT = 1 << 64
   
   USELIBXML = true
@@ -57,7 +50,7 @@ class Opml
   
   def go(dir, count=1)
     count = MAXINT if count == :infinity
-    return go_wrapper(count, self.method(H[dir]))
+    return go_wrapper(count, self.method("go#{dir.to_s}one".to_sym))
   end
   
   def goflatdownone()
