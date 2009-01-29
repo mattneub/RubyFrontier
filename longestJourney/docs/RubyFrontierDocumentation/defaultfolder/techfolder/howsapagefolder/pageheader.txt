@@ -57,17 +57,7 @@ But before the prefixing takes place, the [macros](macros) within that page head
 
   * If there is a [scalar directive](scalardirectives) whose name is **`:meta`**, its value is inserted as a tag without alteration. The intention here is to give you a chance to place other miscellaneous material into the document's `<head>` area.
 	
-* The **`linkstylesheets()`** call writes stylesheet files to disk and inserts links to them. (Alternatively, it is possible to embed a stylesheet, but that would be a different macro — the [embedstylesheet() macro](standardmacros).)
-
-  * The stylesheet files themselves should be located in a [`#stylesheets` folder](directiveobjects), and should be `.css` files.
-
-  * If there are any [scalar directives](scalardirectives) whose name is of the form **`stylesheetxxx`** (the value of such a directive doesn't matter; `true` is a good choice), a file `xxx.css` is sought in the `#stylesheets` folder. The file is copied out to disk (into a `stylesheets` folder at the top level of the Web site), and a `<link>` tag pointing to it is inserted into the document. For example:
-
-              #stylesheetnormal true
-
-      would result in the file `normal.css` being copied out to disk, and a tag similar to this:
-
-              <link rel="stylesheet" href="../../../stylesheets/normal.css" type="text/css" />
+* The **`linkstylesheets()`** call writes stylesheet files to disk and inserts links to them. (Alternatively, it is possible to embed a stylesheet, but that would be a different macro — the [embedstylesheet() macro](standardmacros).) For a discussion of how you tell this macro *what* stylesheet files to link to, see the discussion of [stylesheets](stylesheets).
 
 * The **`linkjavascripts()`** call writes javascript files to disk and inserts links to them.
 

@@ -7,6 +7,7 @@ autoglossary
 glossary
 filters
 pageheader
+stylesheets
 standardmacros
 nextprevs
 user

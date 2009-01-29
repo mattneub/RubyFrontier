@@ -166,6 +166,12 @@ what: &id017
   :path: !ruby/object:Pathname 
     path: defaultfolder/what.html
 what is rubyfrontier?: *id017
+stylesheets: 
+  :linetext: Stylesheets
+  :adr: !ruby/object:Pathname 
+    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/stylesheets.txt
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/stylesheets.html
 technical details: *id018
 macros and macro scoping: *id019
 the template: *id020

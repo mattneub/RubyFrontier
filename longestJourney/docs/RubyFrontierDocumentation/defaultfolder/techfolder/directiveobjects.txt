@@ -34,7 +34,7 @@ As a starting point, we'll use the above screen shot. Not all possible built-in 
 
   This is a "[folded](hierarchy)" directive: the name-value pairs in all `#prefs.yaml` files encountered on the way up the hierarchy are available (except that name at a lower level overrides the same name at higher level).
 
-* **#stylesheets**. If RubyFrontier encounters a `#stylesheets` folder, it will look inside it for stylesheet (`.css`) files that you ask to embed into or link from your Web pages. I talk later about the [standard macros](standardmacros) for embedding or linking to such a stylesheet file, and about how these macros are [typically used](pageheader).
+* **#stylesheets**. If RubyFrontier encounters a `#stylesheets` folder, it will look inside it for stylesheet (`.css`) files that you ask to embed into or link from your Web pages. I talk later about the [standard macros](standardmacros) for [embedding or linking](stylesheets) to such a stylesheet file, and about how these macros are [typically used](pageheader).
 
 * **#template.txt**. If RubyFrontier encounters a `#template.txt` file, this file will be used as the default [template](template) into which the page object will be poured. ("Default template" means you have no `:template` directive specifying a different template by name.)
 

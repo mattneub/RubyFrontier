@@ -14,7 +14,7 @@ Your source folder supplies scalar directives to RubyFrontier in three places:
 
         --- 
         :bgcolor: FFFFEE
-        :stylesheetnormal: true
+        :linkstylesheets: normal
         :markdown: true
 
   These directives specify that by default a page should have a background color of `"#FFFFEE"`, should link to the stylesheet called `normal.css`, and should be rendered through Markdown.

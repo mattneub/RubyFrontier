@@ -20,7 +20,7 @@ All image files copied out in this way are placed, by default, in a folder at th
 
 An optional second parameter in the `imageref()` call is a hash of names and values that you can use to set additional attributes of the `<img>` tag that will be generated. You may supply as many as you like of the following:
 
-* `:height`, `:width`. It is *not* usual to supply these; if you don't, they will be supplied for you. RubyFrontier knows how to get the height and width of a `jpeg`, `gif`, or `png` by examination of the file.
+* `:height`, `:width`. It is *not* usual to supply these; if you don't, they will be supplied for you. RubyFrontier knows how to get the height and width of a `jpeg`, `gif`, `png`, or `tiff` by examination of the file. To suppress height and width attributes altogether, specify `:nosize`.
 
 * `:alt`. The `alt` attribute. This is required by the XHTML standard, so if you don't supply any value, RubyFrontier will include an `alt` attribute for you, supplying a value of `"image"`.
 

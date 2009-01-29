@@ -575,6 +575,8 @@ module UserLand::Html::StandardMacros
   end
   def linkstylesheets(adrPageTable=@adrPageTable) # link to all stylesheets requested in directives
     # call this, not linkstylesheet; it lets you link to multiple stylesheets
+=begin
+    # old way, no longer used
     # works just like linkjavascripts
     s = ""
     adrPageTable.keys.each do |k|
@@ -585,8 +587,11 @@ module UserLand::Html::StandardMacros
         end
       end
     end
-    # new functionality, we accept a directive "linkstylesheets" whose value might be an array
+=end
+    # new way, we maintain a "linkstylesheets" array
     # reason: with CSS, order matters
+    # see incorporateDirective() for how the "linkstylesheets" array gets constructed
+    s = ""
     if adrPageTable[:linkstylesheets]
       adrPageTable[:linkstylesheets].each do |name|
         s += linkstylesheet(name, adrPageTable)
@@ -864,6 +869,7 @@ class UserLand::Html::PageMaker
     adrPageTable["glossary"] = LCHash.new
     adrPageTable["snippets"] = LCHash.new
     adrPageTable["images"] = LCHash.new
+    adrPageTable[:linkstylesheets] = Array.new
   
     # walk file hierarchy looking for things that start with "#"
     # add things only if they don't already exist; that way, closest has precedence
@@ -896,7 +902,8 @@ class UserLand::Html::PageMaker
               end
             when "#prefs" # flatten prefs out into top-level entries in adrPageTable
               prefsHash = YAML.load_file(dir + f)
-              prefsHash.each_key {|key| adrPageTable[key] ||= prefsHash[key]}
+              # prefsHash.each_key {|key| adrPageTable[key] ||= prefsHash[key]}
+              prefsHash.each_key {|key| incorporateDirective(key, prefsHash[key], true, adrPageTable)}
             when "#glossary" # gather glossary entries into glossary hash: NB these are *user* glossary entries
               # (different from Frontier: automatically generated glossary entries for linking live in #autoglossary)
               glossHash = LCHash.new.merge(YAML.load_file(dir + f))
@@ -961,11 +968,36 @@ class UserLand::Html::PageMaker
     end
     return op
   end
-  def runDirective(linetext, adrPageTable=@adrObject)
+  def runDirective(linetext, adrPageTable=@adrPageTable)
     k,v = linetext.split(" ",2)
-    adrPageTable[k.to_sym] = eval(v.chomp) 
+    #adrPageTable[k.to_sym] = eval(v.chomp) 
+    incorporateDirective(k.to_sym, eval(v.chomp))
   rescue SyntaxError
     raise "Syntax error: Failed to evaluate directive #{v.chomp}"
+  end
+  def incorporateDirective(k, v, yieldToExisting=false, adrPageTable=@adrPageTable)
+    # bottleneck routine: give me a k (symbol or string) and a v (value) and I'll add it to the page table
+    # the problem is that not all directives are created equal; in MOST cases adrPageTable[k] = v,
+    # but it turns out to be useful to be able to special-case certain directives
+    # yieldToExisting lets us use this both during page table build (true) and within a page (false)
+    s = k.to_s
+    # special-case stylesheet link directives; reason: stylesheet links have a meaningful order
+    # we accept two forms of directive: stylesheetNormal true (old style) and linkstylesheets ["one", "two"] (new style)
+    # there is NO OVERRIDE: stylesheet names are appended to :linkstylesheets array in order encountered,
+    # and that is the order in which linkstysheets() macro will insert the links
+    if s =~ /^stylesheet./i
+      adrPageTable[:linkstylesheets] << s[10..-1]
+    elsif s.downcase == "linkstylesheets"
+      adrPageTable[:linkstylesheets] += v.to_a
+    elsif s.downcase == "linkstylesheetsnot"
+      adrPageTable[:linkstylesheets] -= v.to_a
+    else
+      if yieldToExisting
+        adrPageTable[k] ||= v
+      else
+        adrPageTable[k] = v
+      end
+    end
   end
   def getFileName(n, adrPageTable=@adrPageTable)
     return normalizeName(n) + getPref("fileextension", adrPageTable)

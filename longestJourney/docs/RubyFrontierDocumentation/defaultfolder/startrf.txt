@@ -32,11 +32,11 @@ Personally, I think RubyFrontier is pretty simple, but that's because I've been 
     
             \<%= imageref("myimage") %>
 
-1. **CSS.** Okay, by now you are probably becoming heartily sick of the default look of the pages you're generating and you're ready to fix the CSS and the template. For the CSS, create a `.css` file in the `#stylesheets` folder. Let's suppose you call it `normal.css`. To make a page use it, insert at the start of the page the directive line `#stylesheetnormal true`, or to make all pages use it, add this line to `#prefs.yaml`:
+1. **CSS.** Okay, by now you are probably becoming heartily sick of the default look of the pages you're generating and you're ready to fix the CSS and the template. For the CSS, create a `.css` file in the `#stylesheets` folder. Let's suppose you call it `normal.css`. To make a page use it, insert at the start of the page the directive line `#linkstylesheets "normal"`, or to make all pages use it, add this line to `#prefs.yaml`:
 
-			:stylesheetnormal: true
+			:linkstylesheets: normal
 
-  (The last part, "normal", must match the name of the stylesheet file.)
+  (The value, "normal", must match the name of the stylesheet file.)
 
 1. **Template.** Editing the [template](template) is trickier. It will really help if you have some idea what you want the template to do. You can directly edit the existing `#template.txt` file if you wish. It is already quite powerful to begin with. The `<bodytext>` pseudo-tag is where each page's content is inserted into the template. The preceding and following `pageheader()` and `pagefooter()` calls are generating HTML and bringing a lot of other RubyFrontier features into play, so initially you should keep them too. Anything you write, therefore, needs to be after the `pageheader()` call and before the `pagefooter()` call. You might, for example, wrap the `<bodytext>` pseudo-tag in some kind of table or div structure.
 	

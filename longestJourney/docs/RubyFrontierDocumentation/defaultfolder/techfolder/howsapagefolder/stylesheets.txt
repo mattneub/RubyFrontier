@@ -1,0 +1,40 @@
+#title "Stylesheets"
+
+As you know, an HTML page can link to one or more CSS stylesheets. Specifying what CSS stylesheets a [page object](types) should be linked to presents certain special challenges for RubyFrontier:
+
+* One HTML page can link to multiple stylesheets.
+
+* Order matters. The order in which stylesheet `<link>` tags appear in an HTML page affects the cascade of styles that is ultimately used to determine the page's appearance.
+
+* Different pages can share the same stylesheet. That's part of the efficiency of linking to a stylesheet. So if page A and page B wish to differ in their styles, they can do it by linking to different sets of stylesheets, but not by linking to two different versions of the same stylesheet (because whatever version of a stylesheet is written to disk is the version that all pages linking to that stylesheet will share).
+
+### How to Specify Linked Stylesheets
+
+In the face of all this, RubyFrontier must provide a mechanism that allows you, the programmer, to specify for each page object what stylesheet(s) it should link to, in a manner consistent with the structure of the [hierarchy](hierarchy) and [directives](scalardirectives). This is not something that the [original Frontier](http://frontier.userland.com/) handled terribly well. My solution is as follows:
+
+* The basic directive for specifying stylesheets to be linked to is the [scalar directive](scalardirectives) **`:linkstylesheets`**. Its value is an array of stylesheet names (without the `.css` suffix). Since this is a scalar directive, it can be encountered at any of the points where scalar directives are specified: in a `#prefs.yaml` file as we walk up the hierarchy, in the page object itself, or in the template — in that order. The order is significant, because the rule for how this directive is processed is special; and here it is:
+
+  We maintain in the [page table](pagetable) an array (called, appropriately enough, `:linkstylesheets`). Every element of a `:linkstylesheets` directive's value is appended to the end of this array, in the order in which the elements appear, in the order in which the `:linkstylesheets` directives are encountered.
+
+* In the above rule, there is no provision for overriding. But there needs to be a way, at a lower level of the hierarchy, to prevent a stylesheet specified at a higher level from being linked to at all. Therefore, there is another scalar directive **`:linkstylesheetsnot`**, whose value is also an array of stylesheet names; when encountered, every element of its value is *removed* from the page table's `:linkstylesheets` array.
+
+* You can alternatively have a scalar directive of the form `:stylesheetXXX`, where `"XXX"` is the name of a stylesheet. (The name of the stylesheet is drawn from the key name, so the value is unimportant; by convention, it is usually `true`.) This is treated precisely as if it had been `:linkstylesheets` with a value of `["XXX"]`. This approach is deprecated, and exists solely for compatibility with the way stylesheets used to work in RubyFrontier.
+
+### The Stylesheets Themselves
+
+The actual stylesheets are `.css` files in a `#stylesheets` folder. Typically there will be just one `#stylesheets` folder, located at the top level of the site.
+
+TextMate is good at editing `.css` files, so maintaining your stylesheets should be not problem.
+
+### How Stylesheets Get Written to Disk and Linked
+
+Late in the [page rendering process](howsapage), the [page header](pageheader) is prefixed to the page. The page header will typically contain a call to the **`linkstylesheets()`** [standard macro](standardmacros). This macro fetches the `:linkstylesheets` array from the page table and, for each element in turn, calls **`linkstylesheet()`** with that element as parameter. The result is that (1) the stylesheet itself is written out to disk, into a `stylesheets` folder at the top level of the site, and (2) a `<link>` tag is inserted into the page's `<head>` region, linking to that stylesheet.
+
+Thus, the order of the stylesheet names in the the `:linkstylesheets` array is the order in which the `<link>` tags are created. This solves the problem we set out to solve.
+
+### Alternative Approaches
+
+The page header can call **`linkstylesheet()`** and supply a parameter value directly (a string representing the name of one stylesheet). The stylesheet is written to disk and a `<link>` tag to it is substituted for macro call. (As already mentioned, a **`linkstylesheets()`** call is actually translated for you into a series of **`linkstylesheet()`** calls.)
+
+Another alternative is that you might want to embed a stylesheet in the page itself. To do so, the page header can call **`embedstylesheet()`**.
+
