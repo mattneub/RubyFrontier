@@ -1,16 +1,17 @@
-begin
-  require "pathname"
-  require "yaml"
-  require "erb"
-  require "pp"
-  require "uri"
-  require "rubygems"
-  require "exifr"
-  #require "ruby-prof"
-rescue
-  puts "Failed to locate a required library or gem! This could cause trouble later, or not... Here's the error message we got:"
-  puts $!
+def myrequire(what)
+    require what
+  rescue LoadError
+    puts "Failed to located required \"#{what}\". This could cause trouble later... or not. Here's the error message we got:"
+    puts $!
 end
+myrequire "pathname"
+myrequire "yaml"
+myrequire "erb"
+myrequire "pp"
+myrequire "uri"
+myrequire "rubygems"
+myrequire "exifr"
+
 
 module Memoizable # based on code by James Edward Gray
   def memoizeORIGINAL( name, cache = Hash.new )
