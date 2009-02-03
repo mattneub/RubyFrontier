@@ -327,6 +327,7 @@ module UserLand::Html
     pm = nil # so that we have a PageMaker object left over at the end
     self.everyPageOfSite(Pathname.new(adrObject)).each do |p|
       pm = PageMaker.new
+      pm.memoize = false # so if we then publishSite, existing values won't bite us
       pm.buildPageTableFully(p)
       tempGlossary = Hash.new
       pm.addPageToGlossary(p, tempGlossary)
@@ -631,8 +632,10 @@ class UserLand::Html::PageMaker
   include UserLand::Html::StandardMacros
   extend Memoizable
   attr_reader :adrPageTable
+  attr_accessor :memoize
   def initialize(adrPageTable = LCHash.new)
     @adrPageTable = adrPageTable
+    @memoize = true # default; instantiator can always turn it off
   end
   def renderable?(adrObject)
     # no error-checking; we assume this object is in a site
@@ -935,7 +938,7 @@ class UserLand::Html::PageMaker
     # so I'm just omitting it here for now
     return adrPageTable
   end
-  memoize :buildPageTableForDirectory
+  memoize :buildPageTableForDirectory unless !@memoize
   def tenderRender(adrObject, adrPageTable=@adrPageTable)
     # sorry about the name of this method, but this is what Frontier calls it...
     # extract directives from page object and return suitable bodytext value
@@ -1030,8 +1033,8 @@ class UserLand::Html::PageMaker
     # linetext is title; might be nil, e.g. this might be a non-renderable (see preflightSite)
     if (linetext = adrPageTable[:title])
       # issue warning if page object has changed location
-      changed = adrPageTable[:autoglossary][linetext] && (adrPageTable[:autoglossary][linetext][:adr] != adrObject)
-      puts "#{adrObject} changed position from #{adrPageTable[:autoglossary][linetext][:adr]}" if changed
+      changed = glossary[linetext] && (glossary[linetext][:adr] != adrObject)
+      puts "#{adrObject} changed position from #{glossary[linetext][:adr]}" if changed
       h[:linetext] = linetext
     end
     # url in ftpsite might not exist
@@ -1128,7 +1131,7 @@ class UserLand::Html::PageMaker
     end
     return (arr.length > 0 ? arr : nil)
   end
-  memoize :pagesInFolder
+  memoize :pagesInFolder unless !@memoize
   def getImageData(imageSpec, adrPageTable=@adrPageTable)
     # find image, get relative path, write out the image, get height and width
     # Frontier has fu for seeking the image, but I assume a single "images" hash gathered as we build page table
@@ -1178,9 +1181,8 @@ class UserLand::Html::PageMaker
   def saveOutAutoglossary(g=nil, adrPageTable=@adrPageTable)
     g ||= adrPageTable[:autoglossary]
     if g
-      File.open(adrPageTable[:adrSiteRootTable] + "#autoglossary.yaml", "w") do |io| 
-        YAML.dump(g, io)
-      end
+      f = adrPageTable[:adrSiteRootTable] + "#autoglossary.yaml"
+      File.open(f, "w") { |io| YAML.dump(g, io) }
     end
   end
 end
