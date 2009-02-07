@@ -31,6 +31,9 @@ module Memoizable # based on code by James Edward Gray
       alias_method original, name
       private original
       define_method(name) do |*args|
+        # provide a bypass
+        return send(original, *args) if @memoize == false
+        # puts "using memoize for #{name}"
         # "nil" might not mean "not present", test explictly
         cache[args] = send(original, *args) unless cache.key?(args)
         # deep copy result
@@ -938,7 +941,7 @@ class UserLand::Html::PageMaker
     # so I'm just omitting it here for now
     return adrPageTable
   end
-  memoize :buildPageTableForDirectory unless !@memoize
+  memoize :buildPageTableForDirectory
   def tenderRender(adrObject, adrPageTable=@adrPageTable)
     # sorry about the name of this method, but this is what Frontier calls it...
     # extract directives from page object and return suitable bodytext value
@@ -1131,7 +1134,7 @@ class UserLand::Html::PageMaker
     end
     return (arr.length > 0 ? arr : nil)
   end
-  memoize :pagesInFolder unless !@memoize
+  memoize :pagesInFolder
   def getImageData(imageSpec, adrPageTable=@adrPageTable)
     # find image, get relative path, write out the image, get height and width
     # Frontier has fu for seeking the image, but I assume a single "images" hash gathered as we build page table
