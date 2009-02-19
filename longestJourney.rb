@@ -1,17 +1,26 @@
-def myrequire(what)
-    require what
-  rescue LoadError
-    puts "Failed to located required \"#{what}\". This could cause trouble later... or not. Here's the error message we got:"
-    puts $!
-end
-myrequire "pathname"
-myrequire "yaml"
-myrequire "erb"
-myrequire "pp"
-myrequire "uri"
-myrequire "rubygems"
-myrequire "exifr"
 
+def myrequire(*what)
+  # (1) no penalty for failure; we catch the LoadError and we don't re-raise
+  # (2) arg can be an array, so multiple requires can be combined in one line
+  # (3) array element itself can be a pair, in which case second must be array of desired includes as symbols
+  # that way, we don't try to perform the includes unless the require succeeded
+  # and we never *say* the include as a module, so it can't fail at compile time
+  # and if an include fails, that does raise all the way since we don't catch NameError
+  what.each do |thing|
+    begin
+      if thing.kind_of?(Array)
+        require thing[0]
+        Array(thing[1]).each {|inc| include self.class.const_get(inc)}
+      else
+        require thing
+      end
+    rescue LoadError
+      puts "Failed to located required \"#{thing}\". This could cause trouble later... or not. Here's the error message we got:"
+      puts $!
+    end
+  end
+end
+myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "exifr", "enumerator"
 
 module Memoizable # based on code by James Edward Gray
   def memoizeORIGINAL( name, cache = Hash.new )
@@ -25,6 +34,7 @@ module Memoizable # based on code by James Edward Gray
   end
   def memoize( name, cache = Hash.new )
     #return # switch off, testing / profiling
+    # code expanded to be less elegant but more instrumentable
     original = "__unmemoized_#{name}__"
     class_variable_set("@@memoized_#{name}", cache) # helps debug, etc.
     ([Class, Module].include?(self.class) ? self : self.class).class_eval do
@@ -33,11 +43,18 @@ module Memoizable # based on code by James Edward Gray
       define_method(name) do |*args|
         # provide a bypass
         return send(original, *args) if @memoize == false
-        # puts "using memoize for #{name}"
-        # "nil" might not mean "not present", test explictly
-        cache[args] = send(original, *args) unless cache.key?(args)
-        # deep copy result
-        Marshal.load(Marshal.dump(cache[args]))
+        unless cache.key?(args)
+          # puts "memoizing #{name} for #{args}"
+          temp = send(original, *args)
+          cache[args] = Marshal.dump(temp)
+          return temp # here's my current reasoning: 
+          # we must not return a pointer to cache contents, lest it be changed
+          # on the other hand, dump/load is time-consuming
+          # so let's compromise: dump now, load later, thus skipping the dump step down the road
+        else
+          # puts "using memoized #{name} for #{args}"
+          return Marshal.load(cache[args]) # return deep copy so we can't accidentally alter cache
+        end
       end
     end
   end
@@ -64,6 +81,20 @@ class String # convenience methods
     return self.gsub(/[^a-zA-Z0-9_]/, "")
   end
 end
+
+class Array # convenience methods
+  def nextprev(obj = nil, &block)
+    ix = (block_given? ? index(find(&block)) : index(obj))
+    [ ix > 0 ? fetch(ix-1) : nil, ix < length - 1 ? fetch(ix+1) : nil ]
+  end
+  def crunch # remove "trailing duplicates" by ==, assumes we are sorted already
+    result = []
+    each_cons(2) {|x,y| result << x unless x == y}
+    result << last unless result.last == last
+    result
+  end
+end
+
 
 class JPEG # used by Pathname#image_size, stolen from the Internet :) http://snippets.dzone.com/posts/show/805
   attr_reader :width, :height, :bits
@@ -102,6 +133,9 @@ private
 end
 
 class Pathname # convenience methods
+  def contains?(p)
+    p.ascend {|dir| break true if self == dir } # nil otherwise
+  end
   def simplename # name without extension
     self.basename(self.extname)
   end
@@ -157,11 +191,14 @@ end
 that is where supplementary files go:
 (1) stuff to keep this file from getting too big
 (2) user.rb, where the user can maintain the UserLand::User class
+uses our Pathname convenience method so we couldn't do this until now
 =end
 p = Pathname.new(__FILE__)
 $: << (p.dirname + p.simplename).to_s
 $usertemplates = (p.dirname + p.simplename) + "user" + "templates"
 $newsite = (p.dirname + p.simplename) + "newsite"
+
+myrequire 'opml'
 
 =begin special dispatcher needed by BindingMaker
 here's the deal: if the user says e.g. html.getLink, BindingMaker's method_missing gets "html"
@@ -262,13 +299,10 @@ class UserLand::Renderers::SuperRenderer
   end
 end
 
-# now that we've defined SuperRenderer, we can load "user.rb", which might contain renderers inheriting from it
-require 'opml'
-begin; require 'user'; rescue; end # no penalty for not having a "user.rb" file 
-
 # public interface for rendering a page (class methods)
 # also general utilities without reference to any specific page being rendered
 module UserLand::Html
+  class << self; extend Memoizable; end # have to talk like this in order to memoize class/module methods
   def self.guaranteePageOfSite(adrObject)
     adrObject = Pathname.new(adrObject).expand_path
     raise "No such file #{adrObject}" unless adrObject.exist?
@@ -314,15 +348,32 @@ module UserLand::Html
       #break if i > 5 # profiling
     end
   end
-  def self.everyPageOfSite(adrObject)
-    # a page is anything in the site table not starting with # or inside a folder starting with #
+  def self.getFtpSiteFile(p)
+    # walk upwards to the first folder containing an #ftpSite file, and return that file
+    # if what you wanted was the folder itself, just call the folder's dirname
+    Pathname.new(p).dirname.ascend do |dir|
+      dir.each_entry do |f|
+        if "#ftpsite" == f.simplename.to_s.downcase
+          return dir + f
+        end
+      end
+      raise "Reached top level without finding #ftpsite" if dir.root?
+    end
+  end
+  def self.everyPageOfFolder(f)
+    # a page is anything in the folder not starting with # or inside a folder starting with #
     # that doesn't mean every page is a renderable; it might merely be a copyable, but it is still a page
+    # "in" means at any depth
     result = Array.new
-    (callFileWriterStartup(Pathname.new(adrObject)))[:adrFtpSite].dirname.find do |p|
+    Pathname.new(f).find do |p|
       Find.prune if p.basename.to_s =~ /^[#.]/
       result << p if (!p.directory? && p.simplename != "") # ignore invisibles
     end
     return result
+  end
+  class << self; memoize :everyPageOfFolder; end # have to talk this way yadda yadda
+  def self.everyPageOfSite(adrObject)
+    return everyPageOfFolder(getFtpSiteFile(adrObject).dirname)
   end
   def self.preflightSite(adrObject)
     # prebuild autoglossary using every page of table containing adrObject path
@@ -345,19 +396,8 @@ module UserLand::Html
     pm.saveOutAutoglossary(glossary) # save out resulting autoglossary
   end  
   def self.callFileWriterStartup(adrObject, adrStorage=Hash.new)
-    # we require an #ftpSite file to mark the top of the site
-    # walk upwards until we find it; fill in adrStorage and return it
-    ftpsite = nil
-    catch :done do
-      adrObject.dirname.ascend do |dir|
-        dir.each_entry do |f|
-          if "#ftpsite" == f.simplename.to_s.downcase
-            ftpsite = dir + f; throw :done;
-          end
-        end
-        raise "Reached top level without finding #ftpsite" if dir.root?
-      end
-    end
+    # fill in adrStorage and return it
+    ftpsite = getFtpSiteFile(adrObject)
     ftpsiteHash = YAML.load_file(ftpsite)
     adrStorage[:adrftpsite] = ftpsite
     adrStorage[:method] = ftpsiteHash[:method]
@@ -648,6 +688,8 @@ class UserLand::Html::PageMaker
     # eventually we might support ftp like Frontier, but right now we just write to disk
     # so the adrStorage parameter isn't being used for anything yet
     f = adrPageTable[:f] # target file
+    # error check; make certain we are not about to write into ourself
+    raise "attempt to write into site table" if adrPageTable[:adrSiteRootTable].contains?(f)
     f.dirname.mkpath
     if renderable?(adrPageTable[:adrObject])
       File.open(f,"w") do |io|
@@ -682,7 +724,12 @@ class UserLand::Html::PageMaker
     # all method defs in tools become methods of BindingMaker
     # all outline renderers in tools spring into life
     theBindingMaker = BindingMaker.new(self)
-    adrPageTable["tools"].each { |k,v| theBindingMaker.instance_eval(File.read(v)) }
+    begin
+      v = nil
+      adrPageTable["tools"].each { |k,v| theBindingMaker.instance_eval(File.read(v)) }
+    rescue SyntaxError
+      raise "Trouble reading #{v}"
+    end
   
     # if the page is an outline or script, now render it (unlike Frontier which did it earlier, unnecessarily)
     case adrPageTable[:bodytext]
@@ -726,6 +773,11 @@ class UserLand::Html::PageMaker
           
     # pagefilter, handed adrPageTable, expected to access :bodytext
     callFilter("pageFilter")
+    
+    # early exit option; provided because...
+    # ...it may be, as in the case of a blog, where bodytext from many pages is embedded in a single page...
+    # ...that there is no reason to go on, since we are only rendering to get the :bodytext
+    return if adrPageTable[:stopAfterPageFilter]
 
     #template
     # TODO: no support yet for indirect template
@@ -836,7 +888,7 @@ class UserLand::Html::PageMaker
   
     # obtain directives from within page object
     # insert page object, in some form, into page table
-    adrPageTable[:bodytext] = tenderRender(adrObject)
+    adrPageTable[:bodytext] = tenderRender(adrPageTable[:adrobject])
     
     # work out :fname, :siteRootFolder, :subDirectoryPath, :f
     # :fname => name of file we will write out
@@ -844,16 +896,17 @@ class UserLand::Html::PageMaker
     # :adrSiteRootTable => folder containing #ftpsite marker, in which whole site object lives
     # :f => full pathname of file we will write out
     # :subDirectoryPath => relative path from :siteRootFolder to :f, or from :adrSiteRootTable to :adrObject
-    if renderable?(adrObject)
-      adrPageTable[:fname] = getFileName(adrObject.simplename)
+    if renderable?(adrPageTable[:adrobject])
+      adrPageTable[:fname] = getFileName(adrPageTable[:adrobject].simplename)
     else
-      adrPageTable[:fname] = adrObject.basename
+      adrPageTable[:fname] = adrPageTable[:adrobject].basename
     end
     folder = getSiteFolder() # sets adrPageTable[:siteRootFolder] and returns it
-    relpath = (adrObject.relative_path_from(adrPageTable[:adrSiteRootTable])).dirname
+    relpath = (adrPageTable[:adrobject].relative_path_from(adrPageTable[:adrSiteRootTable])).dirname
     adrPageTable[:subdirectorypath] = relpath
     adrPageTable[:f] = folder + relpath + adrPageTable[:fname]
-  
+    #pp adrPageTable
+    
     # insert user glossary
     if UserLand::User.respond_to?(:glossary)
       g = adrPageTable["glossary"]
@@ -952,7 +1005,9 @@ class UserLand::Html::PageMaker
     when ".opml"
       return runOutlineDirectives(adrObject) # Opml
     when ".rb"
-      return Sandbox.new(adrObject) # Sandbox
+      s = Sandbox.new(adrObject) # Sandbox
+      s.runDirectives(self) if s.respond_to?(:runDirectives)
+      s
     else
       return "" # not a renderable, unimportant
     end
@@ -978,7 +1033,7 @@ class UserLand::Html::PageMaker
   def runDirective(linetext, adrPageTable=@adrPageTable)
     k,v = linetext.split(" ",2)
     #adrPageTable[k.to_sym] = eval(v.chomp) 
-    incorporateDirective(k.to_sym, eval(v.chomp))
+    incorporateDirective(k.to_sym, eval(v.chomp), false, adrPageTable)
   rescue SyntaxError
     raise "Syntax error: Failed to evaluate directive #{v.chomp}"
   end
@@ -1084,6 +1139,9 @@ class UserLand::Html::PageMaker
   end
   def getOneDirective(directiveName, adrObject)
     # simple-mindedly pull a directive out of a page's contents
+    # we now accept an array of directives, and if so, we return an array
+    is_arr = directiveName.kind_of?(Array)
+    directiveName = Array(directiveName)
     d = Hash.new
     case adrObject.extname
     when ".txt"
@@ -1091,7 +1149,9 @@ class UserLand::Html::PageMaker
     when ".opml"
       runOutlineDirectives(adrObject, d)
     end
-    return d[directiveName] # value or nil
+    arr = directiveName.map {|name| d[name]}
+    return arr if is_arr
+    return arr[0] # if a scalar was supplied
   end
   def getTitleAndPath(id, adrPageTable=@adrPageTable)
     # grab title (linetext) and path from autoglossary; useful for macros
@@ -1105,12 +1165,13 @@ class UserLand::Html::PageMaker
     # if there is a #nextprevs listing ids in order, we just use that
     # otherwise we use the physical file system
     # either or both element of the array can be nil to signify none
-    result = [nil, nil]
-    sibs = pagesInFolder(obj.dirname)
-    us = sibs.index(obj.simplename.to_s)
-    result[0] = sibs[us-1] if us > 0
-    result[1] = sibs[us+1] if us < sibs.length - 1
-    return result
+    # result = [nil, nil]
+    # sibs = pagesInFolder(obj.dirname)
+    # us = sibs.index(obj.simplename.to_s)
+    # result[0] = sibs[us-1] if us > 0
+    # result[1] = sibs[us+1] if us < sibs.length - 1
+    # return result
+    pagesInFolder(obj.dirname).nextprev(obj.simplename.to_s)
   end
   def pagesInFolder(folder, adrPageTable=@adrPageTable)
     # utility, also useful to macros
@@ -1189,6 +1250,8 @@ class UserLand::Html::PageMaker
     end
   end
 end
+
+myrequire 'user' # last of all, so user can define SuperRenderer subclass and use "user.rb" for overrides of anything
 
 if __FILE__ == $0
   
