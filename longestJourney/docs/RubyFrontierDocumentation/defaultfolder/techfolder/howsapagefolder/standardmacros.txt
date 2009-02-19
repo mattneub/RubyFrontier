@@ -28,7 +28,7 @@ The macros are shown as they might be called in a macro under the rules of [macr
 
 * **imageref()**. Writes an image to disk and returns an `<img>` tag referring to it. See on [images](images) for full discussion.
 
-* **html.getOneDirective()**. Takes two parameters, a string name of a directive (such as `"title"`) and a Pathname pointing to a page object. Reads the page object (only if it is a `.txt` or an `.opml` file) and extracts and returns the value of the [scalar directive](scalardirectives) at its start with that name (or nil). 
+* **html.getOneDirective()**. Takes two parameters, a string name of a directive (such as `"title"`) and a Pathname pointing to a page object. Or, alternatively, the first parameter can be an array of string names of directives. Reads the page object (only if it is a `.txt` or an `.opml` file) and extracts and returns the value of the [scalar directive](scalardirectives) at its start with the specified name(s) (or nil). 
 
 * **html.getTitleAndPath()**. Given a single parameter, uses that parameter as a key into the [autoglossary](autoglossary) to retrieve information about a page of the site, and returns an array of two values, the page's title (as a string) and its pathname (as a Pathname object). Either or both of those can be nil. This is useful when, for example, what you have is a page object's simple name and you want to form a link to it whose text includes the title of the Web page the page object generates.
 

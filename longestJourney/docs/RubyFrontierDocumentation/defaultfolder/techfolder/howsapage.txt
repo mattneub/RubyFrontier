@@ -20,15 +20,15 @@ This is a lot of information, and it may seem at first like too much to take in.
 
   I don't use this feature in any of my sites, so it's a little hard for me to suggest what you might use it for; but it's a Frontier feature so RubyFrontier does it. The page object has not yet been read from disk, so I imagine you might use this moment to manipulate the directive contents of the page table in some tricky way. (For example, you could set the [`:siterootfolder`](pagetable) dynamically if you didn't want to use the static `:folder` entry of `#ftpsite.yaml`.)
 
-* We now **read the page object file itself**.
+* We now **read the page object file itself**. We break the file into two pieces: any [scalar directives](scalardirectives) at the start of the file, and everything else.
 
-  If the page object is a `.txt` file or an `.opml` file, we break the file into two pieces: any [scalar directives](scalardirectives) at the start of the file, and everything else.
-
-  * Scalar directives from within the page object override (replace) any same-named directives already stored in the page table. The scalar directives must be located, one per line, right at the start of the page object file, in the form:
+  * Scalar directives from within the page object override (replace) any same-named directives already stored in the [page table](pagetable). The scalar directives must be located, one per line, right at the start of the page object file, in the form:
 
                 #directivename "some value"
 
-      where "#" is the first character on the line, and everything after the name is a valid Ruby expression. (The value is evaluated as a Ruby expression using simple `eval`, but I can imagine that in the future, RubyFrontier might do something more sophisticated here, such as `instance_eval` within the PageMaker object that's rendering the page.) 
+      where "#" is the first character on the line, and everything after the name is a valid Ruby expression. (The value is evaluated as a Ruby expression using simple `eval`, but I can imagine that in the future, RubyFrontier might do something more sophisticated here, such as `instance_eval` within the PageMaker object that's rendering the page.)
+
+  If the file is an `.rb` script file, we need accomplish the same thing by calling the script's `runDirectives()` method if it has one, passing it a reference to the `UserLand::Html::PageMaker` object in which rendering is taking place; this method is expected to manipulate [page table](pagetable) values as desired (by way of the PageMaker object's `adrPageTable` method). At the very least, it should probably define `pm.adrPageTable[:title]`, since it is an error for a renderable to have no title.
 
   * The *remainder* of the page object file — i.e., in the case of a `.txt` file or an `.opml` file, everything after the last directive at the start of the file, or, in the case of an `.rb` file, the entire file — is now stored in the page table under the `:bodytext` key.
 
@@ -38,7 +38,7 @@ This is a lot of information, and it may seem at first like too much to take in.
 
 * If the page object file is an `.opml` file or an `.rb` file, it is now **turned into text**. The value we will operate on is the value of the `:bodytext` key in the page table, and the result of the operation becomes the *new* value of the `:bodytext` key in the page table. Here's what we do:
 
-  * If the page object is an `.rb` file, meaning that it consists of a *script*, we **run the script**. In particular, the script is expected to define a top-level method, `render()`, taking one parameter; that method is called, supplying one parameter — the `UserLand::Html::PageMaker` object that's rendering the page. The script is thus in a very powerful position. It can obtain the page table (for example, if the `PageMaker` object is called `pm`, the page table is `pm.adrPageTable`) and can do whatever it wishes. At the very least, it should probably define `pm.adrPageTable[:title]`, since it is an error for a renderable to have no title. The result of the script becomes the new value of `:bodytext`.
+  * If the page object is an `.rb` script file, we **run the script**. In particular, the script is expected to define a top-level method, `render()`, taking one parameter; that method is called, supplying one parameter — the `UserLand::Html::PageMaker` object that's rendering the page. The script is thus in a very powerful position. It can obtain the page table (for example, if the `PageMaker` object is called `pm`, the page table is `pm.adrPageTable`) and can do whatever it wishes. The result of the script becomes the new value of `:bodytext`.
 
   * If the page is an `.opml` file, it consists of an *outline* (expressed as XML); you must *designate and supply* an **[outline renderer](outlinerenderers) to transform it into text**. To *designate* the outline renderer, you must, prior to this moment, have defined the `:renderoutlinewith` [scalar directive](scalardirectives); its value must be the string name of the outline renderer class (which, as for any class name, must begin with a capital letter). To *supply* the outline renderer, you will usually have placed an `.rb` file in a `#tools` folder; or, if you want an outline renderer to be available to all your Web sites, you can keep it in [the `user.rb` file](user). The renderer's `render()` method is called, as described [here](outlinerenderers), using [macro scoping](macros); the result of this call becomes the new value of `:bodytext`.
 
