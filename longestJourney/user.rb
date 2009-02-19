@@ -32,6 +32,22 @@ module UserLand::Html
       end
     end
   end
+  
+  # stuff for blogging
+  HEARTREGEX = /<!\-\- bodytextstart \-\->(.*)<!\-\- bodytextend \-\->/m
+  def self.heartOfRenderedPage(adrObject, regex = HEARTREGEX)
+    # render a page and pluck out its heart; good for embedding one page in another (as in a blog)
+    # regex should be like above, so that match[1] fetches desired heart
+    # okay, but now I no longer use regex, since I realized all I want is the bodytext
+    pm = PageMaker.new
+    pm.adrPageTable[:stopAfterPageFilter] = true
+    pm.buildObject(adrObject)
+    # regex.match(pm.adrPageTable[:renderedtext])[1]
+    pm.adrPageTable[:bodytext]
+    # but I expect I will need to modify this to look for some "snip" comment or something, and snip there
+  end
+  class << self; memoize :heartOfRenderedPage; end # have to talk this way yadda yadda
+  
 end
 
 class UserLand::Html::PageMaker
@@ -42,6 +58,32 @@ class UserLand::Html::PageMaker
     return nil unless (downfolder.directory?)
     return pagesInFolder(downfolder)
   end
+  
+  # stuff for blogging
+  def storyHashes(adrPageTable=@adrPageTable)
+    # something like this, it seems to me, is needed in order to make a blogging component feasible
+    # in a blog site, there are many different situations where we need fundamental info about all "stories"
+    # so it makes sense to bottleneck and standardize the routine for gathering that info 
+    # (and, as a secondary benefit, we can cache that info)
+    # we have one requirement: there must be a pref, pathToStories, pointing from top level to the stories folder
+    # any page in that folder is considered a story
+    # it is also expected (but not required?) that each story contain title, category, and date directives
+    # where date is in form YYYY-MM-DD HH:MM:SS
+    
+    # find all stories = pages in stories folder as instructed by prefs
+    arr = UserLand::Html.everyPageOfFolder(adrPageTable[:adrsiteroottable] + adrPageTable[:pathToStories])
+    # create mighty array of hashes of info about those pages
+    mighty = Array.new
+    arr.each do |p|
+      h = Hash.new
+      h[:pathname] = p
+      h[:category], h[:title], date = getOneDirective([:category, :title, :date], p)
+      h[:date] = DateTime.strptime(date, "%F %T")
+      mighty << h
+    end
+    return mighty
+  end
+  # and should memoize
 end
 
 module UserLand::User
