@@ -120,9 +120,7 @@ class Opml
 end
 
 class Opmlrexml < Opml
-  require 'rexml/document'
-  include REXML
-  
+  myrequire ['rexml/document', :REXML]
   
   # ivars: doc, top, curline
   def initialize(f)
@@ -230,9 +228,7 @@ class Opmlrexml < Opml
 end
 
 class Opmllibxml < Opml
-  require 'rubygems'
-  require 'xml/libxml'
-  include XML
+  myrequire ['xml/libxml', :XML]
   
   class XML::Node
     def next_element
