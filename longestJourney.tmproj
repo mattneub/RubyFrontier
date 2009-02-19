@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>longestJourney/docs/RubyFrontierDocumentation/default.txt</string>
+	<string>longestJourney/user.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -21,6 +21,66 @@
 	<integer>297</integer>
 	<key>metaData</key>
 	<dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#autoglossary.yaml</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>24</integer>
+				<key>line</key>
+				<integer>175</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>141</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>19</integer>
+				<key>line</key>
+				<integer>175</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>24</integer>
+				<key>line</key>
+				<integer>175</integer>
+			</dict>
+		</dict>
+		<key>longestJourney/docs/RubyFrontierDocumentation/#filters/finalFilter.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>32</integer>
+				<key>line</key>
+				<integer>16</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>16</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>17</integer>
+			</dict>
+		</dict>
 		<key>longestJourney/docs/RubyFrontierDocumentation/#filters/pageFilter.rb</key>
 		<dict>
 			<key>caret</key>
@@ -40,9 +100,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>154</integer>
+				<integer>61</integer>
 				<key>line</key>
-				<integer>10</integer>
+				<integer>26</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -181,20 +241,6 @@
 			<key>firstVisibleLine</key>
 			<integer>4</integer>
 		</dict>
-		<key>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/stylesheets.txt</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>161</integer>
-				<key>line</key>
-				<integer>24</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>16</integer>
-		</dict>
 		<key>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/template.txt</key>
 		<dict>
 			<key>caret</key>
@@ -223,21 +269,30 @@
 			<key>firstVisibleLine</key>
 			<integer>23</integer>
 		</dict>
+		<key>longestJourney/user.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>40</integer>
+				<key>line</key>
+				<integer>42</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>2</integer>
+		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/directiveobjects.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/hierarchy.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapage.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/pageheader.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/standardmacros.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/scalardirectives.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/default.txt</string>
-		<string>longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/stylesheets.txt</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#filters/finalFilter.rb</string>
+		<string>longestJourney/user.rb</string>
+		<string>longestJourney/docs/RubyFrontierDocumentation/#filters/pageFilter.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{696, 245}, {970, 774}}</string>
+	<string>{{640, 254}, {970, 774}}</string>
 </dict>
 </plist>

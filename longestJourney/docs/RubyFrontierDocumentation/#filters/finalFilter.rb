@@ -17,4 +17,4 @@ def finalFilter(adrPageTable)
     adrPageTable[:renderedtext] = adrPageTable[:renderedtext].gsub(/<a href="">(.*?)<\/a>/, '\1')
   end
   
-end
+end 
