@@ -60,6 +60,15 @@ module Memoizable # based on code by James Edward Gray
   end
 end
 
+class Hash # convenience methods
+  def fetch2(k) # crummy name, but what the heck; utility to try string version of a symbol key
+    # we use this restricted approach because in case of a tie the symbol must win
+    # why? because directives from the page are symbols, and must take precedence
+    raise "fetch2 argument #{k} must be a symbol" unless k.kind_of?(Symbol)
+    self[k].nil? ? self[k.to_s] : self[k]
+  end
+end
+
 class LCHash < Hash # implement pseudo-case-insensitive fetching
   # if your key is lowercase (symbol or string), then incorrectly cased fetch requests will find it
   def [](k)
@@ -238,7 +247,7 @@ class BindingMaker
     return @thePageMaker.send(s, *args) if UserLand::Html::StandardMacros.method_defined?(s)
     
     # try adrPageTable; unlike Frontier, and wisely I think, we allow implicit get but no implicit set
-    if 0 == args.length and result = (@adrPageTable[s] || @adrPageTable[s.to_s])
+    if 0 == args.length and result = @adrPageTable.fetch2(s)
       return result 
     end
     
@@ -427,6 +436,69 @@ end
 # (see BindingMaker for the routing mechanism here)
 module UserLand::Html::StandardMacros
   GENERATOR = "RubyFrontier"
+  def linkstylesheet(sheetName, adrPageTable=@adrPageTable) # link to one stylesheet
+    # you really ought to use linkstylesheets instead, it calls this for you
+    # TODO: Frontier's logic for finding the style sheet (source) is much more complex
+    # I just assume we have a #stylesheets folder containing .css files
+    # and I also just assume we'll write it into a folder called "stylesheets" at top level
+    sheetLoc = adrPageTable[:siteRootFolder] + "stylesheets" + (sheetName[0, getPref("maxfilenamelength", adrPageTable)] + ".css")
+    source = adrPageTable["stylesheets"] + "#{sheetName}.css"
+    raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
+    # write out the stylesheet if necessary
+    sheetLoc.dirname.mkpath
+    if sheetLoc.needs_update_from(source)
+      puts "Writing css (#{sheetName})!"
+      FileUtils.cp(source, sheetLoc, :preserve => true)
+    end
+    pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
+    %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />\n}
+  end
+  def linkjavascript(sheetName, adrPageTable=@adrPageTable) # link to one javascript
+    # you really ought to use linkjavascripts instead, it calls this for you
+    # TODO: as with linkstylesheet, my logic is very simplified:
+    # I just assume we have a #javascripts folder and we write to top-level "javascripts"
+    sheetLoc = adrPageTable[:siteRootFolder] + "javascripts" + (sheetName[0, getPref("maxfilenamelength", adrPageTable)] + ".js")
+    source = adrPageTable["javascripts"] + "#{sheetName}.js"
+    raise "javascript #{sheetName} does not seem to exist" unless source.exist?
+    # write out the javascript if necessary
+    sheetLoc.dirname.mkpath
+    if sheetLoc.needs_update_from(source)
+      puts "Writing javascript (#{sheetName})!"
+      FileUtils.cp(source, sheetLoc, :preserve => true)
+    end
+    pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
+    %{<script src="#{pageToSheet}" type="text/javascript" ></script>\n}
+  end
+  def embedstylesheet(sheetName, adrPageTable=@adrPageTable) # embed stylesheet
+    # you really ought to use linkstylesheets instead, it calls this for you
+    # TODO: as with linkstylesheet, unlike Frontier, my logic for finding the stylesheet is very simplified
+    # must be in #stylesheets folder as css file, end of story
+    source = adrPageTable["stylesheets"] + "#{sheetName}.css"
+    raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
+    %{\n<style type="text/css">\n<!--\n#{File.read(source)}\n-->\n</style>\n}
+  end
+  def linkstylesheets(adrPageTable=@adrPageTable) # link to all stylesheets requested in directives
+    # call this, not linkstylesheet; it lets you link to multiple stylesheets
+    # new way, we maintain a "linkstylesheets" array (see incorporateDirective()), because with CSS, order matters
+    # another new feature: we now permit directive embedstylesheet
+    s = ""
+    Array(adrPageTable[:linkstylesheets]).each do |name|
+      s << linkstylesheet(name, adrPageTable)
+    end
+    if sheet = adrPageTable.fetch2(:embedstylesheet)
+      s << embedstylesheet(sheet)
+    end
+    s
+  end
+  def linkjavascripts(adrPageTable=@adrPageTable) # link to all javascripts requested in directives
+    # not in Frontier at all, but clearly a mechanism like this is needed
+    # works like "meta", allowing multiple javascriptXXX directives to ask that we link to XXX
+    s = ""
+    adrPageTable.keys.select do |k| # key should start with "javascript" but not *be* javascript (or the folder "javascripts")
+      k.to_s =~ /^javascript./i && k.to_s.downcase != "javascripts"
+    end.each { |k| s << linkjavascript(k.to_s[10..-1], adrPageTable) }
+    s
+  end
   def metatags(htmlstyle=false, adrPageTable=@adrPageTable) # generate meta tags
     htmlText = ""
     
@@ -443,16 +515,9 @@ module UserLand::Html::StandardMacros
     # turn directives whose name starts with "meta" into meta tag
     # e.g. directive metacool, value "RubyFrontier", generates <meta name="cool" content="RubyFrontier">
     # directive metaequivcool, value "RubyFrontier", generates <meta http-equiv="cool" content="RubyFrontier">
-    adrPageTable.each do |k,v|
-      k = k.to_s
-      if k =~ /^meta./i # key should start with "meta" but not *be* "meta"
-        if k =~ /^metaequiv/i
-          type, metaName = "http-equiv", k[9..-1]
-        else
-          type, metaName = "name", k[4..-1]
-        end
-        htmlText << %{\n<meta #{type}="#{metaName}" content="#{v}" />}
-      end
+    adrPageTable.select {|k,v| k.to_s =~ /^meta./i}.each do |k,v| # key should start with "meta" but not *be* "meta"
+      type, metaName = ((k = k.to_s) =~ /^metaequiv/i ? ["http-equiv", k[9..-1]] : ["name", k[4..-1]])
+      htmlText << %{\n<meta #{type}="#{metaName}" content="#{v}" />}
     end
     
     # opportunity to insert anything whatever into head section
@@ -461,116 +526,12 @@ module UserLand::Html::StandardMacros
     
     # allow for possibility that <meta /> syntax is illegal, as in html
     htmlText = htmlText.gsub("/>",">") if htmlstyle
-    return htmlText
-  end
-  def bodytag(adrPageTable=@adrPageTable) # generate body tag
-    htmltext = ""
-    
-    # background image, drawn from background directive
-    if s = adrPageTable["background"] or s = adrPageTable[:background]
-      htmltext += %{ background="#{getImageData(s, adrPageTable)[:url]}" } rescue ""
-    end
-
-    # other body tag attributes, drawn from directives
-    # really should not be using this feature! this is what CSS is for
-    # still, it's legal, and traditional in Frontier
-    attslist = %w{bgcolor alink vlink link 
-      text topmargin leftmargin marginheight 
-      marginwidth onload onunload
-    }
-    attslist.each do |oneatt|
-      if s = adrPageTable[oneatt] or s = adrPageTable[oneatt.to_sym]
-        if %w{alink bgcolor text link vlink}.include?(oneatt)
-          # colors should be hex and start with #
-          unless s =~ /^#/
-            if s.length == 6
-              unless s =~ /[^0-9a-f]/i
-                s = "#" + s
-              end
-            end
-          end
-        end
-        htmltext += %{ #{oneatt}="#{s}"}
-      end
-    end 
-    return "<body#{htmltext}>"
-  end
-  def linkstylesheet(sheetName, adrPageTable=@adrPageTable) # link to one stylesheet
-    # you really ought to use linkstylesheets instead, it calls this for you
-    # Frontier's logic for finding the style sheet is much more complex
-    # I just assume we have a #stylesheets folder containing .css files
-    # and I also just assume we'll write it into a folder called "stylesheets" at top level
-    # note that in my implementation, although you *can* call this in a macro, you shouldn't;
-    fname = sheetName[0, getPref("maxfilenamelength", adrPageTable)] + ".css"
-    sheetLoc = adrPageTable[:siteRootFolder] + Pathname.new("stylesheets/#{fname}")
-    source = adrPageTable["stylesheets"] + Pathname.new("#{sheetName}.css")
-    raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
-    # write out the stylesheet if necessary
-    sheetLoc.dirname.mkpath
-    if sheetLoc.needs_update_from(source)
-      puts "Writing css (#{sheetName})!"
-      FileUtils.cp(source, sheetLoc, :preserve => true)
-    end
-    pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
-    return %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />\n}
-  end
-  def embedstylesheet(sheetName, adrPageTable=@adrPageTable) # embed stylesheet
-    # as with linkstylesheet, unlike Frontier, my logic for finding the stylesheet is very simplified
-    # must be in #stylesheets folder as css file, end of story
-    source = adrPageTable["stylesheets"] + Pathname.new("#{sheetName}.css")
-    raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
-    s = File.read(source)
-    return %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
-  end
-  def imageref(imagespec, options=Hash.new, adrPageTable=@adrPageTable) # create img tag
-    # finding the image, copying it out, and obtaining its height and width and relative url...
-    # is the job of getImageData
-    imageTable = getImageData(imagespec, adrPageTable)
-    options = Hash.new if options.nil? # become someone might pass nil
-    height = options[:height] || imageTable[:height]
-    width = options[:width] || imageTable[:width]
-    htmlText = %{<img src="#{imageTable[:url]}" }
-    # added :nosize to allow suppression of width and height
-    htmlText += %{width="#{width}" height="#{height}" } unless (!width && !height) || options[:nosize]
-    %w{name id alt hspace vspace align style class title border}.each do |what|
-      htmlText += %{ #{what}="#{options[what.to_sym]}" } if options[what.to_sym]
-    end
-    
-    # some attributes get special treatment
-    # usemap, must start with #
-    if (usemap = options[:usemap])
-      usemap = ("#" + usemap).squeeze("#")
-      htmlText += %{ usemap="#{usemap}" }
-    end
-    if options[:ismap]
-      htmlText += ' ismap="ismap" '
-    end
-    # lowsrc, not supported (not valid HTML any more)
-    #if (lowsrc = options[:lowsrc])
-    #  htmlText += %{ lowsrc="#{getImageData(lowsrc, adrPageTable)[:url]}" }
-    #end
-    if (rollsrc = options[:rollsrc])
-      htmlText += %{ onmouseout="this.src='#{imageTable[:url]}'" }
-      htmlText += %{ onmouseover="this.src='#{getImageData(rollsrc, adrPageTable)[:url]}'" }
-    end
-    # explanation, we now use "alt"; anyhow, there *must* be one
-    unless options[:alt]
-      htmlText += %{ alt="image" }
-    end
-    htmlText += " />"
-    # neaten
-    htmlText = htmlText.squeeze(" ")
-    # glossref, wrap whole thing in link ready for normal handling
-    # unlikely (manual <a> is way better) but someone might want to use it
-    if (glossref = options[:glossref])
-      htmlText = %{<a href="#{glossref}">#{htmlText}</a>}
-    end
-    return htmlText
+    htmlText + "\n"
   end
   def pageheader(adrPageTable=@adrPageTable) # generate standard page header from html tag to body tag
     # if pageheader directive exists, assume macro was explicitly called in error
     # cool because template can contain pageheader() call with or without #pageheader directive elsewhere
-    return "" if ( adrPageTable[:pageheader] || adrPageTable["pageheader"] )
+    return "" if adrPageTable.fetch2(:pageheader)
     # our approach is simply to provide a standard header
     # note that we do not return it! we slot it into the #pageheader directive for later processing...
     # ... and just return an empty string
@@ -593,62 +554,76 @@ module UserLand::Html::StandardMacros
     # for example, might want a comment to delimit things for dreamweaver or something
     return "</body>\n#{t}\n</html>\n"
   end
-  def linkjavascripts(adrPageTable=@adrPageTable) # link to all javascripts requested in directives
-    # not in Frontier at all, but clearly a mechanism like this is needed
-    # works like "meta", allowing multiple javascriptXXX directives to ask that we link to XXX
-    s = ""
-    adrPageTable.keys.each do |k| # values are irrelevant, all the info is in the key name
-      k = k.to_s
-      if k =~ /^javascript./i # key should start with "javascript" but not *be* "javascript"
-        if k.downcase != "javascripts" # "javascripts" is special, it's the folder of scripts
-          s += linkjavascript(k[10..-1], adrPageTable)
+  def bodytag(adrPageTable=@adrPageTable) # generate body tag, drawing attributes from directives
+    # really should not be using any of these attributes! that's what CSS is for; but hey, that's Frontier
+    htmltext = ""
+    
+    if s = adrPageTable.fetch2(:background)
+      htmltext << %{ background="#{getImageData(s, adrPageTable)[:url]}" } rescue ""
+    end
+
+    attslist = %w{bgcolor alink vlink link 
+      text topmargin leftmargin marginheight 
+      marginwidth onload onunload
+    }
+    attslist.each do |oneatt|
+      if s = adrPageTable.fetch2(oneatt.to_sym)
+        if %w{alink bgcolor text link vlink}.include?(oneatt)
+          # colors should be hex and start with #
+          unless s =~ /^#/
+            if s.length == 6
+              unless s =~ /[^0-9a-f]/i
+                s = "#" + s
+              end
+            end
+          end
         end
+        htmltext << %{ #{oneatt}="#{s}"}
       end
-    end
-    return s
+    end 
+    "<body#{htmltext}>"
   end
-  def linkstylesheets(adrPageTable=@adrPageTable) # link to all stylesheets requested in directives
-    # call this, not linkstylesheet; it lets you link to multiple stylesheets
-=begin
-    # old way, no longer used
-    # works just like linkjavascripts
-    s = ""
-    adrPageTable.keys.each do |k|
-      k = k.to_s
-      if k =~ /^stylesheet./i
-        if k.downcase != "stylesheets"
-          s += linkstylesheet(k[10..-1], adrPageTable)
-        end
-      end
+  def imageref(imagespec, options=Hash.new, adrPageTable=@adrPageTable) # create img tag
+    # finding the image, copying it out, and obtaining its height and width and relative url, is the job of getImageData
+    imageTable = getImageData(imagespec, adrPageTable)
+    options = Hash.new if options.nil? # become someone might pass nil
+    height = options[:height] || imageTable[:height]
+    width = options[:width] || imageTable[:width]
+    htmlText = %{<img src="#{imageTable[:url]}" }
+    # added :nosize to allow suppression of width and height
+    htmlText << %{width="#{width}" height="#{height}" } unless (!width && !height) || options[:nosize]
+    %w{name id alt hspace vspace align style class title border}.each do |what|
+      htmlText << %{ #{what}="#{options[what.to_sym]}" } if options[what.to_sym]
     end
-=end
-    # new way, we maintain a "linkstylesheets" array
-    # reason: with CSS, order matters
-    # see incorporateDirective() for how the "linkstylesheets" array gets constructed
-    s = ""
-    if adrPageTable[:linkstylesheets]
-      adrPageTable[:linkstylesheets].each do |name|
-        s += linkstylesheet(name, adrPageTable)
-      end
+    
+    # some attributes get special treatment
+    # usemap, must start with #
+    if (usemap = options[:usemap])
+      usemap = ("#" + usemap).squeeze("#")
+      htmlText << %{ usemap="#{usemap}" }
     end
-    return s
-  end
-  def linkjavascript(sheetName, adrPageTable=@adrPageTable) # link to one javascript
-    # you really ought to use linkjavascripts instead, it calls this for you
-    # as with linkstylesheet, my logic is very simplified:
-    # I just assume we have a #javascripts folder and we write to top-level "javascripts"
-    fname = sheetName[0, getPref("maxfilenamelength", adrPageTable)] + ".js"
-    sheetLoc = adrPageTable[:siteRootFolder] + Pathname.new("javascripts/#{fname}")
-    source = adrPageTable["javascripts"] + Pathname.new("#{sheetName}.js")
-    raise "javascript #{sheetName} does not seem to exist" unless source.exist?
-    # write out the javascript if necessary
-    sheetLoc.dirname.mkpath
-    if sheetLoc.needs_update_from(source)
-      puts "Writing javascript (#{sheetName})!"
-      FileUtils.cp(source, sheetLoc, :preserve => true)
+    if options[:ismap]
+      htmlText << ' ismap="ismap" '
     end
-    pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
-    return %{<script src="#{pageToSheet}" type="text/javascript" ></script>\n}
+    # lowsrc not supported (not valid HTML any more)!
+    # rollsrc, simple rollover creation
+    if (rollsrc = options[:rollsrc])
+      htmlText << %{ onmouseout="this.src='#{imageTable[:url]}'" }
+      htmlText << %{ onmouseover="this.src='#{getImageData(rollsrc, adrPageTable)[:url]}'" }
+    end
+    # explanation, we now use "alt"; anyhow, there *must* be one
+    unless options[:alt]
+      htmlText << %{ alt="image" }
+    end
+    htmlText << " />"
+    # neaten
+    htmlText = htmlText.squeeze(" ")
+    # glossref, wrap whole thing in link ready for normal handling
+    # unlikely (manual <a> or html.getLink is way better) but it's Frontier, someone might want to use it
+    if (glossref = options[:glossref])
+      htmlText = %{<a href="#{glossref}">#{htmlText}</a>}
+    end
+    htmlText
   end
 end
 
