@@ -8,19 +8,19 @@ def myrequire(*what)
   # and if an include fails, that does raise all the way since we don't catch NameError
   what.each do |thing|
     begin
-      if thing.kind_of?(Array)
-        require thing[0]
-        Array(thing[1]).each {|inc| include self.class.const_get(inc)}
-      else
-        require thing
-      end
+      require((t = Array(thing))[0])
+      Array(t[1]).each {|inc| include self.class.const_get(inc)}
     rescue LoadError
-      puts "Failed to located required \"#{thing}\". This could cause trouble later... or not. Here's the error message we got:"
+      puts "Failed to locate required \"#{thing}\". This could cause trouble later... or not. Here's the error message we got:"
       puts $!
     end
   end
 end
 myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "exifr", "enumerator"
+
+def myraise(what)
+  raise RuntimeError, what, caller[0] # reduce callstack to line where "myraise" was called
+end
 
 module Memoizable # based on code by James Edward Gray
   def memoizeORIGINAL( name, cache = Hash.new )
@@ -62,11 +62,9 @@ end
 
 class LCHash < Hash # implement pseudo-case-insensitive fetching
   # if your key is lowercase (symbol or string), then incorrectly cased fetch requests will find it
-  alias :"old_fetch" :"[]"
   def [](k)
-    return old_fetch(k) if key?(k)
-    return old_fetch(k) unless [Symbol, String].include?(k.class)
-    old_fetch(k.downcase)
+    k = k.downcase if !key?(k) and k.respond_to?(:downcase)
+    super
   end
 end
 
@@ -78,23 +76,21 @@ end
 
 class String # convenience methods
   def dropNonAlphas
-    return self.gsub(/[^a-zA-Z0-9_]/, "")
+    tr('^a-zA-Z0-9_', '')
   end
 end
 
 class Array # convenience methods
   def nextprev(obj = nil, &block)
-    ix = (block_given? ? index(find(&block)) : index(obj))
-    [ ix > 0 ? fetch(ix-1) : nil, ix < length - 1 ? fetch(ix+1) : nil ]
+    ix = index( block_given? ? find(&block) : obj )
+    return [nil, nil] unless ix
+    [ ix > 0 ? fetch(ix-1) : nil, fetch(ix+1, nil) ]
   end
-  def crunch # remove "trailing duplicates" by ==, assumes we are sorted already
-    result = []
-    each_cons(2) {|x,y| result << x unless x == y}
-    result << last unless result.last == last
-    result
+  def crunch # remove "trailing duplicates" by == (unlike uniq), assumes we are sorted already
+    result = enum_for(:each_cons, 2).map {|x,y| x unless x == y}.compact 
+    result << (result.last == last ? nil : last)
   end
 end
-
 
 class JPEG # used by Pathname#image_size, stolen from the Internet :) http://snippets.dzone.com/posts/show/805
   attr_reader :width, :height, :bits
@@ -140,18 +136,17 @@ class Pathname # convenience methods
     self.basename(self.extname)
   end
   def needs_update_from(p) # compare mod dates
-    return true unless self.exist?
-    return true if self.mtime < p.mtime
-    return false
+    !self.exist? || self.mtime < p.mtime
   end
   def relative_uri_from(p2) # derive relative (partial) URI
     # unfortunately a relative path is not the same as a relative uri, so can't use relative_path_from
     # so we construct a pair of pseudo http URLs and have URI do the work
-    # nice feature is that build2 also escapes as needed
     raise "expecting absolute path" unless self.absolute? && p2.absolute?
-    uri1 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => self.to_s
-    uri2 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => p2.to_s
-    return uri1.route_from(uri2)
+    #uri1 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => self.to_s
+    #uri2 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => p2.to_s
+    uri1 = URI(URI.escape("file://" + self.to_s))
+    uri2 = URI(URI.escape("file://" + p2.to_s))
+    return uri1.route_from(uri2).path
   end
   def image_size # read image file height and width
     # stolen from the Internet :) http://snippets.dzone.com/posts/show/805
@@ -194,33 +189,12 @@ that is where supplementary files go:
 uses our Pathname convenience method so we couldn't do this until now
 =end
 p = Pathname.new(__FILE__)
-$: << (p.dirname + p.simplename).to_s
-$usertemplates = (p.dirname + p.simplename) + "user" + "templates"
-$newsite = (p.dirname + p.simplename) + "newsite"
+ljfolder = p.dirname + p.simplename
+$: << ljfolder.to_s
+$usertemplates = ljfolder + "user" + "templates"
+$newsite = ljfolder + "newsite"
 
 myrequire 'opml'
-
-=begin special dispatcher needed by BindingMaker
-here's the deal: if the user says e.g. html.getLink, BindingMaker's method_missing gets "html"
-that is not enough for us to know whether to route to the Html *class* or the PageMaker *instance*
-so we need to send back an answer that will allow us to hear about the *next* word ("getLink")
-so BindingMaker sends back its HtmlDispatcher
-thus, HtmlDispatcher's method_missing is guaranteed to be called only for a word introduced by "html."
-its job is to choose between, and dispatch to, either the Html class or the PageMaker instance
-to make the latter possible, it is created with a ref to the BindingMaker instance, which has a ref to the PageMaker instance
-=end
-class HtmlDispatcher
-  def method_missing(s, *args)
-    if UserLand::Html.respond_to? s
-      return UserLand::Html.send(s, *args)
-    else
-      return @theBindingMaker.thePageMaker.send(s, *args)
-    end
-  end
-  def initialize(caller)
-    @theBindingMaker = caller
-  end
-end
 
 =begin environment in which macro evaluation and outline rendering takes place
   this is all done for maximum similarity to Frontier, and for sheer convenience
@@ -239,20 +213,28 @@ end
       but's a Frontier legacy so I've left it in (and I d*o use it)
 =end
 class BindingMaker
+  def html # if user's expression starts with "html", return object with method_missing to handle rest of expression
+    # so we need to send back an object that will allow us to hear about the *next* word ("getLink" etc.)
+    # its job is to choose between, and dispatch to, either the Html class or the PageMaker instance
+    # to make the latter possible, we capture a ref to the PageMaker instance
+    itsPageMaker = @thePageMaker
+    Module.new do
+      class << self; self; end.send(:define_method, :method_missing) do |s, *args|
+        if UserLand::Html.respond_to? s
+          return UserLand::Html.send(s, *args)
+        else
+          return itsPageMaker.send(s, *args)
+        end
+      end
+    end
+  end
   # handle shortcut / bareword expressions in macro evaluation
   def method_missing(s, *args)
-    # if user's expression begins with explicit "html.", it is calling a built-in utility
-    return @theHtmlDispatcher if s == :html
-    
-    # test for user.html.macros - not needed! 
-    # if the user wants to inject something into UserLand::HTML via user.rb, that's fine
-    
-    # try tools table
-    # we have loaded tools method defs into this BindingMaker object already
-    # if they are not seen automatically (in which case method_missing was never even called), we expose them like this
-    return self.send(s, *args) if self.respond_to?(s)
+    # if starts with html., we are not called, html method above handled it
+    # test for user.html.macros not needed, since user can inject into UserLand::Html via user.rb
+    # test for tools table not needed, they are part of this BindingMaker object already
 
-    # try html.standardMacros
+    # try html.standardMacros; it is included into PageMaker
     return @thePageMaker.send(s, *args) if UserLand::Html::StandardMacros.method_defined?(s)
     
     # try adrPageTable; unlike Frontier, and wisely I think, we allow implicit get but no implicit set
@@ -260,13 +242,16 @@ class BindingMaker
       return result 
     end
     
-    raise "BindingMaker unable to evaluate #{s}"
+    begin
+      super
+    rescue Exception => e
+      raise e.exception("BindingMaker unable to evaluate '#{s}'")
+    end
   end
   def getBinding(); return binding(); end
   def initialize(thePageMaker)
     @thePageMaker = thePageMaker # so we can access it later
     @adrPageTable = thePageMaker.adrPageTable # so macros can get at it
-    @theHtmlDispatcher = HtmlDispatcher.new(self) # assistant
   end
   attr_reader :thePageMaker
 end
@@ -275,7 +260,7 @@ end
 this allows outline renderers to enjoy the same environment as macro evaluation (see on BindingMaker, above)
 (this is not a Frontier feature, but it sure should be! makes life a lot easier;
 e.g. you can reach @adrPageTable, tools, Html methods really easily)
-so, an outline renderer must be in module UserLand::Renderers and must be a class deriving from SuperRenderer
+so, an outline renderer must be a class deriving from UserLand::Renderers::SuperRenderer
 subclasses should not override "initialize" without calling super or imitating
 subclasses must implement "render(op)" where "op" is an Opml object (see opml.rb)
 =end
@@ -292,7 +277,7 @@ class UserLand::Renderers::SuperRenderer
     @theBindingMaker = theBindingMaker # to provide macro evaluation environment
   end
   def method_missing(s, *args)
-    @theBindingMaker.method_missing(s, *args)
+    @theBindingMaker.send(s, *args) # delegation (fixes bug, previously I was sending straight to method_missing)
   end
   def render
     raise "Renderer failed to implement render()"
@@ -304,35 +289,36 @@ end
 module UserLand::Html
   class << self; extend Memoizable; end # have to talk like this in order to memoize class/module methods
   def self.guaranteePageOfSite(adrObject)
-    adrObject = Pathname.new(adrObject).expand_path
-    raise "No such file #{adrObject}" unless adrObject.exist?
-    raise "File #{adrObject} not a site page" unless self.everyPageOfSite(adrObject).include?(adrObject)
+    adrObject = Pathname(adrObject).expand_path
+    myraise "No such file #{adrObject}" unless adrObject.exist?
+    myraise "File #{adrObject} not a site page" unless self.everyPageOfSite(adrObject).include?(adrObject)
   end
-  def self.releaseRenderedPage(adrObject, flPreview = true)
-    time = Time.new.to_f
+  def self.releaseRenderedPage(adrObject, flPreview = true, doTimings = true)
+    time = Time.new.to_f if doTimings # if you really want to, you can turn off the timings output
     
-    adrObject = Pathname.new(adrObject).expand_path
-    self.guaranteePageOfSite(adrObject) # validity check
+    adrObject = Pathname(adrObject).expand_path
+    self.guaranteePageOfSite(adrObject) # raises if not
     
     # TODO: omitting "extra templates" logic
     
-    adrStorage = callFileWriterStartup(adrObject) # adrStorage is unused at present
+    # TODO: omitting file writer startup mechanism, adrStorage unused
+    # in fact, callFileWriterStartup is now completely unused now that getFtpSiteFile has been extracted from it
+    # adrStorage = callFileWriterStartup(adrObject)
           
     pm = PageMaker.new
     pm.buildObject(adrObject)
-    puts "page built in #{Time.new.to_f - time} seconds"
-    
+    puts "page built in #{Time.new.to_f - time} seconds" if doTimings
     pm.writeFile
     
     # TODO: omitting file writer shutdown mechanism
     # callFileWriterShutdown(adrObject, adrStorage)
     
     pm.saveOutAutoglossary # save out autoglossary if any
-    
+        
     if flPreview && (File.extname(pm.adrPageTable[:fname]) =~ /\.htm/i) # supposed to be a test for browser displayability
-      if pm.adrPageTable[:ftpsite][:apacheURL]
-        f = pm.adrPageTable[:f].relative_path_from(Pathname.new(pm.adrPageTable[:ftpsite][:apacheSite]).expand_path)
-        `open #{URI.escape(pm.adrPageTable[:ftpsite][:apacheURL] + f)}`
+      if (apacheURL = pm.adrPageTable[:ftpsite][:apacheURL])
+        f = pm.adrPageTable[:f].relative_path_from(Pathname(pm.adrPageTable[:ftpsite][:apacheSite]).expand_path)
+        `open #{URI.escape(apacheURL + f)}`
       else
         `open file://#{URI.escape(pm.adrPageTable[:f].to_s)}`
       end
@@ -340,91 +326,94 @@ module UserLand::Html
     
   end
   def self.publishSite(adrObject, preflight=true)
-    adrObject = Pathname.new(adrObject).expand_path
+    adrObject = Pathname(adrObject).expand_path
+    self.guaranteePageOfSite(adrObject) # raises if not
     self.preflightSite(adrObject) if preflight
-    self.everyPageOfSite(adrObject).each_with_index do |p, i|
+    self.everyPageOfSite(adrObject).each do |p|
       puts "publishing #{p}"
       self.releaseRenderedPage(p, (p == adrObject)) # the only one to open in browser is the one we started with
-      #break if i > 5 # profiling
     end
   end
   def self.getFtpSiteFile(p)
-    # walk upwards to the first folder containing an #ftpSite file, and return that file
-    # if what you wanted was the folder itself, just call the folder's dirname
-    Pathname.new(p).dirname.ascend do |dir|
-      dir.each_entry do |f|
-        if "#ftpsite" == f.simplename.to_s.downcase
-          return dir + f
-        end
-      end
-      raise "Reached top level without finding #ftpsite" if dir.root?
+    # walk upwards to the first folder containing an #ftpSite file, and return that file as a Pathname
+    # if what you wanted was the folder itself, just get the file's dirname
+    Pathname(p).dirname.ascend do |dir|
+      dir.each_entry { |f| return dir + f if "#ftpsite" == f.simplename.to_s.downcase }
+      myraise "Reached top level without finding #ftpsite; #{p} apparently not in a site source folder" if dir.root?
     end
   end
   def self.everyPageOfFolder(f)
     # a page is anything in the folder not starting with # or inside a folder starting with #
     # that doesn't mean every page is a renderable; it might merely be a copyable, but it is still a page
-    # "in" means at any depth
+    # "in" means at any depth; distinguish from pagesInFolder which is shallow, only during rendering, and uses #nextprevs order
     result = Array.new
-    Pathname.new(f).find do |p|
+    Pathname(f).find do |p|
       Find.prune if p.basename.to_s =~ /^[#.]/
       result << p if (!p.directory? && p.simplename != "") # ignore invisibles
     end
-    return result
+    result
   end
   class << self; memoize :everyPageOfFolder; end # have to talk this way yadda yadda
   def self.everyPageOfSite(adrObject)
-    return everyPageOfFolder(getFtpSiteFile(adrObject).dirname)
+    self.everyPageOfFolder(self.getFtpSiteFile(adrObject).dirname)
   end
   def self.preflightSite(adrObject)
     # prebuild autoglossary using every page of table containing adrObject path
-    glossary = Hash.new
+    glossary = LCHash.new
     pm = nil # so that we have a PageMaker object left over at the end
-    self.everyPageOfSite(Pathname.new(adrObject)).each do |p|
+    self.everyPageOfSite(Pathname(adrObject)).each do |p|
       pm = PageMaker.new
       pm.memoize = false # so if we then publishSite, existing values won't bite us
       pm.buildPageTableFully(p)
-      tempGlossary = Hash.new
-      pm.addPageToGlossary(p, tempGlossary)
-      # merge by hand watching for non-uniques
-      tempGlossary.each do |k,v|
-        if glossary[k] && v != glossary[k]
-          puts "----\nNon-unique autoglossary entry detected for #{k}\n#{v.inspect} vs.\n#{glossary[k].inspect}\nprocessing #{p}"
-        end
-        glossary[k.downcase] = v
+      tempGlossary = LCHash.new
+      pm.addPageToGlossary(p, tempGlossary) # downcases for us
+      glossary.merge!(tempGlossary) do |k, vold, vnew| # notify user of non-uniques
+        puts "----", "Non-unique autoglossary entry detected for #{k}",
+          vold.inspect, "vs.", vnew.inspect, "while processing #{p}" if vold != vnew
+        vnew
       end
     end
-    pm.saveOutAutoglossary(glossary) # save out resulting autoglossary
+    pm.saveOutAutoglossary(Hash[glossary]) # save out resulting autoglossary
   end  
-  def self.callFileWriterStartup(adrObject, adrStorage=Hash.new)
+=begin  
+  def self.callFileWriterStartup(adrObject, adrStorage=Hash.new) # UNUSED
     # fill in adrStorage and return it
     ftpsite = getFtpSiteFile(adrObject)
     ftpsiteHash = YAML.load_file(ftpsite)
     adrStorage[:adrftpsite] = ftpsite
     adrStorage[:method] = ftpsiteHash[:method]
-    adrStorage = LCHash.new.merge(adrStorage) # convert to an LCHash so lowercase keys work
+    adrStorage = LCHash[adrStorage] # convert to an LCHash so lowercase keys work
     return adrStorage
   end
-  def self.getLink(linetext, url)
-    return %{<a href="#{url}">#{linetext}</a>}
+=end
+  def self.getLink(linetext, url, options={})
+    # options (hash of symbol-string pairs) can be any <a> tag attributes
+    # can also be :anchor, which is treated specially; we check for initial hash-character and append to url
+    # can also be :othersite, used by our refglossary system before the url
+    opt = options.map do |k,v|
+      case k
+      when :othersite; url = v + "^" + url; nil
+      when :anchor; url = url + ("#" + v).squeeze("#"); nil
+      else %{#{k.to_s}="#{v}"}
+      end
+    end.compact.join(" ")
+    %{<a href="#{url}"#{" " + opt if !opt.empty?}>#{linetext}</a>}
   end
   def self.newSite()
     s = `#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog filesave --title "New Web Site" --text "Specify a folder to create"`
     exit if s == "" # user cancelled
-    p = Pathname.new(s.chomp)
+    p = Pathname(s.chomp)
     p.mkpath
     FileUtils.cp_r($newsite.to_s + '/.', p)
     FileUtils.rm((p + "#autoglossary.yaml").to_s) # just causes errors if it's there
-    sup = ENV['TM_SUPPORT_PATH']
-    `"#{sup}/bin/mate" '#{p}'`
+    `"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{p}'`
   end
   def self.traverseLink(adrObject, linktext)
-    autoglossary = (callFileWriterStartup(Pathname.new(adrObject)))[:adrFtpSite].dirname + "#autoglossary.yaml"
+    autoglossary = self.getFtpSiteFile(Pathname(adrObject)).dirname + "#autoglossary.yaml"
     if autoglossary.exist?
-      entry = LCHash.new.merge(YAML.load_file(autoglossary.to_s))[linktext.downcase]
-      if entry && entry[:adr]
-        sup = ENV['TM_SUPPORT_PATH']
-        `"#{sup}/bin/mate" '#{entry[:adr]}'`
-        exit
+      entry = LCHash[(YAML.load_file(autoglossary.to_s))][linktext.downcase]
+      if entry && entry[:adr] && entry[:adr].exist?
+        return `"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{entry[:adr]}'`
       end
     end
     puts "Not found." # appears in tooltip in TM
@@ -831,7 +820,7 @@ class UserLand::Html::PageMaker
             id = $'
             path = refGlossary($` + $1).match(/href="(.*?)"/)[1]
             path = (adrPageTable[:adrSiteRootTable] + Pathname.new(path)).cleanpath + "#autoglossary.yaml"
-            h = LCHash.new.merge(YAML.load_file(path))
+            h = LCHash[YAML.load_file(path)]
             #puts "h:"
             #pp h
             url = %{<a href="#{h[id.gsub('\\','')][:url]}">}
@@ -966,7 +955,7 @@ class UserLand::Html::PageMaker
               prefsHash.each_key {|key| incorporateDirective(key, prefsHash[key], true, adrPageTable)}
             when "#glossary" # gather glossary entries into glossary hash: NB these are *user* glossary entries
               # (different from Frontier: automatically generated glossary entries for linking live in #autoglossary)
-              glossHash = LCHash.new.merge(YAML.load_file(dir + f))
+              glossHash = LCHash[(YAML.load_file(dir + f))]
               adrPageTable["glossary"] = glossHash.merge(adrPageTable["glossary"]) # note order: what's in adrPageTable overrides
             when "#ftpsite"
               found_ftpsite = true
@@ -995,6 +984,7 @@ class UserLand::Html::PageMaker
     return adrPageTable
   end
   memoize :buildPageTableForDirectory
+  private :buildPageTableForDirectory
   def tenderRender(adrObject, adrPageTable=@adrPageTable)
     # sorry about the name of this method, but this is what Frontier calls it...
     # extract directives from page object and return suitable bodytext value
@@ -1033,7 +1023,7 @@ class UserLand::Html::PageMaker
   def runDirective(linetext, adrPageTable=@adrPageTable)
     k,v = linetext.split(" ",2)
     #adrPageTable[k.to_sym] = eval(v.chomp) 
-    incorporateDirective(k.to_sym, eval(v.chomp), false, adrPageTable)
+    incorporateDirective(k.to_sym, eval(v.chomp, binding), false, adrPageTable) # "binding" for better error reports
   rescue SyntaxError
     raise "Syntax error: Failed to evaluate directive #{v.chomp}"
   end
@@ -1108,9 +1098,12 @@ class UserLand::Html::PageMaker
     glossary[linetext.downcase] = h if linetext
   end
   def processMacros(s, theBinding, adrPageTable=@adrPageTable)
-    # process macros; the Ruby equivalent is to use ERB, so we do
+    # process macros
+    # the Ruby equivalent of processing macros is to use ERB, so we do
     # reference munging like Frontier's is done in the BindingMaker class
-    return ERB.new(s).result(theBinding)
+    ERB.new(s).result(theBinding)
+  ensure
+    $!.set_backtrace caller(0) if $! # nicer backtrace in case of failure
   end
   def refGlossary(name, adrPageTable=@adrPageTable)
     # return a complete <a> tag referring to the named target from where we are, or nil
@@ -1123,7 +1116,7 @@ class UserLand::Html::PageMaker
     name, anchor = name.split("#", 2)
     anchor = anchor ? "#" + anchor : ""
     # autoglossary
-    g = LCHash.new.merge(adrPageTable[:autoglossary])
+    g = LCHash[(adrPageTable[:autoglossary])]
     if g && g[name] && g[name][:path]
       path = adrPageTable[:siteRootFolder] + g[name][:path]
       return %{<a href="#{path.relative_uri_from(adrPageTable[:f])}#{anchor}">} 
@@ -1268,8 +1261,10 @@ if __FILE__ == $0
 #Profiler__::start_profile
 #UserLand::Html::releaseRenderedPage("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml")
 #Profiler__::print_profile($stdout)
-Profiler__::start_profile
-UserLand::Html::publishSite("/Volumes/gromit/Users/matt2/anger/Word Process/jobs/sd45/sd45docs/scriptde.txt")
-Profiler__::print_profile($stdout)
+#Profiler__::start_profile
+#UserLand::Html::publishSite("/Volumes/gromit/Users/matt2/anger/Word Process/jobs/sd45/sd45docs/scriptde.txt")
+#Profiler__::print_profile($stdout)
+
+puts UserLand::Html::getLink("hey", "ho", {:id, "yeah", :anchorr, "biteme", :othersitee, "apeth", :class, "zork"})
 
 end
