@@ -1,4 +1,7 @@
 --- 
 :folder: ~/Desktop/RubyFrontierDocs
+:folderNOT: ~/Sites/RubyFrontierDocs
 :method: file
 :isLocal: true
+:apacheURLNOT: http://192.168.15.100/~mattneub/
+:apacheSiteNOT: ~/Sites
