@@ -32,6 +32,8 @@ The macros are shown as they might be called in a macro under the rules of [macr
 
 * **html.getTitleAndPath()**. Given a single parameter, uses that parameter as a key into the [autoglossary](autoglossary) to retrieve information about a page of the site, and returns an array of two values, the page's title (as a string) and its pathname (as a Pathname object). Either or both of those can be nil. This is useful when, for example, what you have is a page object's simple name and you want to form a link to it whose text includes the title of the Web page the page object generates.
 
+* **html.getLink()**. An expanded version of Frontier's utility for creating a complete `<a>` tag, replacing both Frontier's `html.getLink()` and my own well-known `glossSub()` macro. Takes two required parameters, the "linetext" (the text surrounded by the tag) and the URL for the `href` attribute value. A third parameter is an optional hash of symbol–string pairs, which are turned into additional attributes of the `<a>` tag, except that two symbols are treated specially: `:anchor` is affixed to the end of the URL (with `"#"` if needed), and `:othersite` is prefixed to the start of the URL with `"^"`, for use by our autoglossary external site mechanism (see "Links to Other RubyFrontier Sites" on [this page](autoglossary#external)).
+
 
 
 
