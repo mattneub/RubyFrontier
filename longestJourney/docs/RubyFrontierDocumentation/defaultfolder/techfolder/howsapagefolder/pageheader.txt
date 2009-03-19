@@ -57,7 +57,7 @@ But before the prefixing takes place, the [macros](macros) within that page head
 
   * If there is a [scalar directive](scalardirectives) whose name is **`:meta`**, its value is inserted as a tag without alteration. The intention here is to give you a chance to place other miscellaneous material into the document's `<head>` area.
 	
-* The **`linkstylesheets()`** call writes stylesheet files to disk and inserts links to them. (Alternatively, it is possible to embed a stylesheet, but that would be a different macro — the [embedstylesheet() macro](standardmacros).) For a discussion of how you tell this macro *what* stylesheet files to link to, see the discussion of [stylesheets](stylesheets).
+* The **`linkstylesheets()`** call writes stylesheet files to disk and inserts links to them. (Also, it can [embed a stylesheet](standardmacros).) For a discussion of how you tell this macro *what* stylesheet files to link to or embed, see the discussion of [stylesheets](stylesheets).
 
 * The **`linkjavascripts()`** call writes javascript files to disk and inserts links to them.
 

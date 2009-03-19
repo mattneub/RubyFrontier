@@ -36,5 +36,5 @@ Thus, the order of the stylesheet names in the the `:linkstylesheets` array is t
 
 The page header can call **`linkstylesheet()`** and supply a parameter value directly (a string representing the name of one stylesheet). The stylesheet is written to disk and a `<link>` tag to it is substituted for macro call. (As already mentioned, a **`linkstylesheets()`** call is actually translated for you into a series of **`linkstylesheet()`** calls.)
 
-Another alternative is that you might want to embed a stylesheet in the page itself. To do so, the page header can call **`embedstylesheet()`**.
+Another alternative is that you might want to embed a stylesheet in the page itself. To do so, the page header can call **`embedstylesheet()`**. But this isn't very flexible, so the **`linkstylesheets()`** [standard macro](standardmacros) calls **`embedstylesheet()`** for you if you've set a scalar directive **`embedstylesheet`** (whose value is the name of the stylesheet).
 

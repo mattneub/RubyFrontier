@@ -22,7 +22,7 @@ The macros are shown as they might be called in a macro under the rules of [macr
 
 * **linkstylesheet()**. Called by `linkstylesheets()`. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in the `#stylesheets` folder), copies it out to disk, and returns a link to it from the page currently being rendered.
 
-* **embedstylesheet()**. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in the `#stylesheets` folder) and returns its text, wrapped up in a proper `<script>` tag.
+* **embedstylesheet()**. Called by `linkstylesheets()`. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in the `#stylesheets` folder) and returns its text, wrapped up in a proper `<script>` tag.
 
 ###Typically used in the page body (or template)
 
