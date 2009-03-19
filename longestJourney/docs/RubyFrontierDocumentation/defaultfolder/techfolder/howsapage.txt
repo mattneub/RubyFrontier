@@ -58,7 +58,7 @@ This is a lot of information, and it may seem at first like too much to take in.
 
 * **[Macros](macros) are processed** (except in the highly unlikely circumstance that the [scalar directive](scalardirectives) `:processmacros` is `false`). A macro is an [ERB](ERB) expression in your page object or template (the two have been combined by the previous step into a single string). This is when calculated content (such as [images](images) and automatically generated navigation) is substituted into the Web page.
 
-* **Glossary expansion** takes place. In RubyFrontier's version of glossary expansion (quite different from Frontier's), a glossary item is an `<a>` tag's `href` attribute value. If this value is not (1) an absolute URL (indicated by the presence of colon-slash-slash), or (2) an otherwise complete URL (indicated by a dot within the URL), or (3) a pure local anchor (indicated by a pound-sign at its start), it is considered eligible for glossary expansion.
+* **[Glossary expansion](glossary)** takes place. In RubyFrontier's version of glossary expansion (quite different from Frontier's), a glossary item is an `<a>` tag's `href` attribute value. If this value is not (1) an absolute URL (indicated by the presence of colon-slash-slash), or (2) an otherwise complete URL (indicated by a dot within the URL), or (3) a pure local anchor (indicated by a pound-sign at its start), it is considered eligible for glossary expansion.
 	
   The value is first looked up in the [autoglossary](autoglossary), as being the identifier of a page within the site; if that succeeds, a relative URL from the page object to the target page is substituted for it.
 
