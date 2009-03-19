@@ -48,6 +48,39 @@ module UserLand::Html
   end
   class << self; memoize :heartOfRenderedPage; end # have to talk this way yadda yadda
   
+  def self.markdown(s)
+    result = nil
+    IO.popen(ENV['TM_SUPPORT_PATH'] + "/bin/markdown.pl", "r+") do |io|
+      io.write s
+      io.close_write
+      result = io.read
+    end
+    # also do <markdown> stretches, solve places markdown refuses to do
+    result = result.gsub(/<markdown>(.*?)<\/markdown>/m) do |match|
+      s = $1
+      IO.popen(ENV['TM_SUPPORT_PATH'] + "/bin/markdown.pl", "r+") do |io|
+        io.write s
+        io.close_write
+        s = io.read
+      end
+      # this next line may need improvement
+      s[3..-6] # markdown always wraps in <p> tags with LF, but this is a span, remove them
+    end
+    result.gsub("&lt;%", "<%") # markdown substitutes &lt;% for <%, so restore
+  end
+  
+  def self.smartypants(s)
+    result = nil
+    IO.popen(ENV['TM_SUPPORT_PATH'] + "/bin/SmartyPants.pl", "r+") do |io|
+      io.write s
+      io.close_write
+      result = io.read
+    end
+    # also clean up from markdown problems that cause false p / div trouble
+    result = result.gsub(%r{<p>\s*?<div}, "<div").gsub(%r{</div>\s*?</p>}, "</div>")
+    result = result.gsub(%r{(<div.*?>)</p>}, '\1').gsub(%r{<p></div>}, "</div>")
+    result
+  end
 end
 
 class UserLand::Html::PageMaker
@@ -116,9 +149,7 @@ http://www.xplain.com
 Ruby
 http://www.ruby-lang.org/en/
 END
-    h = Hash.new
-    s.split("\n").each_slice(2) {|a| h[a[0]] = a[1]}
-    return h
+    Hash[*s.split("\n")]
   end
 end
 
@@ -181,8 +212,5 @@ module UserLand::Renderers
       # output flat because otherwise <pre> inherits tabs from the layout
       return op.inspect_flat.gsub(/\[(.*?)\]\((.*?)\)/, '<a href="\2">\1</a>')
     end
-    #def initialize(adrPageTable = nil)
-    #  @adrPageTable = adrPageTable
-    #end
   end
 end
