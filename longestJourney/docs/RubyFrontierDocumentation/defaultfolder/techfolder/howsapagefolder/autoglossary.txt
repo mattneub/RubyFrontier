@@ -62,7 +62,7 @@ If RubyFrontier looks up an `href` value in the autoglossary and doesn't find it
 
 If lookup in both the autoglossary and the normal glossary fails, RubyFrontier assumes you've made an error. This error is not fatal; rendering of the page object continues. But an error message is issued, and RubyFrontier substitutes, as the value of the `href` attribute, `"errorRefGlossaryFailedHere"`. So you can find failed autoglossary substitutions in a generated Web page by searching for `"errorRefGlossaryFailedHere"` in the Web page's HTML.
 
-###Links to Other RubyFrontier Sites
+###<a name="external"></a>Links to Other RubyFrontier Sites
 
 RubyFrontier can also use the autoglossary mechanism to generate URLs to other RubyFrontier-based sites that you maintain. For example, I maintain pages at www.tidbits.com and at www.apeth.com. What if a page in the TidBITS site wants to link to a page in the Apeth site? Of course I can do this with an absolute URL; but this means that I must get the URL right, plus if I move a page within the Apeth site I have to remember to change any links to it from within the TidBITS site. Instead, I let RubyFrontier's autoglossary mechanism help me.
 
