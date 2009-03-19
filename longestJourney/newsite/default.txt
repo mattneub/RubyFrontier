@@ -1,6 +1,6 @@
 #title "My Cool Web Page"
   
-<div align="center">
+<div style="text-align:center">
 
 <%= imageref("rubyFrontierLogo") %>
 
