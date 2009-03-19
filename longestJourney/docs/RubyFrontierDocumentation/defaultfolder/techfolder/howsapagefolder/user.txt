@@ -30,9 +30,7 @@ When file `user.rb` is loaded, here are the sorts of thing it can do:
 		thebookontheweb
 		http://pages.sbcglobal.net/mattneub/frontierDef/ch00.html
 		END
-		    h = Hash.new
-		    s.split("\n").each_slice(2) {|a| h[a[0]] = a[1]}
-		    return h
+	        Hash[*s.split("\n")]
 		  end
 		end
 
