@@ -354,7 +354,8 @@ module UserLand::Html
   def self.everyPageOfFolder(f)
     # a page is anything in the folder not starting with # or inside a folder starting with #
     # that doesn't mean every page is a renderable; it might merely be a copyable, but it is still a page
-    # "in" means at any depth; distinguish from pagesInFolder which is shallow, only during rendering, and uses #nextprevs order
+    # "in" means at any depth
+    # distinguish from pagesInFolder which is shallow, only during rendering, only renderables, and uses #nextprevs order
     result = Array.new
     Pathname(f).find do |p|
       Find.prune if p.basename.to_s =~ /^[#.]/
@@ -645,14 +646,15 @@ class UserLand::Html::PageMaker
     @memoize = true # default; instantiator can always turn it off
   end
   def renderable?(adrObject)
-    # no error-checking; we assume this object is in a site
-    [".txt", ".opml", ".rb"].include?(Pathname.new(adrObject).extname)
+    # no error-checking; purely a matter of suffix
+    [".txt", ".opml", ".rb"].include?(Pathname(adrObject).extname)
   end
   def writeFile(adrStorage=nil, s=@adrPageTable[:renderedtext], adrPageTable=@adrPageTable)
-    # eventually we might support ftp like Frontier, but right now we just write to disk
+    # TODO: eventually we might support ftp like Frontier, but right now we just write to disk
     # so the adrStorage parameter isn't being used for anything yet
+    # the usual thing is to call with no parameters (see releaseRenderedPage):
+    # we write out the page we have rendered, page table tells us how
     f = adrPageTable[:f] # target file
-    # error check; make certain we are not about to write into ourself
     raise "attempt to write into site table" if adrPageTable[:adrSiteRootTable].contains?(f)
     f.dirname.mkpath
     if renderable?(adrPageTable[:adrObject])
@@ -672,6 +674,7 @@ class UserLand::Html::PageMaker
       adrFilter = adrPageTable["filters"] + "#{filter_name}.rb"
       if adrFilter.exist?
         Sandbox.new(adrFilter).send(filter_name, adrPageTable)
+        # TODO: I'm thinking of checking arity and sending along self as a further param if desired
       end
     end
   end
@@ -686,21 +689,22 @@ class UserLand::Html::PageMaker
     # it provides an environment in which to deal with outline renderers and macro processing
     # load all tools into BindingMaker instance as sandbox
     # all method defs in tools become methods of BindingMaker
-    # all outline renderers in tools spring into life
+    # all outline renderers in tools spring into life as classes
     theBindingMaker = BindingMaker.new(self)
     begin
-      v = nil
-      adrPageTable["tools"].each { |k,v| theBindingMaker.instance_eval(File.read(v)) }
+      v = nil # trick so that "v" is global to the block, in case "rescue" is called
+      adrPageTable["tools"].each_value { |v| theBindingMaker.instance_eval(File.read(v)) }
     rescue SyntaxError
-      raise "Trouble reading #{v}"
+      raise "Trouble parsing #{v}"
     end
   
     # if the page is an outline or script, now render it (unlike Frontier which did it earlier, unnecessarily)
     case adrPageTable[:bodytext]
     when Opml # outline!
-      # renderer is expected to be a subclass of SuperRenderer within module UserLand::Renderers
+      # renderer is a subclass of module UserLand::Renderers::SuperRenderer
       # can be defined in user.rb, or as an .rb file in tools 
-      # it should not override initialize, and must accept render with 1 arg (an Opml object)
+      # it should not override initialize in such a way as to disable it, and must accept render with 1 arg (an Opml object)
+      # has access to @thePageMaker and @adrPageTable
       begin
         renderer_klass = UserLand::Renderers.module_eval(adrPageTable[:renderoutlinewith]) 
       rescue 
@@ -723,7 +727,7 @@ class UserLand::Html::PageMaker
     # this is not a Frontier feature, and in fact Frontier suffered from the lack of it
     # the idea is that you might want to do text substitution (like Frontier's glossary) *early*,
     # so that the text is processed like everything else
-    # a snippet is a .txt file in a #tools folder
+    # a snippet is a .txt file in a #tools folder, and has been loaded into a "snippets" hash
     # you can have direct access to it, obviously, via adrPageTable...
     # ...but here, as a shortcut, we substitute directly into [[...]]
     adrPageTable[:bodytext].gsub!(/\[\[(.*?)\]\]/) do
@@ -747,8 +751,8 @@ class UserLand::Html::PageMaker
     # TODO: no support yet for indirect template
     # named template supported, assumed to be in #templates or user/templates
     # if named, it will be :template, a string; if found, it will be "template", a Pathname
-    raise "No template found or specified" unless (adrTemplate = (adrPageTable[:template] || adrPageTable["template"]))
-    if adrTemplate.kind_of?(String) # named template
+    raise "No template found or specified" unless (adrTemplate = adrPageTable.fetch2(:template))
+    if adrTemplate.kind_of?(String) # named template, look for it and convert to Pathname
       catch (:done) do
         [adrPageTable["templates"], $usertemplates].each do |f|
           if f && f.exist?
@@ -763,6 +767,8 @@ class UserLand::Html::PageMaker
       end
       raise "Template #{adrTemplate} named but not found" unless adrTemplate.kind_of?(Pathname)
     end
+    
+    # run directives in the template
     s = runDirectives(adrTemplate)
     # TODO: omitting stuff about revising if #fileExtension was changed by template
       
@@ -774,58 +780,17 @@ class UserLand::Html::PageMaker
     # important to write it as follows or we get possibly unwanted \\, \1 substitution
     s = s.sub(/<bodytext>/i) {|x| adrPageTable[:bodytext]}
       
-    # macros
+    # macros (except in pageheader, we haven't gotten there yet)
     s = processMacros(s, theBindingMaker.getBinding) unless !getPref("processmacros")
   
-    # glossary expansion; my equivalent is to look for already existing <a href...> tags
-    # ...generated no matter how, e.g. manually, with getLink, with markdown [](), whatever
-    # to count as a candidate, must be clearly "local"
-    # we can resolve identifiers in user glossary or our autoglossary (see refGlossary)... 
-    s = s.gsub /<a href="(.*?)"(.*?)>/i do |ref|
-      retval = ref # if nothing else, just return what we came in with
-      href = $1
-      rest = $2
-      # if contains dot or colon-slash-slash, or starts with #, assume this is a real URL, don't touch
-      # but user can override the first two checks by escaping
-      unless href =~ /[^\\]\./ || href =~ %r{[^\\]\://} || href =~ /^#/
-        if href =~ /([^\\])\^/ # remote-site semantics
-          # we look up id in autoglossary of another "site" 
-          # (use site^id to specify, where "site" is relative filepath in glossary)
-          begin
-            id = $'
-            path = refGlossary($` + $1).match(/href="(.*?)"/)[1]
-            path = (adrPageTable[:adrSiteRootTable] + Pathname.new(path)).cleanpath + "#autoglossary.yaml"
-            h = LCHash[YAML.load_file(path)]
-            #puts "h:"
-            #pp h
-            url = %{<a href="#{h[id.gsub('\\','')][:url]}">}
-            #puts "url:"
-            #p url
-            #TODO: failing to notice/barf if there is no url entry in the hash
-          rescue
-            puts "Remote glossary lookup failed on #{href}, apparently while processing #{adrPageTable[:adrObject]}"
-          end
-        else
-          href = href.gsub('\\','') # remove user escaping if any
-          url = refGlossary(href)
-        end
-        if url
-          retval = url
-        else # refGlossary failed, insert dummy but legal URL
-          retval = "<a href=\"errorRefGlossaryFailedHere\">"
-        end
-        # refGlossary will create a complete new <a> tag (not sure if that's wise, but it's what I'm doing)...
-        # ...so, if they have stuff after the href, we have hung on to it, restore it now 
-        retval[-1] = rest + ">" # restore stuff after href tag, if any
-      end
-      retval
-    end
-  
+    # glossary expansion (resolve local <a> tags)
+    s = resolveLinks(s)
+      
     # pageHeader attribute or result of pageheader() standardmacro call instead
     # we don't handle this until now, because other stuff might need to influence title or bgcolor or something
     # might be named (symbol key) or found (string key); might be direct string or indirect pathname
-    if ph = adrPageTable[:pageheader] or ph = adrPageTable["pageheader"]
-      ph = File.read(adrPageTable["pageheader"]) if ph.kind_of?(Pathname)
+    if ph = adrPageTable.fetch2(:pageheader)
+      ph = File.read(ph) if ph.kind_of?(Pathname)
       s = processMacros(ph, theBindingMaker.getBinding) + s
     end
   
@@ -959,7 +924,6 @@ class UserLand::Html::PageMaker
     return adrPageTable
   end
   memoize :buildPageTableForDirectory
-  private :buildPageTableForDirectory
   def tenderRender(adrObject, adrPageTable=@adrPageTable)
     # sorry about the name of this method, but this is what Frontier calls it...
     # extract directives from page object and return suitable bodytext value
@@ -1080,8 +1044,44 @@ class UserLand::Html::PageMaker
   ensure
     $!.set_backtrace caller(0) if $! # nicer backtrace in case of failure
   end
+  def resolveLinks(s, adrPageTable=@adrPageTable)
+    # glossary expansion; my equivalent is to look for already existing <a href...> tags
+    # ...generated no matter how, e.g. manually, with getLink, with markdown [](), whatever
+    # we can resolve identifiers in user glossary or our autoglossary (see refGlossary)
+    s.gsub /<a href="(.*?)"(.*?)>/i do |ref| 
+      # NB href must come absolutely first, we are deliberately hard-coded on this format
+      # this is cool because it means you can except an <a> tag from resolution merely by using a different format
+      retval = ref # if nothing else, just return what we came in with
+      href = $1
+      rest = $2
+      # to count as a candidate, must be clearly "local":
+      # if contains dot or colon-slash-slash, or starts with #, assume this is a real URL, don't touch
+      # but user can override the first two checks by escaping (double-backslash), thus saying, yes, do process me
+      unless href =~ /[^\\]\./ || href =~ %r{[^\\]\://} || href =~ /^#/
+        if href =~ /([^\\])\^/ # remote-site semantics, site^id (escape to prevent this interpretation)
+          # site is relative filepath in glossary, id is to be looked up in autoglossary of that site
+          begin
+            id = $'
+            path = refGlossary($` + $1)
+            path = (adrPageTable[:adrSiteRootTable] + Pathname.new(path)).cleanpath + "#autoglossary.yaml"
+            url = LCHash[YAML.load_file(path)][id.gsub('\\','')][:url]
+            #TODO: failing to notice/barf if there is no url entry in the hash?
+          rescue
+            puts "Remote glossary lookup failed on #{href}, apparently while processing #{adrPageTable[:adrObject]}"
+          end
+        else # non-remote-site (normal) semantics
+          url = refGlossary(href.gsub('\\',''))
+          puts "RefGlossary failed on #{href}, apparently while processing #{adrPageTable[:adrObject]}" unless url
+        end
+        retval = url || "errorRefGlossaryFailedHere"
+        retval = %{<a href="#{retval}"#{rest}>} # form link, restoring stuff after href tag if any
+      end
+      retval
+    end
+  end
   def refGlossary(name, adrPageTable=@adrPageTable)
-    # return a complete <a> tag referring to the named target from where we are, or nil
+    # return href referring to the named target from where we are, or nil
+    # [NB possible breakage warning: used to return complete <a> tag - OTOH users should not be calling directly anyway]
     # Frontier merely substitutes a glossPath at this stage, but I don't see the need for that
     # as usual I am leaving out a certain amount of Frontier's logic here
     # also I'm departing from Frontier's logic: we have two hashes to look in:
@@ -1091,19 +1091,18 @@ class UserLand::Html::PageMaker
     name, anchor = name.split("#", 2)
     anchor = anchor ? "#" + anchor : ""
     # autoglossary
-    g = LCHash[(adrPageTable[:autoglossary])]
+    g = LCHash[adrPageTable[:autoglossary]]
     if g && g[name] && g[name][:path]
       path = adrPageTable[:siteRootFolder] + g[name][:path]
-      return %{<a href="#{path.relative_uri_from(adrPageTable[:f])}#{anchor}">} 
+      return path.relative_uri_from(adrPageTable[:f]) + anchor
     end
     # user glossary
     g = adrPageTable["glossary"]
     if g && g[name]
-      return %{<a href="#{g[name]}#{anchor}">}
+      return g[name] + anchor
     end
-    # report failure
-    puts "RefGlossary failed on #{name}, apparently while processing #{adrPageTable[:adrObject]}"
-    return nil
+    # failure
+    nil
   end
   def getOneDirective(directiveName, adrObject)
     # simple-mindedly pull a directive out of a page's contents
