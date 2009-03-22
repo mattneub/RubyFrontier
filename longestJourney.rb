@@ -673,15 +673,22 @@ class UserLand::Html::PageMaker
     if adrPageTable["filters"]
       adrFilter = adrPageTable["filters"] + "#{filter_name}.rb"
       if adrFilter.exist?
-        Sandbox.new(adrFilter).send(filter_name, adrPageTable)
-        # TODO: I'm thinking of checking arity and sending along self as a further param if desired
+        s = Sandbox.new(adrFilter)
+        m = s.method(filter_name) rescue myraise("Filter file #{filter_name}.rb must define method #{filter_name}")
+        case m.arity
+        when 1
+          s.send(filter_name, adrPageTable)
+        when 2
+          s.send(filter_name, adrPageTable, self)
+        else
+          myraise "Filter method #{filter_name} must take 1 or 2 parameters"
+        end
       end
     end
   end
   def buildObject(adrObject, adrPageTable=@adrPageTable)
     # construct entire page table
     buildPageTableFully(adrObject)
-    
     # if this is not a renderable, that's all
     return "" unless renderable?(adrObject)
     
@@ -705,16 +712,23 @@ class UserLand::Html::PageMaker
       # can be defined in user.rb, or as an .rb file in tools 
       # it should not override initialize in such a way as to disable it, and must accept render with 1 arg (an Opml object)
       # has access to @thePageMaker and @adrPageTable
+      myraise("Failed to specify an outline renderer (renderOutlineWith)!") unless renderer = adrPageTable[:renderoutlinewith]
       begin
-        renderer_klass = UserLand::Renderers.module_eval(adrPageTable[:renderoutlinewith]) 
-      rescue 
-        raise "Renderer #{adrPageTable[:renderoutlinewith]} not found!"
+        renderer_klass = UserLand::Renderers.module_eval(renderer) 
+      rescue
+        myraise "Renderer #{renderer} not found!"
       end
       adrPageTable[:bodytext] = renderer_klass.new(self, theBindingMaker).render(adrPageTable[:bodytext])
     when Sandbox # script!
       # must have a render() method, we call it in a sandbox, handing it the whole PageMaker object
       # after that, dude, you're on your own!
-      adrPageTable[:bodytext] = adrPageTable[:bodytext].render(self)
+      renderer = adrPageTable[:bodytext]
+      begin
+        raise("") unless renderer.method(:render).arity == 1
+      rescue
+        myraise("Page object script must define render method accepting one parameter")
+      end
+      adrPageTable[:bodytext] = renderer.render(self)
     end
     
     # update autoglossary
@@ -748,9 +762,7 @@ class UserLand::Html::PageMaker
     return if adrPageTable[:stopAfterPageFilter]
 
     #template
-    # TODO: no support yet for indirect template
-    # named template supported, assumed to be in #templates or user/templates
-    # if named, it will be :template, a string; if found, it will be "template", a Pathname
+    # if named, it will be a string; if found or "indirect", it will be a Pathname
     raise "No template found or specified" unless (adrTemplate = adrPageTable.fetch2(:template))
     if adrTemplate.kind_of?(String) # named template, look for it and convert to Pathname
       catch (:done) do
@@ -804,7 +816,7 @@ class UserLand::Html::PageMaker
   
   end
   def buildPageTableFully(adrObject, adrPageTable=@adrPageTable)
-    # this has no exact Frontier analog; it's the first few lines of buildObject
+    # this has no exact Frontier analog; it's the first few lines of buildObject, factored out
     # the point is that Frontier's buildPageTable does not really finish building the page table...
     # ...but we need a routine that *does* fully finish (without rendering), so we can pull out directives properly
     # idea is to be lightweight but complete, so that resulting adrPageTable can be used for other purposes
@@ -819,22 +831,22 @@ class UserLand::Html::PageMaker
     # insert page object, in some form, into page table
     adrPageTable[:bodytext] = tenderRender(adrPageTable[:adrobject])
     
-    # work out :fname, :siteRootFolder, :subDirectoryPath, :f
+    # work out paths and names:
     # :fname => name of file we will write out
-    # :siteRootFolder => folder into which all pages will be written
-    # :adrSiteRootTable => folder containing #ftpsite marker, in which whole site object lives
-    # :f => full pathname of file we will write out
-    # :subDirectoryPath => relative path from :siteRootFolder to :f, or from :adrSiteRootTable to :adrObject
     if renderable?(adrPageTable[:adrobject])
       adrPageTable[:fname] = getFileName(adrPageTable[:adrobject].simplename)
     else
       adrPageTable[:fname] = adrPageTable[:adrobject].basename
     end
+    # :siteRootFolder => folder into which all pages will be written
     folder = getSiteFolder() # sets adrPageTable[:siteRootFolder] and returns it
+    # :subDirectoryPath => relative path from :siteRootFolder to :f, or from :adrSiteRootTable to :adrObject
+    # :adrSiteRootTable => folder containing #ftpsite marker, in which whole site object lives
+    # (already set, in buildPageTableForDirectory)
     relpath = (adrPageTable[:adrobject].relative_path_from(adrPageTable[:adrSiteRootTable])).dirname
     adrPageTable[:subdirectorypath] = relpath
+    # :f => full pathname of file we will write out
     adrPageTable[:f] = folder + relpath + adrPageTable[:fname]
-    #pp adrPageTable
     
     # insert user glossary
     if UserLand::User.respond_to?(:glossary)
@@ -845,7 +857,6 @@ class UserLand::Html::PageMaker
     end
   end
   def buildPageTable(adrObject, adrPageTable=@adrPageTable)
-   # puts "====", "buildPageTable called: #{self}", adrObject, "===="
     # isolate this directory as parameter so we can memoize
     adrPageTable.merge!(buildPageTableForDirectory(adrObject.dirname))
     # record what object is being rendered
@@ -862,7 +873,6 @@ class UserLand::Html::PageMaker
   
     # walk file hierarchy looking for things that start with "#"
     # add things only if they don't already exist; that way, closest has precedence
-    # if it is a #tools folder, hash pathnames under simple filenames
     # if it is #prefs or #glossary, load as a yaml hash and merge with existing hash
     # if it is #ftpsite, determine root etc.
     # else, just hash pathname under simple filename
@@ -871,39 +881,41 @@ class UserLand::Html::PageMaker
       adrObjectDir.ascend do |dir|
         dir.each_entry do |f|
           if /^#/ =~ f
-            case f.simplename.to_s.downcase
-            when "#tools" # gather tools into tools hash; new feature (non-Frontier), .txt files go into snippets hash
-              (dir + f).each_entry do |ff|
+            dirf = dir + f
+            case f.simplename.to_s.downcase # special casing of certain directives
+            when "#tools"
+              # gather tools into tools hash, hashing pathnames under simple filenames
+              # new feature (non-Frontier), .txt files go into snippets hash
+              dirf.each_entry do |ff|
                 unless /^\./ =~ (tool_simplename = ff.simplename.to_s.downcase)
                   case ff.extname
                   when ".rb"
-                    adrPageTable["tools"][tool_simplename] ||= dir + f + ff
+                    adrPageTable["tools"][tool_simplename] ||= dirf + ff
                   when ".txt"
-                    adrPageTable["snippets"][tool_simplename] ||= File.read(dir + f + ff)
+                    adrPageTable["snippets"][tool_simplename] ||= File.read(dirf + ff)
                   end
                 end
               end
-            when "#images" # gather references to images into images hash, similar to tools
-              (dir + f).each_entry do |ff|
+            when "#images" # gather images into images hash, hashing pathnames under simple filenames
+              dirf.each_entry do |ff|
                 unless /^\./ =~ (im_simplename = ff.simplename.to_s.downcase)
-                  adrPageTable["images"][im_simplename] ||= dir + f + ff
+                  adrPageTable["images"][im_simplename] ||= dirf + ff
                 end
               end
-            when "#prefs" # flatten prefs out into top-level entries in adrPageTable
-              prefsHash = YAML.load_file(dir + f)
-              # prefsHash.each_key {|key| adrPageTable[key] ||= prefsHash[key]}
-              prefsHash.each_key {|key| incorporateDirective(key, prefsHash[key], true, adrPageTable)}
-            when "#glossary" # gather glossary entries into glossary hash: NB these are *user* glossary entries
-              # (different from Frontier: automatically generated glossary entries for linking live in #autoglossary)
-              glossHash = LCHash[(YAML.load_file(dir + f))]
-              adrPageTable["glossary"] = glossHash.merge(adrPageTable["glossary"]) # note order: what's in adrPageTable overrides
+            when "#prefs" # flatten prefs out to become top-level entries of adrPageTable
+              # we do NOT downcase this key; arbitrary directives can have meaningful case (as in #metaAppleTitle)
+              YAML.load_file(dirf).each {|k,v| incorporateDirective(k, v, true, adrPageTable)}
+            when "#glossary" # gather user glossary entries into glossary hash
+              g = adrPageTable["glossary"]
+              YAML.load_file(dirf).each do |k,v|
+                g[k.downcase] = v unless g[k]
+              end
             when "#ftpsite"
               found_ftpsite = true
-              adrPageTable[:ftpsite] ||= YAML.load_file(dir + f)
+              adrPageTable[:ftpsite] ||= YAML.load_file(dirf)
               adrPageTable[:adrsiteroottable] ||= dir
-              #adrPageTable[:subDirectoryPath] ||= (adrObject.relative_path_from(dir)).dirname
             else
-              adrPageTable[f.simplename.to_s[1..-1]] ||= (dir + f) # pathname TODO: should I lowercase this key?
+              adrPageTable[f.simplename.to_s.downcase[1..-1]] ||= dirf # pathname hashed under simple filename
             end
           end
         end
@@ -918,7 +930,7 @@ class UserLand::Html::PageMaker
     else
       Hash.new
     end
-    # url-setting and some other stuff (fname, f) not yet written
+    # url-setting and some other stuff (fname, f) not yet done
     # there is an inefficiency in Frontier here: this is all done again after tenderRender
     # so I'm just omitting it here for now
     return adrPageTable
@@ -960,11 +972,11 @@ class UserLand::Html::PageMaker
     return op
   end
   def runDirective(linetext, adrPageTable=@adrPageTable)
-    k,v = linetext.split(" ",2)
-    #adrPageTable[k.to_sym] = eval(v.chomp) 
-    incorporateDirective(k.to_sym, eval(v.chomp, binding), false, adrPageTable) # "binding" for better error reports
+    k,v = linetext.chomp.split(" ",2)
+    # directive becomes symbol, not downcased (case can have meaning), overrides existing; value is evaled
+    incorporateDirective(k.to_sym, eval(v, binding), false, adrPageTable) # "binding" for better error reports
   rescue SyntaxError
-    raise "Syntax error: Failed to evaluate directive #{v.chomp}"
+    raise "Syntax error: Failed to evaluate directive #{v}"
   end
   def incorporateDirective(k, v, yieldToExisting=false, adrPageTable=@adrPageTable)
     # bottleneck routine: give me a k (symbol or string) and a v (value) and I'll add it to the page table
@@ -991,20 +1003,20 @@ class UserLand::Html::PageMaker
     end
   end
   def getFileName(n, adrPageTable=@adrPageTable)
-    return normalizeName(n) + getPref("fileextension", adrPageTable)
+    normalizeName(n) + getPref("fileextension", adrPageTable)
   end
   def normalizeName(n, adrPageTable=@adrPageTable)
     n = n.to_s
     n = n.dropNonAlphas if getPref("dropnonalphas", adrPageTable)
     n = n.downcase if getPref("lowercasefilenames", adrPageTable)
-    return n[0, getPref("maxfilenamelength", adrPageTable) - getPref("fileextension", adrPageTable).length]
+    n[0, getPref("maxfilenamelength", adrPageTable) - getPref("fileextension", adrPageTable).length]
   end
   def getSiteFolder(adrPageTable=@adrPageTable)
-    # where shall we render/copy pages into? set :siteRootFolder and return it as well
+    # where shall we render/copy pages into? set :siteRootFolder, and return it as well
     return adrPageTable[:siteRootFolder] if adrPageTable[:siteRootFolder]
-    folder = Pathname.new(adrPageTable[:ftpsite][:folder]).expand_path
+    folder = Pathname(adrPageTable[:ftpsite][:folder]).expand_path
     # ensure whole containing path exists; if not, use temp folder
-    folder = Pathname.new(`mktemp -d /tmp/website.XXXXXX`) unless folder.dirname.exist?
+    folder = Pathname(`mktemp -d /tmp/website.XXXXXX`) unless folder.dirname.exist?
     return (adrPageTable[:siterootfolder] = folder) # set in adrPageTable and also return it
   end
   def addPageToGlossary(adrObject, glossary=adrPageTable[:autoglossary], adrPageTable=@adrPageTable)
@@ -1026,13 +1038,12 @@ class UserLand::Html::PageMaker
     end
     # url in ftpsite might not exist
     begin
-      url = adrPageTable[:ftpsite][:url]
-      url += "/" unless url =~ %r{/$}
-      uri = URI::join(url, URI::escape(h[:path].to_s))
-      h[:url] = uri.to_s
+      url = adrPageTable[:ftpsite][:url].chomp("/") + "/" # ensure ends with slash
+      h[:url] = URI::join(url, URI::escape(h[:path].to_s)).to_s
     rescue
     end
     # put into autoglossary hash, possibly twice
+    # we downcase and use LCHash for lookup, but autoglossary itself is normal hash
     glossary[adrPageTable[:f].simplename.to_s.downcase] = h
     glossary[linetext.downcase] = h if linetext
   end
@@ -1041,8 +1052,13 @@ class UserLand::Html::PageMaker
     # the Ruby equivalent of processing macros is to use ERB, so we do
     # reference munging like Frontier's is done in the BindingMaker class
     ERB.new(s).result(theBinding)
-  ensure
-    $!.set_backtrace caller(0) if $! # nicer backtrace in case of failure
+  rescue Exception => e # real nice error reporting
+    line = e.backtrace.grep(/^\(erb\)/)[0].split(':')[1].to_i
+    puts "Exception while evaluating line #{line}:"
+    puts s.split("\n")[line-1]
+    e.backtrace.grep(/^\(eval\)/).reverse.each {|b| arr = b.split(":"); puts "#{arr[2]}, line #{arr[1]}"}
+    e.set_backtrace caller(0)
+    raise
   end
   def resolveLinks(s, adrPageTable=@adrPageTable)
     # glossary expansion; my equivalent is to look for already existing <a href...> tags
@@ -1127,28 +1143,17 @@ class UserLand::Html::PageMaker
   end
   def getNextPrev(obj, adrPageTable=@adrPageTable)
     # useful for macros
-    # return array of two identfiers, namely the prev and next renderable page at this level
-    # ids suitable for use in autoglossary consultation
-    # if there is a #nextprevs listing ids in order, we just use that
-    # otherwise we use the physical file system
-    # either or both element of the array can be nil to signify none
-    # result = [nil, nil]
-    # sibs = pagesInFolder(obj.dirname)
-    # us = sibs.index(obj.simplename.to_s)
-    # result[0] = sibs[us-1] if us > 0
-    # result[1] = sibs[us+1] if us < sibs.length - 1
-    # return result
+    # return array of two identifiers, namely the prev and next renderable page at this level
     pagesInFolder(obj.dirname).nextprev(obj.simplename.to_s)
   end
   def pagesInFolder(folder, adrPageTable=@adrPageTable)
     # utility, also useful to macros
     # return array of identifiers of renderables in folder
-    # these identifiers are suitable for use in getTitleAndPath and other autoglossary consultation
+    # suitable for use in autoglossary consultation (refGlossary and whatever calls it)
     # if there is a #nextprevs, the array is ordered as in the nextprevs
     # otherwise we just use alphabetical order (filesystem)
     # return nil if no result
     # memoized, since #nextprevs and folder contents unlikely to change during a rendering
-    # third parameter gives a chance to cancel this (hard to see why you'd want to)
     arr = Array.new
     nextprevs = folder + "#nextprevs.txt"
     if (nextprevs.exist?)
@@ -1165,14 +1170,14 @@ class UserLand::Html::PageMaker
   memoize :pagesInFolder
   def getImageData(imageSpec, adrPageTable=@adrPageTable)
     # find image, get relative path, write out the image, get height and width
-    # Frontier has fu for seeking the image, but I assume a single "images" hash gathered as we build page table
+    # TODO: Frontier has fu for seeking the image, but I assume a single "images" hash gathered as we build page table
     raise "No 'images' folder found" unless adrPageTable["images"]
     imagePath = adrPageTable["images"][imageSpec]
     raise "Image #{imageSpec} not found" unless imagePath
-    # I also assume single folder at top level (but I leave folder name as a pref)
+    # TODO: I also assume single folder at top level (but I leave folder name as a pref)
     imagesFolder = adrPageTable[:siteRootFolder] + getPref("imagefoldername", adrPageTable)
     # actually write the image; I've always thought this is an inappropriate place to do this...
-    # ... and would eventually like to change it
+    # ... and would eventually like to change it (TODO)
     imagesFolder.mkpath
     imageTarg = imagesFolder + imagePath.basename
     FileUtils.cp(imagePath, imageTarg, :preserve => true) if imageTarg.needs_update_from(imagePath)
