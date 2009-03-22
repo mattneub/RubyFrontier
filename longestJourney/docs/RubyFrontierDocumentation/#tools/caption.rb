@@ -3,7 +3,7 @@ def caption(img, txt)
   # how wide is the picture?
   width = html.getImageData(img)[:width] + 10
   %{
-    <div style="text-align:center"><table width="#{width}"><tr><td class="pic">
+    <div><table style="margin-left:auto; margin-right:auto; width:#{width}px"><tr><td class="pic">
     #{imageref(img)}
     </td></tr>
     <tr><td class="caption">
