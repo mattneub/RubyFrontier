@@ -40,7 +40,7 @@ class Opml
   # and "go_wrapper" takes care of returning the right thing
   # NB use of "call" lets us use "return" and does not seem slower than "yield" and a proc
   # it is up to our subclasses to implement methods godownone, goupone, goleftone, gorightone
-  # (goflatdownone and goflatupone are implemented in terms of those, so we implement them here)
+  # goflatdownone and goflatupone are implemented in terms of those, so we implement them here
 =end
   def go_wrapper(count, meth)
     return false unless meth.call
@@ -355,106 +355,3 @@ class Opmllibxml < Opml
   
 end
 
-if __FILE__ == $0
-
-#testingfile = ENV["HOME"] + "/Desktop/testing.opml"
-f = "/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml"
-
-op = Opml.new(f)
-#puts op.inspect_flat
-#exit
-
-=begin
-60.times do
-  puts op.getLineText
-  op.go(:down,2)
-end
-exit
-=end
-
-
-begin # awfully cute test for showing whether flatdown 1 and flatup 1 are working, at least
-  arr1 = Array.new
-  arr2 = Array.new
-  arr1 << op.getLineText
-  while op.go(:flatdown,1)
-    arr1 << op.getLineText
-  end
-  arr2 << op.getLineText
-  while op.go(:flatup,1)
-    arr2 << op.getLineText
-  end
-  if arr1 == arr2.reverse
-    puts "Mein fuhrer, I can walk!"
-  end
-end
-exit
-
-
-op.insert("bite me", :right)
-op.firstsummit
-20.times do
-  puts op.getLineText
-  op.go(:flatdown)
-end
-op.insert("bite me again", :right)
-op.go(:left)
-20.times do
-  puts op.getLineText
-  op.go(:flatdown)
-end
-exit
-
-
-def visit(op)
-  while true
-    linetext = op.getLineText()
-    line = linetext
-    didRecurse = false
-    pendingClosingTags = []
-    if line =~ /\|/ # my incredibly simple-minded way of handling the single-line shortcut: split right
-      op.setLineText($`)
-      op.insert($', :right)
-      op.go(:left,1)
-    end
-    if op.go(:right,1)
-      childRecursed = visit(op)
-      if line =~ /</
-        line.scan /<([!%\?])?\s*(\/)?\s*(\w[\w:-]*)[^>]*?(\/)?>/ do |m|
-          next if m[0] # starts with <% or similar, ignore
-          next if m[3] # self-closing (xml) tag, ignore
-          tag = "</#{m[2]}>" # proposed closing tag
-          if m[1] # this *is* a closing tag, remove from list if we added it already
-            ix = pendingClosingTags.index(tag)
-            pendingClosingTags.delete_at(ix) if ix
-            next
-          end
-          # okay, it's a legit closing tag, add it to the list!
-          # list grows from front, because e.g. <blockquote><p> closing tag list is </p><blockquote>
-          pendingClosingTags.unshift(tag)
-        end
-        if pendingClosingTags.length > 0
-          if childRecursed
-            op.insert(pendingClosingTags.join(""), :down)
-          else
-            op.setLineText(op.getLineText + pendingClosingTags.join(""))
-          end
-        end
-      end
-      op.go(:left,1)
-      didRecurse = true
-    end
-    return didRecurse unless op.go(:down,1)
-  end      
-end
-
-#visit(op)
-
-s = op.getLineText
-puts s
-puts s+"haha"
-op.setLineText(s+"haha")
-puts op.getLineText
-
-
-end
