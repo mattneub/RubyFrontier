@@ -1225,25 +1225,3 @@ end
 
 myrequire 'user' # last of all, so user can define SuperRenderer subclass and use "user.rb" for overrides of anything
 
-if __FILE__ == $0
-  
-# UserLand::Html::releaseRenderedPage("/Users/mattleopard/anger/Word Process/jobs/dialectic/docs/fourwindowsfolder/adbk.txt")
-# UserLand::Html::preflightSite("/Users/mattleopard/anger/Word Process/jobs/dialectic/docs/appmodes.txt")
-# UserLand::Html::releaseRenderedPage("./scriptde.txt")
-# UserLand::Html::preflightSite(Pathname.new("./scriptde.txt").expand_path)
-# UserLand::Html::publishSite("/Users/mattleopard/anger/Word Process/jobs/dialectic/docs/appmodes.txt")
-# UserLand::Html::releaseRenderedPage("./scriptdefolder/develop.txt")
-# pp UserLand::Html::everyPageOfSite(Pathname.new("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml").expand_path)
-#UserLand::Html::newSite()
-#UserLand::Html::releaseRenderedPage("/Volumes/gromit/Users/matt2/anger/Word Process/emperorWebSite/site/default2.opml")
-#require 'profiler'
-#Profiler__::start_profile
-#UserLand::Html::releaseRenderedPage("/Volumes/gromit/Users/matt2/anger/Word Process/web sites/emperorWebSite/site/default2.opml")
-#Profiler__::print_profile($stdout)
-#Profiler__::start_profile
-#UserLand::Html::publishSite("/Volumes/gromit/Users/matt2/anger/Word Process/jobs/sd45/sd45docs/scriptde.txt")
-#Profiler__::print_profile($stdout)
-
-puts UserLand::Html::getLink("hey", "ho", {:id, "yeah", :anchorr, "biteme", :othersitee, "apeth", :class, "zork"})
-
-end
