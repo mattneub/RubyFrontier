@@ -416,6 +416,8 @@ module UserLand::Html
     p.mkpath
     FileUtils.cp_r($newsite.to_s + '/.', p)
     FileUtils.rm((p + "#autoglossary.yaml").to_s) # just causes errors if it's there
+    # also get rid of svn leftovers if present
+    `find '#{p}' -name ".svn" -print0 | xargs -0 rm -R -f`
     `"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{p}'`
   end
   def self.traverseLink(adrObject, linktext)
@@ -794,7 +796,7 @@ class UserLand::Html::PageMaker
       
     # macros (except in pageheader, we haven't gotten there yet)
     s = processMacros(s, theBindingMaker.getBinding) unless !getPref("processmacros")
-  
+    
     # glossary expansion (resolve local <a> tags)
     s = resolveLinks(s)
       
@@ -1120,9 +1122,11 @@ class UserLand::Html::PageMaker
     # failure
     nil
   end
-  def getOneDirective(directiveName, adrObject)
+  def getOneDirective(directiveName, adrObject, adrPageTable=@adrPageTable)
     # simple-mindedly pull a directive out of a page's contents
     # we now accept an array of directives, and if so, we return an array
+    # we also accept a refglossary id instead of an absolute adrObject pathname
+    adrObject = adrPageTable[:autoglossary][adrObject][:adr] unless adrObject === Pathname
     is_arr = directiveName.kind_of?(Array)
     directiveName = Array(directiveName)
     d = Hash.new
