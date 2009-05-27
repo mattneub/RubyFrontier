@@ -45,9 +45,13 @@ module UserLand::Html
     # regex.match(pm.adrPageTable[:renderedtext])[1]
     pm.adrPageTable[:bodytext]
     # but I expect I will need to modify this to look for some "snip" comment or something, and snip there
+    if pm.adrPageTable[:bodytext] =~ %r{<!\-\-\s*snip\s*\-\->}
+      pm.adrPageTable[:bodytext] = $` + "\n\n" + UserLand::Html.getLink("More...", pm.adrPageTable[:title], {:class, "more"})
+    end
   end
   class << self; memoize :heartOfRenderedPage; end # have to talk this way yadda yadda
   
+    
   def self.markdown(s)
     result = nil
     IO.popen(ENV['TM_SUPPORT_PATH'] + "/bin/markdown.pl", "r+") do |io|
