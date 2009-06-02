@@ -1126,7 +1126,7 @@ class UserLand::Html::PageMaker
     # simple-mindedly pull a directive out of a page's contents
     # we now accept an array of directives, and if so, we return an array
     # we also accept a refglossary id instead of an absolute adrObject pathname
-    adrObject = adrPageTable[:autoglossary][adrObject][:adr] unless adrObject === Pathname
+    adrObject = adrPageTable[:autoglossary][adrObject][:adr] unless adrObject.kind_of? Pathname
     is_arr = directiveName.kind_of?(Array)
     directiveName = Array(directiveName)
     d = Hash.new
