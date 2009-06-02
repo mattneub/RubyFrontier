@@ -285,7 +285,8 @@ class Opmllibxml < Opml
       if first
         first.prev = el
       else
-        @curline.child = el
+        # @curline.child = el # "deprecated"
+        @curline << el
       end
     end
     @curline = el # select inserted line
