@@ -832,13 +832,13 @@ class UserLand::Html::PageMaker
     # obtain directives from within page object
     # insert page object, in some form, into page table
     adrPageTable[:bodytext] = tenderRender(adrPageTable[:adrobject])
-    
+        
     # work out paths and names:
     # :fname => name of file we will write out
     if renderable?(adrPageTable[:adrobject])
-      adrPageTable[:fname] = getFileName(adrPageTable[:adrobject].simplename)
+      adrPageTable[:fname] ||= getFileName(adrPageTable[:adrobject].simplename)
     else
-      adrPageTable[:fname] = adrPageTable[:adrobject].basename
+      adrPageTable[:fname] ||= adrPageTable[:adrobject].basename
     end
     # :siteRootFolder => folder into which all pages will be written
     folder = getSiteFolder() # sets adrPageTable[:siteRootFolder] and returns it
@@ -928,9 +928,9 @@ class UserLand::Html::PageMaker
     # (nothing like this in Frontier, we need this for our own autoglossary mechanism)
     adrGlossTable = adrPageTable["autoglossary"]
     adrPageTable[:autoglossary] = if adrGlossTable && adrGlossTable.exist?
-      YAML.load_file(adrGlossTable)
+      LCHash[YAML.load_file(adrGlossTable)]
     else
-      Hash.new
+      LCHash.new
     end
     # url-setting and some other stuff (fname, f) not yet done
     # there is an inefficiency in Frontier here: this is all done again after tenderRender
@@ -1222,7 +1222,7 @@ class UserLand::Html::PageMaker
     g ||= adrPageTable[:autoglossary]
     if g
       f = adrPageTable[:adrSiteRootTable] + "#autoglossary.yaml"
-      File.open(f, "w") { |io| YAML.dump(g, io) }
+      File.open(f, "w") { |io| YAML.dump(Hash[g], io) }
     end
   end
 end
