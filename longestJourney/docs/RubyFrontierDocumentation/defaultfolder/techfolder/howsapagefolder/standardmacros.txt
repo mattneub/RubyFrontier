@@ -24,16 +24,16 @@ The macros are shown as they might be called in a macro under the rules of [macr
 
 * **embedstylesheet()**. Called by `linkstylesheets()`. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in the `#stylesheets` folder) and returns its text, wrapped up in a proper `<script>` tag.
 
-###Typically used in the page body (or template)
+###Typically used in the page body (or template) or macros
 
 * **imageref()**. Writes an image to disk and returns an `<img>` tag referring to it. See on [images](images) for full discussion.
 
-* **html.getOneDirective()**. Takes two parameters, a string name of a directive (such as `"title"`) and a Pathname pointing to a page object. Or, alternatively, the first parameter can be an array of string names of directives. Reads the page object (only if it is a `.txt` or an `.opml` file) and extracts and returns the value of the [scalar directive](scalardirectives) at its start with the specified name(s) (or nil). 
+* **html.getOneDirective()**. Takes two parameters, a string name of a directive (such as `"title"`) and a Pathname pointing to a page object. Alternatively, the first parameter may be an array of string names of directives. Alternatively, the second parameter may be a page identifier that can be looked up in the [autoglossary](autoglossary). Reads the page object (only if it is a `.txt` or an `.opml` file) and extracts and returns the value of the [scalar directive](scalardirectives) at its start with the specified name(s) (or nil). 
 
-* **html.getTitleAndPath()**. Given a single parameter, uses that parameter as a key into the [autoglossary](autoglossary) to retrieve information about a page of the site, and returns an array of two values, the page's title (as a string) and its pathname (as a Pathname object). Either or both of those can be nil. This is useful when, for example, what you have is a page object's simple name and you want to form a link to it whose text includes the title of the Web page the page object generates.
+* **html.getTitleAndPaths()**. Given a single parameter, uses that parameter as a key into the [autoglossary](autoglossary) to retrieve information about a page of the site, and returns an array of the three values it finds there: the page's title (as a string), its pathname (as a Pathname object), and the page object's pathname (as a Pathname object). Any of those can be nil. There's nothing here you couldn't do yourself by look into the autoglossary hash; it's just a quick shortcut. Useful, for example, when what you have is a page object's simple name and you want to form a link to it whose text includes the title of the Web page the page object generates; or when you have a page identifier and you need the pathname of the actual page object. (Note: if you were previously calling **html.getTitleAndPath()**, no problem; it remains as legacy code.)
 
 * **html.getLink()**. An expanded version of Frontier's utility for creating a complete `<a>` tag, replacing both Frontier's `html.getLink()` and my own well-known `glossSub()` macro. Takes two required parameters, the "linetext" (the text surrounded by the tag) and the URL for the `href` attribute value. A third parameter is an optional hash of symbol–string pairs, which are turned into additional attributes of the `<a>` tag, except that two symbols are treated specially: `:anchor` is affixed to the end of the URL (with `"#"` if needed), and `:othersite` is prefixed to the start of the URL with `"^"`, for use by our autoglossary external site mechanism (see "Links to Other RubyFrontier Sites" on [this page](autoglossary#external)).
 
-
+* **html.pagesInFolder()**. Given a folder, lists all the renderable page objects in that folder. The list is an array of identifiers suitable as keys into the [autoglossary](autoglossary). The order is the order from the folder's [#nextprevs.txt](nextprevs) file if there is one; otherwise it's alphabetical.
 
 

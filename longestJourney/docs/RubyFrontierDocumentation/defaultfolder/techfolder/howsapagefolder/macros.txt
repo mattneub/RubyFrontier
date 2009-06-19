@@ -22,7 +22,7 @@ In Frontier, when a macro runs, certain **abbreviated modes of expression** are 
 
 * **Instance methods of the `UserLand::Html::PageMaker` object** that is rendering the page are in scope, also as methods of the name `html`.
 
-  So, for example, to call `UserLand::Html::PageMaker#getTitleAndPath`, you can just say `html.getTitleAndPath(id)` (where `id` is the required first parameter; this is the PageMaker object that is rendering the current page, so the page table is automatically supplied as the second parameter).
+  So, for example, to call `UserLand::Html::PageMaker#getTitleAndPaths`, you can just say `html.getTitleAndPaths(id)` (where `id` is the required first parameter; this is the PageMaker object that is rendering the current page, so the page table is automatically supplied as the second parameter).
 
 * **Macro scripts** (scripts in the [`#tools` folder](directiveobjects)) are in scope, under the names of any top-level methods they may contain. So, for example, if a `#tools` folder contains a script (`.rb`) file that defines a top-level method `homelink`, you can call it by saying `homelink()`. How many parameters such a top-level method takes and what they mean is entirely up to you. Remember, the macro script *itself* is running under macro scoping, so it has access to the page table, other tools, and everything else listed here.
 

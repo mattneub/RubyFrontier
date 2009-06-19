@@ -1140,10 +1140,13 @@ class UserLand::Html::PageMaker
     return arr if is_arr
     return arr[0] # if a scalar was supplied
   end
+  def getTitleAndPaths(id, adrPageTable=@adrPageTable)
+    # grab title (linetext) and paths from autoglossary; useful for macros
+    return [nil,nil,nil] unless adrPageTable[:autoglossary] && (entry = adrPageTable[:autoglossary][id])
+    return entry[:linetext], entry[:path], entry[:adr]
+  end
   def getTitleAndPath(id, adrPageTable=@adrPageTable)
-    # grab title (linetext) and path from autoglossary; useful for macros
-    return [nil,nil] unless adrPageTable[:autoglossary] && adrPageTable[:autoglossary][id]
-    return adrPageTable[:autoglossary][id][:linetext], adrPageTable[:autoglossary][id][:path]
+    getTitleAndPaths(id, adrPageTable) # we are legacy
   end
   def getNextPrev(obj, adrPageTable=@adrPageTable)
     # useful for macros
