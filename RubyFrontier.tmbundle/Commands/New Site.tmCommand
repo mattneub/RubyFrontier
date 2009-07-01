@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby
+
+f = ENV['TM_FILEPATH']
+b = ENV['TM_BUNDLE_SUPPORT']
+require "#{b}/bin/longestJourney.rb"
+UserLand::Html::newSite()</string>
+	<key>input</key>
+	<string>none</string>
+	<key>name</key>
+	<string>New Site</string>
+	<key>output</key>
+	<string>discard</string>
+	<key>uuid</key>
+	<string>7010B257-8006-41DB-A4A1-96AF9EFA87FA</string>
+</dict>
+</plist>
