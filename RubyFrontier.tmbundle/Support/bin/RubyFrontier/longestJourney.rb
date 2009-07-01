@@ -294,5 +294,5 @@ myrequire 'userland_pagemaker'
 # load user.rb last of all, so user can define SuperRenderer subclass and use "user.rb" for overrides of anything
 # location of user.rb is outside the bundle and is defined in a global $userrb which the user must set
 
-myrequire $userrb
+myrequire $userrb rescue puts "No $userrb specified, did not load a user file."
 
