@@ -1,0 +1,26 @@
+Install the RubyFrontier.tmbundle file in the usual way. Place it in ~/Library/Application Support/TextMate/Bundles, or just double-click it and TextMate will install it.
+
+=======
+
+PREPARATION
+
+You are expected (though not required) to have a "user.rb" file outside the bundle. Whenever a RubyFrontier command runs, the "user.rb" file is loaded after all of RubyFrontier's own code has loaded. Thus, "user.rb" is your opportunity to add to or customize RubyFrontier's behavior globally (as opposed to the many customizations you can have in a particular Web site folder). For example, this is where you implement glossary entries and outline renderers that you wish to have available in all your sites.
+
+To set the location of this "user.rb" file, drill down in RubyFrontier.tmbundle to Support/bin/longestJourney.rb. This file has just two lines of code (if it doesn't, you got the wrong longestJourney.rb), and the first sets a global, $userrb. You should set this to the pathname of your "user.rb" file. Your "user.rb" does not actually have to be called "user.rb", but it should be a Ruby file.
+
+=======
+
+DEPENDENCIES
+
+RubyFrontier has been tested under Ruby 1.8.6. It probably works under 1.8.7. I would not expect it to work under 1.9.x yet.
+
+RubyFrontier uses the "exifr" gem to get the dimensions of TIFF images. But you do not need to install the "exifr" gem immediately; RubyFrontier will mention its absence to you, but it will work just fine as long as your Web sites have no TIFF images.
+
+=======
+
+DOCUMENTATION
+
+Drill down in RubyFrontier.tmbundle to Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/default.txt. With the default.txt file selected, choose RubyFrontier > Publish Site. After a heart-stopping pause, the documentation Web site will be built in a new folder on your Desktop and the first page of the site will open in your browser. Read and enjoy. This documentation is identical to the documentation on the Web, here:
+
+http://www.apeth.com/RubyFrontierDocs/default.html
+

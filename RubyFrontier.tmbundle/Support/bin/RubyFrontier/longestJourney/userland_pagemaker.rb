@@ -548,7 +548,7 @@ class UserLand::Html::PageMaker
     raise "No 'images' folder found" unless adrPageTable["images"]
     imagePath = adrPageTable["images"][imageSpec]
     raise "Image #{imageSpec} not found" unless imagePath
-    # TODO: I also assume single folder at top level (but I leave folder name as a pref)
+    # TODO: I also assume single images folder at top level (but I leave folder name as a pref)
     imagesFolder = adrPageTable[:siteRootFolder] + getPref("imagefoldername", adrPageTable)
     # actually write the image; I've always thought this is an inappropriate place to do this...
     # ... and would eventually like to change it (TODO)

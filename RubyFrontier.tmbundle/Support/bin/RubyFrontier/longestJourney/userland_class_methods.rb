@@ -1,8 +1,35 @@
 # public interface for rendering a page (class methods)
 # also general utilities without reference to any specific page being rendered
 
+# utility for making nice pre output where we say "puts" (actuall two "write" calls)
+# use with "open"; on init, substitutes itself for stdout, then runs block, then on close undoes the substitution
+# by inserting <br> we keep the messages flowing to the HTML window
+class FakeStdout < StringIO
+  def initialize(*args)
+    super *args
+    @old_stdout = $stdout
+    $stdout = self
+  end
+  def write(s)
+    @old_stdout.print s.gsub("\n", "<br>")
+  end
+  def close
+    $stdout = @old_stdout
+    super
+  end
+end
+
 module UserLand::Html
   class << self; extend Memoizable; end # have to talk like this in order to memoize class/module methods
+  def self.perform(command_name, *args)
+    require "#{ENV["TM_SUPPORT_PATH"]}/lib/web_preview.rb"
+    STDOUT.sync = true
+    html_header("RubyFrontier")
+    puts "<pre>"
+    FakeStdout.open("", "w+") {self.send(command_name, *args)}
+    puts "</pre>"
+    html_footer()
+  end
   def self.guaranteePageOfSite(adrObject)
     adrObject = Pathname(adrObject).expand_path
     myraise "No such file #{adrObject}" unless adrObject.exist?
