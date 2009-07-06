@@ -1,32 +1,46 @@
 # public interface for rendering a page (class methods)
 # also general utilities without reference to any specific page being rendered
 
+# require built-in utils for outputting html
+require "#{ENV["TM_SUPPORT_PATH"]}/lib/web_preview.rb"
+require "#{ENV["TM_SUPPORT_PATH"]}/lib/escape.rb"
+#require "#{ENV["TM_SUPPORT_PATH"]}/lib/exit_codes.rb"
+
+
 # utility for making nice pre output where we say "puts" (actuall two "write" calls)
 # use with "open"; on init, substitutes itself for stdout, then runs block, then on close undoes the substitution
 # by inserting <br> we keep the messages flowing to the HTML window
-class FakeStdout < StringIO
+class FakeStdout
+  def self.open
+    fs = self.new
+    yield
+  rescue Exception => e
+    fs.close
+    puts e.message
+    p e.backtrace.join("<br>")
+  ensure
+    fs.close
+  end
   def initialize(*args)
     super *args
     @old_stdout = $stdout
     $stdout = self
   end
   def write(s)
-    @old_stdout.print s.gsub("\n", "<br>")
+    @old_stdout.print htmlize(s, :no_newline_after_br => true) #s.gsub("\n", "<br>")
   end
   def close
     $stdout = @old_stdout
-    super
   end
 end
 
 module UserLand::Html
   class << self; extend Memoizable; end # have to talk like this in order to memoize class/module methods
   def self.perform(command_name, *args)
-    require "#{ENV["TM_SUPPORT_PATH"]}/lib/web_preview.rb"
     STDOUT.sync = true
     html_header("RubyFrontier")
     puts "<pre>"
-    FakeStdout.open("", "w+") {self.send(command_name, *args)}
+    FakeStdout.open {self.send(command_name, *args)}
     puts "</pre>"
     html_footer()
   end
@@ -101,6 +115,7 @@ module UserLand::Html
     self.everyPageOfFolder(self.getFtpSiteFile(adrObject).dirname)
   end
   def self.preflightSite(adrObject)
+    puts "preflighting site..."
     # prebuild autoglossary using every page of table containing adrObject path
     glossary = LCHash.new
     pm = nil # so that we have a PageMaker object left over at the end
@@ -117,6 +132,7 @@ module UserLand::Html
       end
     end
     pm.saveOutAutoglossary(Hash[glossary]) # save out resulting autoglossary
+    puts "site preflighted, autoglossary rebuilt and saved"
   end  
 =begin  
   def self.callFileWriterStartup(adrObject, adrStorage=Hash.new) # UNUSED
