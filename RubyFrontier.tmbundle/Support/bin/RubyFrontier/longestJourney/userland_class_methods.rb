@@ -27,7 +27,11 @@ class FakeStdout
     $stdout = self
   end
   def write(s)
-    @old_stdout.print htmlize(s, :no_newline_after_br => true) #s.gsub("\n", "<br>")
+    s = htmlize(s, :no_newline_after_br => true) #s.gsub("\n", "<br>")
+    s = s.gsub(%r[(/.*)(<br>|$)]) do |ss| 
+      %{<a href="txmt://open?url=file://#{e_url($1)}">#{$1}</a>#{$2}}
+    end
+    @old_stdout.print s
   end
   def close
     $stdout = @old_stdout

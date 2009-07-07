@@ -11,7 +11,7 @@ def myrequire(*what)
       require((t = Array(thing))[0])
       Array(t[1]).each {|inc| include self.class.const_get(inc)}
     rescue LoadError
-      puts "Failed to locate required \"#{thing}\". This could cause trouble later... or not. Here's the error message we got:"
+      puts "Failed to locate required \"#{thing}\"", "This could cause trouble later... or not. Here's the error message we got:"
       puts $!
     end
   end
