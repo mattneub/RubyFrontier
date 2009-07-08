@@ -2,7 +2,11 @@
 
 Frontier provided a way to let you make settings that would be in common for rendering *all* your Web sites (unless overridden by a setting within a site). For example, if you know that in a lot of different sites you'd like to say "apple" as a shortcut for "http://www.apple.com" in links, it seems silly to make you redefine this in a [`#glossary` hash](glossary) for *every* source folder. So you need a place where you can define "apple" to mean "http://www.apple.com" just *once*, and have this definition available in any page in any Web site you render.
 
-To handle the need for such **user settings**, RubyFrontier provides the following mechanism:
+To handle the need for such **user settings**, RubyFrontier provides the following mechanism. You provide a file — the **user.rb** file. (It doesn't actually have to be named `user.rb`, but that's the convention and that's what I'm going to call it.) You tell RubyFrontier where it is by choosing RubyFrontier > Locate User.rb File. From then on, RubyFrontier remembers where this file is (on this computer).
+
+Whenever you give a RubyFrontier command, such as Publish Page, as RubyFrontier is loading all the files where its code is kept, it loads `user.rb` *last*. This means that `user.rb` is your chance to add code to the RubyFrontier command's Ruby world.
+
+<!--
 
 The primary location for RubyFrontier's own code is a file called `longestJourney.rb`. In the same folder, side by side with this file, is a folder called `longestJourney`. Inside the folder `longestJourney` you are permitted to keep two things: a file called `user.rb`, and a folder called `user`.
 
@@ -14,7 +18,10 @@ I will now explain the purposes of these two items.
 
 At present, the only purpose of the `user` folder is to contain a folder called `templates` in which [named templates](template) can be stored. RubyFrontier includes two named templates, whose purpose is discussed [here](template).
 
+
 ###The user.rb File
+
+-->
 
 When file `user.rb` is loaded, here are the sorts of thing it can do:
 
@@ -38,4 +45,6 @@ When file `user.rb` is loaded, here are the sorts of thing it can do:
 
 * **Inject code into RubyFrontier**. A typical use would be that you find yourself needing to keep a utility method in the `#tools` folder of more than one source folder; you can save yourself the trouble and keep it in `user.rb` instead. For example, if `user.rb` defines an instance method of `UserLand::Html::PageMaker`, then that method can be conveniently called from a [macro](macros) by using the `html.` prefix (in accordance with the rules of [macro scoping](macros)).
 
-  But you can go further. Since `user.rb` is loaded after the entirety of `longestJourney.rb`, you can actually overshadow RubyFrontier's own native code if you so desire. This was always a huge problem with Frontier: it wasn't object-oriented, so it was difficult to overshadow the built-in code with your own, and if you modified the built-in code directly (as I did with many handlers, especially among the `html` verbs) you risked losing your modifications when you updated the database. With Ruby, however, it's simple; if you want to open up a RubyFrontier class and mess with it in `user.rb`, you can.
+  But you can go further. Since `user.rb` is loaded after the entirety of `longestJourney.rb` and the various other files it requires, you can actually overshadow RubyFrontier's own native code if you so desire. This was always a huge problem with Frontier: it wasn't object-oriented, so it was difficult to overshadow the built-in code with your own, and if you modified the built-in code directly (as I did with many handlers, especially among the `html` verbs) you risked losing your modifications when you updated the database. With Ruby, however, it's simple; if you want to open up a RubyFrontier class and mess with it in `user.rb`, you can. And your changes won't be directly tromped on when you download an updated version of the RubyFrontier bundle (because your changes are not *in* the RubyFrontier bundle).
+
+**Note concerning the "user templates"**: Frontier had a mechanism of "user templates"; any templates kept in the `user` table could be referred to by name in any site. RubyFrontier imitates this only to the extent of [including two "user templates"](template) that can be referred to by name. But they are actually inside the RubyFrontier bundle and so the user templates mechanism is not really open to your use, unless you want to reach right inside the RubyFrontier bundle and put additional templates in there. In future, if there is demand, I am certainly open to restoring a more convenient user templates mechanism; but up to now I have not done so because I haven't felt the need for it.
