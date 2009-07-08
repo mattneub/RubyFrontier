@@ -10,7 +10,7 @@
 f = ENV['TM_FILEPATH']
 b = ENV['TM_BUNDLE_SUPPORT']
 require "#{b}/bin/longestJourney.rb"
-UserLand::Html::perform(:preflightSite, f)
+RubyFrontier::perform(:preflightSite, true, f)
 </string>
 	<key>input</key>
 	<string>none</string>

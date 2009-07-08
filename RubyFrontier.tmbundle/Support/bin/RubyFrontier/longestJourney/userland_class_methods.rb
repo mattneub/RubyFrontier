@@ -1,53 +1,9 @@
 # public interface for rendering a page (class methods)
 # also general utilities without reference to any specific page being rendered
 
-# require built-in utils for outputting html
-require "#{ENV["TM_SUPPORT_PATH"]}/lib/web_preview.rb"
-require "#{ENV["TM_SUPPORT_PATH"]}/lib/escape.rb"
-#require "#{ENV["TM_SUPPORT_PATH"]}/lib/exit_codes.rb"
-
-
-# utility for making nice pre output where we say "puts" (actuall two "write" calls)
-# use with "open"; on init, substitutes itself for stdout, then runs block, then on close undoes the substitution
-# by inserting <br> we keep the messages flowing to the HTML window
-class FakeStdout
-  def self.open
-    fs = self.new
-    yield
-  rescue Exception => e
-    fs.close
-    puts e.message
-    p e.backtrace.join("<br>")
-  ensure
-    fs.close
-  end
-  def initialize(*args)
-    super *args
-    @old_stdout = $stdout
-    $stdout = self
-  end
-  def write(s)
-    s = htmlize(s, :no_newline_after_br => true) #s.gsub("\n", "<br>")
-    s = s.gsub(%r[(/.*)(<br>|$)]) do |ss| 
-      %{<a href="txmt://open?url=file://#{e_url($1)}">#{$1}</a>#{$2}}
-    end
-    @old_stdout.print s
-  end
-  def close
-    $stdout = @old_stdout
-  end
-end
 
 module UserLand::Html
   class << self; extend Memoizable; end # have to talk like this in order to memoize class/module methods
-  def self.perform(command_name, *args)
-    STDOUT.sync = true
-    html_header("RubyFrontier")
-    puts "<pre>"
-    FakeStdout.open {self.send(command_name, *args)}
-    puts "</pre>"
-    html_footer()
-  end
   def self.guaranteePageOfSite(adrObject)
     adrObject = Pathname(adrObject).expand_path
     myraise "No such file #{adrObject}" unless adrObject.exist?
@@ -90,7 +46,7 @@ module UserLand::Html
     self.guaranteePageOfSite(adrObject) # raises if not
     self.preflightSite(adrObject) if preflight
     self.everyPageOfSite(adrObject).each do |p|
-      puts "publishing #{p}"
+      puts "publishing '#{p}'"
       self.releaseRenderedPage(p, (p == adrObject)) # the only one to open in browser is the one we started with
     end
   end
@@ -131,7 +87,7 @@ module UserLand::Html
       pm.addPageToGlossary(p, tempGlossary) # downcases for us
       glossary.merge!(tempGlossary) do |k, vold, vnew| # notify user of non-uniques
         puts "----", "Non-unique autoglossary entry detected for #{k}",
-          vold.inspect, "vs.", vnew.inspect, "while processing #{p}" if vold != vnew
+          vold.inspect, "vs.", vnew.inspect, "while processing '#{p}'" if vold != vnew
         vnew
       end
     end

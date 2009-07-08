@@ -30,11 +30,11 @@ class UserLand::Html::PageMaker
       File.open(f,"w") do |io|
         io.write s
       end
-      puts "Rendered #{adrPageTable[:adrObject]}"
+      puts "Rendered '#{adrPageTable[:adrObject]}'"
     else # just copy it
       if f.needs_update_from(adrPageTable[:adrObject])
         FileUtils.cp(adrPageTable[:adrObject], f, :preserve => true)
-        puts "Copied #{adrPageTable[:adrObject]}"
+        puts "Copied '#{adrPageTable[:adrObject]}'"
       end
     end
   end
@@ -402,7 +402,7 @@ class UserLand::Html::PageMaker
     if (linetext = adrPageTable[:title])
       # issue warning if page object has changed location
       changed = glossary[linetext] && (glossary[linetext][:adr] != adrObject)
-      puts "#{adrObject}", "changed position from #{glossary[linetext][:adr]}" if changed
+      puts "'#{adrObject}'", "changed position from #{glossary[linetext][:adr]}" if changed
       h[:linetext] = linetext
     end
     # url in ftpsite might not exist
@@ -452,11 +452,11 @@ class UserLand::Html::PageMaker
             url = LCHash[YAML.load_file(path)][id.gsub('\\','')][:url]
             #TODO: failing to notice/barf if there is no url entry in the hash?
           rescue
-            puts "Remote glossary lookup failed on #{href}", "apparently while processing #{adrPageTable[:adrObject]}"
+            puts "Remote glossary lookup failed on #{href}", "apparently while processing '#{adrPageTable[:adrObject]}'"
           end
         else # non-remote-site (normal) semantics
           url = refGlossary(href.gsub('\\',''))
-          puts "RefGlossary failed on #{href}", "apparently while processing #{adrPageTable[:adrObject]}" unless url
+          puts "RefGlossary failed on #{href}", "apparently while processing '#{adrPageTable[:adrObject]}'" unless url
         end
         retval = url || "errorRefGlossaryFailedHere"
         retval = %{<a href="#{retval}"#{rest}>} # form link, restoring stuff after href tag if any

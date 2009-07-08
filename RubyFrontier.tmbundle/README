@@ -6,7 +6,7 @@ PREPARATION
 
 You are expected (though not required) to have a "user.rb" file outside the bundle. Whenever a RubyFrontier command runs, the "user.rb" file is loaded after all of RubyFrontier's own code has loaded. Thus, "user.rb" is your opportunity to add to or customize RubyFrontier's behavior globally (as opposed to the many customizations you can have in a particular Web site folder). For example, this is where you implement glossary entries and outline renderers that you wish to have available in all your sites.
 
-To set the location of this "user.rb" file, drill down in RubyFrontier.tmbundle to Support/bin/longestJourney.rb. This file has just two lines of code (if it doesn't, you got the wrong longestJourney.rb), and the first sets a global, $userrb. You should set this to the pathname of your "user.rb" file. Your "user.rb" does not actually have to be called "user.rb", but it should be a Ruby file.
+To set the location of this "user.rb" file, use the Locate User_rb File command. Your "user.rb" does not actually have to be called "user.rb", but it should be a Ruby file.
 
 =======
 
