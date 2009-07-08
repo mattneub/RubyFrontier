@@ -8,3 +8,4 @@ To read the RubyFrontier documentation:
 
 (4) Enjoy!
 
+This folder (RubyFrontierDocumentation) is also offered as an example of a RubyFrontier web site source folder.
