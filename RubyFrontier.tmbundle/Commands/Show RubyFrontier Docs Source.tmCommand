@@ -7,12 +7,14 @@
 	<key>command</key>
 	<string>#!/usr/bin/env ruby
 
+require 'fileutils'
+
 b = ENV['TM_BUNDLE_SUPPORT']
 p = b + "/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation"
 f = ENV['HOME'] + "/Desktop/f" + `uuidgen`.chomp
 FileUtils.mkdir(f)
 FileUtils.cp_r(p, f)
-`"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{p}'`
+`"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{f + "/RubyFrontierDocumentation"}'`
 </string>
 	<key>input</key>
 	<string>none</string>
