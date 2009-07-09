@@ -17,7 +17,7 @@ RubyFrontier::perform(:publishSite, true, f)
 	<key>input</key>
 	<string>none</string>
 	<key>keyEquivalent</key>
-	<string>@"</string>
+	<string>~@'</string>
 	<key>name</key>
 	<string>Publish Site</string>
 	<key>output</key>

@@ -22,6 +22,8 @@ RubyFrontier::perform(:releaseRenderedPage, true, f)
 	<string>Publish Page</string>
 	<key>output</key>
 	<string>showAsHTML</string>
+	<key>scope</key>
+	<string>text, source.ruby</string>
 	<key>uuid</key>
 	<string>512E481D-298D-407D-9CBC-A1C1E91C1492</string>
 </dict>

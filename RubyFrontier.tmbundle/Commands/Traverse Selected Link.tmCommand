@@ -21,6 +21,8 @@ RubyFrontier::perform(:traverseLink, false, f, STDIN.read)</string>
 	<string>Traverse Selected Link</string>
 	<key>output</key>
 	<string>showAsTooltip</string>
+	<key>scope</key>
+	<string>text, source.ruby</string>
 	<key>uuid</key>
 	<string>E17FB077-FABB-4B17-8DFB-7C74544D3B63</string>
 </dict>
