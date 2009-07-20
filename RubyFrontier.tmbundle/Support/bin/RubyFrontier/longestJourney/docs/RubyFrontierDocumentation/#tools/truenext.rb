@@ -3,7 +3,7 @@ def truenext()
   obj = @adrPageTable[:adrObject]
   unless link
     # try first down
-    arr = html.getSubs(obj)
+    arr = getSubs(obj)
     link = arr[0] if arr
   end
   unless link
