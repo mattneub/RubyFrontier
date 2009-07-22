@@ -26,7 +26,25 @@ http://www.apeth.com/RubyFrontierDocs/default.html
 
 =======
 
+HISTORY
+
+I started writing RubyFrontier in about January of 2008. It is very directly modelled after UserLand Frontier's Web framework. By about April of 2008 it was working well enough that I was maintaining my own Web sites with it. Then there was a long beta period where RubyFrontier was made available only to a small number of testers.
+
+=======
+
+VERSION
+
+Let's call this version 0.9. We are no longer in beta; we are willing to share with the world at large. First completely public release. July 22, 2009.
+
+=======
+
 LICENSE
 
 The RubyFrontier bundle for TextMate and all its code are released under the MIT license. See the file "LICENSE".
+
+=======
+
+AUTHOR
+
+Matt Neuburg <matt@tidbits.com>
 
