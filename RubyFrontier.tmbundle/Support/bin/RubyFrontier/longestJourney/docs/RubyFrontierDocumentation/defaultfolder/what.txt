@@ -2,7 +2,7 @@
 
 RubyFrontier is my personal writing tool for creating, editing, and maintaining Web sites. Note that it is *not* a "CMS". It does not run on the server side. It's just a writing tool that makes ordinary static pages and other objects in Web sites. Those sites then have to be uploaded to the Web in the normal way.
 
-(Did you watch the [screencast](http://www.apeth.com/whatisrubyfrontier.mov)?)
+(Did you watch the [screencast](http://www.apeth.com/rubyFrontier.mov)?)
 
 RubyFrontier embodies several principles:
 
@@ -18,7 +18,7 @@ RubyFrontier embodies several principles:
 
   * **Ruby code in the page's content:** A table of contents page that looks, in real time, at all the other pages in the Web site and presents itself as a hierarchical list of links to them.
 
-  * **Ruby code in the template:** "Smart" navigation: a page automatically generates its own breadcrumbs links to its containing folders, previous/next links, and downward links to subtopics (as shown in the [screencast](http://www.apeth.com/whatisrubyfrontier.mov)). 
+  * **Ruby code in the template:** "Smart" navigation: a page automatically generates its own breadcrumbs links to its containing folders, previous/next links, and downward links to subtopics (as shown in the [screencast](http://www.apeth.com/rubyFrontier.mov)). 
 
       The navigation links at the top of these documentation pages are another example of what a "smart" navigation Ruby script might do. In fact, these documentation pages are themselves an example of the kind of thing I use RubyFrontier for!
 
