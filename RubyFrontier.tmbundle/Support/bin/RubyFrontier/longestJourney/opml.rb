@@ -8,7 +8,7 @@ class Opml
 
   MAXINT = 1 << 64
   
-  USELIBXML = true
+  USELIBXML = false
   def self.new(*args)
     object = if USELIBXML
       Opmllibxml.allocate
@@ -229,23 +229,24 @@ end
 
 class Opmllibxml < Opml
   myrequire ['xml/libxml', :XML]
-  
-  class XML::Node
-    def next_element
-      ptr = self.next
-      while ptr
-        return ptr if ptr.element?
-        ptr = ptr.next
+  if defined?(XML)
+    class XML::Node
+      def next_element
+        ptr = self.next
+        while ptr
+          return ptr if ptr.element?
+          ptr = ptr.next
+        end
+        return nil
       end
-      return nil
-    end
-    def previous_element
-      ptr = self.prev
-      while ptr
-        return ptr if ptr.element?
-        ptr = ptr.prev
+      def previous_element
+        ptr = self.prev
+        while ptr
+          return ptr if ptr.element?
+          ptr = ptr.prev
+        end
+        return nil
       end
-      return nil
     end
   end
     

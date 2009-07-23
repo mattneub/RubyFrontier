@@ -9,9 +9,9 @@ def myrequire(*what)
   what.each do |thing|
     begin
       require((t = Array(thing))[0])
-      Array(t[1]).each {|inc| include self.class.const_get(inc)}
+      Array(t[1]).each {|inc| include self.class.const_get(inc) rescue puts "Warning: failed to include #{inc.to_s}"}
     rescue LoadError
-      puts "Failed to locate required \"#{thing}\"", "This could cause trouble later... or not. Here's the error message we got:"
+      puts "Warning: Require failed", "This could cause trouble later... or not. Here's the error message we got:"
       puts $!
     end
   end
@@ -203,7 +203,7 @@ $: << ljfolder.to_s
 $usertemplates = ljfolder + "user" + "templates"
 $newsite = ljfolder + "newsite"
 
-myrequire 'opml'
+require 'opml'
 
 =begin environment in which macro evaluation and outline rendering takes place
   this is all done for maximum similarity to Frontier, and for sheer convenience
