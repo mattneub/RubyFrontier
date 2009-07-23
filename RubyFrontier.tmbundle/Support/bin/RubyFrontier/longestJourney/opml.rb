@@ -8,9 +8,9 @@ class Opml
 
   MAXINT = 1 << 64
   
-  USELIBXML = false
+  @USELIBXML = false # class instance variable used as pseudo-constant, change in user.rb if desired
   def self.new(*args)
-    object = if USELIBXML
+    object = if @USELIBXML
       Opmllibxml.allocate
     else
       Opmlrexml.allocate
