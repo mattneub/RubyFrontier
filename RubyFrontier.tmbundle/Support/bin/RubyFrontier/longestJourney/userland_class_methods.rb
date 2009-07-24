@@ -119,7 +119,7 @@ module UserLand::Html
     %{<a href="#{url}"#{" " + opt if !opt.empty?}>#{linetext}</a>}
   end
   def self.newSite()
-    s = `#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog filesave --title "New Web Site" --text "Specify a folder to create"`
+    s = `"#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog" filesave --title "New Web Site" --text "Specify a folder to create"`
     exit if s == "" # user cancelled
     p = Pathname(s.chomp)
     p.mkpath
