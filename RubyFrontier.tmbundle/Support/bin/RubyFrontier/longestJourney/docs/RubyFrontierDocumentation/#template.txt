@@ -16,7 +16,8 @@
 <p style="font-size:80%; text-align:center">This documentation prepared
 	by Matt Neuburg, phd = matt at tidbits dot com 
 	(<a href="http://www.tidbits.com/matt/">http://www.tidbits.com/matt/</a>),
-	using <b><a href="default">RubyFrontier</a></b>. 
+	using <b><a href="default">RubyFrontier</a></b>.<br />Download RubyFrontier from
+	<a href="http://sourceforge.net/projects/rubyfrontier/">SourceForge</a>.
 </p>
 
 <%= pagefooter() %>
