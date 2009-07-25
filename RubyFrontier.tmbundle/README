@@ -30,11 +30,13 @@ HISTORY
 
 I started writing RubyFrontier in about January of 2008. It is very directly modelled after UserLand Frontier's Web framework. By about April of 2008 it was working well enough that I was maintaining my own Web sites with it. Then there was a long beta period where RubyFrontier was made available only to a small number of testers.
 
+Initial public release, version 0.9, July 23, 2009. Quickly followed by 0.9.1 to handle the case where libxml wasn't installed on the users machines. Then there was some kerfuffle over escaping shell paths.
+
 =======
 
 VERSION
 
-Let's call this version 0.9. We are no longer in beta; we are willing to share with the world at large. First completely public release. July 22, 2009.
+Version 0.9.4. After some initial flurry following the public release, I think we have handled the business of escaping shell paths so that RubyFrontier should work on machines where there's a space in TM_SUPPORT_PATH. Also, suppress defaults read error msg in case user has never set user.rb path. July 25, 2009.
 
 =======
 

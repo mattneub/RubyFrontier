@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-f = `defaults read com.neuburg.matt.rubyFrontier userrb`
+f = `defaults read com.neuburg.matt.rubyFrontier userrb 2>/dev/null`
 $userrb = f.chomp
 
 # require built-in utils for outputting html

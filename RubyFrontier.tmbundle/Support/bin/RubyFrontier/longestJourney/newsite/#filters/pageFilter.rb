@@ -3,7 +3,7 @@ def pageFilter(adrPageTable)
   # for example, here's how to get markdown support:
 
   if adrPageTable[:markdown]
-    IO.popen(%{"#{ENV['TM_SUPPORT_PATH']}/bin/markdown.pl"}, "r+") do |io|
+    IO.popen(%{"#{ENV['TM_SUPPORT_PATH']}/bin/Markdown.pl"}, "r+") do |io|
       io.write adrPageTable[:bodytext]
       io.close_write
       adrPageTable[:bodytext] = io.read
