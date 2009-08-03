@@ -38,3 +38,8 @@ The page header can call **`linkstylesheet()`** and supply a parameter value dir
 
 Another alternative is that you might want to embed a stylesheet in the page itself. To do so, the page header can call **`embedstylesheet()`**. But this isn't very flexible, so the **`linkstylesheets()`** [standard macro](standardmacros) calls **`embedstylesheet()`** for you if you've set a scalar directive **`embedstylesheet`** (whose value is the name of the stylesheet).
 
+### Support for LESS
+
+Recently, I discovered [LESS](http://lesscss.org/docs.html), a more convenient way of writing and structuring CSS. I instantly added LESS support to RubyFrontier. (This had to be done at the core RubyFrontier level because it affects how two of the [standard macros](standardmacros) work.)
+
+So, the rule is, if the `:less` directive is defined, then any stylesheets will be passed through LESS.

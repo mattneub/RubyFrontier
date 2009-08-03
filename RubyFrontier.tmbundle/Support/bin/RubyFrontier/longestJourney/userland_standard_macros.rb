@@ -16,7 +16,11 @@ module UserLand::Html::StandardMacros
     sheetLoc.dirname.mkpath
     if sheetLoc.needs_update_from(source)
       puts "Writing css (#{sheetName})!"
-      FileUtils.cp(source, sheetLoc, :preserve => true)
+      if adrPageTable[:less]
+        sheetLoc.open("w") {|io| io.write(Less.parse(source.read))}
+      else
+        FileUtils.cp(source, sheetLoc, :preserve => true)
+      end
     end
     pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
     %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />\n}
@@ -43,7 +47,9 @@ module UserLand::Html::StandardMacros
     # must be in #stylesheets folder as css file, end of story
     source = adrPageTable["stylesheets"] + "#{sheetName}.css"
     raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
-    %{\n<style type="text/css">\n<!--\n#{File.read(source)}\n-->\n</style>\n}
+    s = source.read
+    s = Less.parse(s) if adrPageTable[:less]
+    %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
   end
   def linkstylesheets(adrPageTable=@adrPageTable) # link to all stylesheets requested in directives
     # call this, not linkstylesheet; it lets you link to multiple stylesheets
