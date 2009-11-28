@@ -239,6 +239,7 @@ class UserLand::Html::PageMaker
     adrPageTable["snippets"] = LCHash.new
     adrPageTable["images"] = LCHash.new
     adrPageTable[:linkstylesheets] = Array.new
+    adrPageTable[:linkjavascripts] = Array.new
   
     # walk file hierarchy looking for things that start with "#"
     # add things only if they don't already exist; that way, closest has precedence
@@ -357,12 +358,19 @@ class UserLand::Html::PageMaker
     # we accept two forms of directive: stylesheetNormal true (old style) and linkstylesheets ["one", "two"] (new style)
     # there is NO OVERRIDE: stylesheet names are appended to :linkstylesheets array in order encountered,
     # and that is the order in which linkstysheets() macro will insert the links
+    # NEW: exactly the same thing for javascript link directives
     if s =~ /^stylesheet./i
       adrPageTable[:linkstylesheets] << s[10..-1]
     elsif s.downcase == "linkstylesheets"
       adrPageTable[:linkstylesheets] += v.to_a
     elsif s.downcase == "linkstylesheetsnot"
       adrPageTable[:linkstylesheets] -= v.to_a
+    elsif s =~ /^javascript./i
+      adrPageTable[:linkjavascripts] << s[10..-1]
+    elsif s.downcase == "linkjavascripts"
+      adrPageTable[:linkjavascripts] += v.to_a
+    elsif s.downcase == "linkjavascriptsnot"
+      adrPageTable[:linkjavascripts] -= v.to_a
     else
       if yieldToExisting
         adrPageTable[k] ||= v

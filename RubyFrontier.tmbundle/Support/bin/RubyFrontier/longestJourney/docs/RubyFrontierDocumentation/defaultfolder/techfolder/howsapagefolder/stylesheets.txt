@@ -1,6 +1,8 @@
-#title "Stylesheets"
+#title "Stylesheets and JavaScript Files"
 
 As you know, an HTML page can link to one or more CSS stylesheets. Specifying what CSS stylesheets a [page object](types) should be linked to presents certain special challenges for RubyFrontier:
+
+> NOTE: These considerations apply equally to javascript files, which work almost exactly like stylesheets and are dealt with later on this page.
 
 * One HTML page can link to multiple stylesheets.
 
@@ -34,7 +36,7 @@ Thus, the order of the stylesheet names in the the `:linkstylesheets` array is t
 
 ### Alternative Approaches
 
-The page header can call **`linkstylesheet()`** and supply a parameter value directly (a string representing the name of one stylesheet). The stylesheet is written to disk and a `<link>` tag to it is substituted for macro call. (As already mentioned, a **`linkstylesheets()`** call is actually translated for you into a series of **`linkstylesheet()`** calls.)
+The page header can call **`linkstylesheet()`** and supply a parameter value directly (a string representing the name of one stylesheet). The stylesheet is written to disk and a `<link>` tag to it is substituted for the macro call. (As already mentioned, a **`linkstylesheets()`** call is actually translated for you into a series of **`linkstylesheet()`** calls.)
 
 Another alternative is that you might want to embed a stylesheet in the page itself. To do so, the page header can call **`embedstylesheet()`**. But this isn't very flexible, so the **`linkstylesheets()`** [standard macro](standardmacros) calls **`embedstylesheet()`** for you if you've set a scalar directive **`embedstylesheet`** (whose value is the name of the stylesheet).
 
@@ -43,3 +45,11 @@ Another alternative is that you might want to embed a stylesheet in the page its
 Recently, I discovered [LESS](http://lesscss.org/docs.html), a more convenient way of writing and structuring CSS. I instantly added LESS support to RubyFrontier. (This had to be done at the core RubyFrontier level because it affects how two of the [standard macros](standardmacros) work.)
 
 So, the rule is, if the `:less` directive is defined, then any stylesheets will be passed through LESS.
+
+### JavaScript Files
+
+JavaScript files are handled almost exactly like stylesheet files; the only difference is that there is no support (at present) for embedding JavaScript in the page itself. So, the main points are precisely parallel to everything I've just said about stylesheets:
+
+* The page table maintains a `:linkjavascripts` array of javascript file names. You can specify this value with the **`:linkjavascripts`** directive, whose value is an array of javascript file names (without the `.js` suffix; the actual javascript files, with the `.js` suffix, should live in a `#javascripts` folder). The **`:linkjavascripts`** directive can appear in various places, so different parts of your site (such as the `#prefs.yaml` file and the current page object) can both contribute to the `:linkjavascripts` array. You can alternatively use a scalar directive of the form `:javascriptXXX`, where `"XXX"` is the name of a JavaScript file.
+
+* The [page header](pageheader) will typically contain a call to the **`linkjavascripts()`** [standard macro](standardmacros). This macro fetches the `:linkjavascripts` array from the page table and, for each element in turn, calls **`linkjavascript()`** with that element as parameter. The result is that (1) the javascript file itself is written out to disk, into a `javascripts` folder at the top level of the site, and (2) a `<script>` tag is inserted into the page's `<head>` region, linking to that javascript file. Alternatively, the page header can call **`linkjavascript()`** and supply a parameter value directly (a string representing the name of one javascript file).

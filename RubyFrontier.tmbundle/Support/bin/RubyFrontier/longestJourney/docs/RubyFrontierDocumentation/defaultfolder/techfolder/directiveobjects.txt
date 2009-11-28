@@ -24,7 +24,7 @@ As a starting point, we'll use the above screen shot. Not all possible built-in 
 
   This is a "[folded](hierarchy)" directive: the contents of all `#images` folders encountered on the way up the hierarchy are available (except that an image at a lower level overrides a same-named image at a higher level).
 
-* **#javascripts**. If RubyFrontier encounters a `#javascripts` folder, it will look inside it for javascript (`.js`) files that you ask to link from your Web pages. I talk later about the [standard macro](standardmacros) for linking to such a javascript file, and about how this macro is [typically used](pageheader).
+* **#javascripts**. If RubyFrontier encounters a `#javascripts` folder, it will look inside it for javascript (`.js`) files that you ask to link from your Web pages. I talk [later](stylesheets) about the [standard macro](standardmacros) for linking to such a javascript file, and about how this macro is [typically used](pageheader).
 
 * **#pageheader.txt**. If RubyFrontier encounters a `#pageheader.txt` file, it will use the contents of this file at the point in the template where the `pageheader()` [macro](standardmacros) is called (usually the first line of the [template](template)). The pageheader is typically used to supply all the HTML up to and including the `<body>` tag. This directive object is completely optional; there are two other ways to supply the pageheader (discussed [later](pageheader)).
 

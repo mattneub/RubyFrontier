@@ -16,7 +16,7 @@ module UserLand::Html::StandardMacros
     sheetLoc.dirname.mkpath
     if sheetLoc.needs_update_from(source)
       puts "Writing css (#{sheetName})!"
-      if adrPageTable[:less]
+      if adrPageTable[:less] # support for LESS
         sheetLoc.open("w") {|io| io.write(Less.parse(source.read))}
       else
         FileUtils.cp(source, sheetLoc, :preserve => true)
@@ -67,10 +67,11 @@ module UserLand::Html::StandardMacros
   def linkjavascripts(adrPageTable=@adrPageTable) # link to all javascripts requested in directives
     # not in Frontier at all, but clearly a mechanism like this is needed
     # works like "meta", allowing multiple javascriptXXX directives to ask that we link to XXX
+    # new way, we maintain a "linkjavascripts" array (see incorporateDirective()), because with javascript, order matters
     s = ""
-    adrPageTable.keys.select do |k| # key should start with "javascript" but not *be* javascript (or the folder "javascripts")
-      k.to_s =~ /^javascript./i && k.to_s.downcase != "javascripts"
-    end.each { |k| s << linkjavascript(k.to_s[10..-1], adrPageTable) }
+    Array(adrPageTable[:linkjavascripts]).each do |name|
+      s << linkjavascript(name, adrPageTable)
+    end
     s
   end
   def metatags(htmlstyle=false, adrPageTable=@adrPageTable) # generate meta tags

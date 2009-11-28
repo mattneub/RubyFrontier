@@ -1,180 +1,181 @@
 --- 
-tech: &id018 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/tech.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/tech.html
-  :linetext: Technical Details
-glossary expansion: &id015 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/glossary.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/glossary.html
-  :linetext: Glossary Expansion
-outline renderers: &id012 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/outlinerenderers.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/outlinerenderers.html
-  :linetext: Outline Renderers
-user: &id001 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/user.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/user.html
-  :linetext: User Settings
-why rubyfrontier?: &id023 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/whyrf.txt
+why rubyfrontier?: &id013 
   :path: !ruby/object:Pathname 
     path: defaultfolder/whyrf.html
-  :linetext: Why RubyFrontier?
-default: &id005 
   :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/default.txt
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/whyrf.txt
+  :linetext: Why RubyFrontier?
+pagetable: &id001 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/pagetable.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/pagetable.txt
+  :linetext: The Page Table
+the template: &id008 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/template.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/template.txt
+  :linetext: The Template
+outline renderers: &id005 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/outlinerenderers.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/outlinerenderers.txt
+  :linetext: Outline Renderers
+the page table: *id001
+stylesheets and javascript files: &id011 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/stylesheets.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/stylesheets.txt
+  :linetext: Stylesheets and JavaScript Files
+hierarchy: &id003 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/hierarchy.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/hierarchy.txt
+  :linetext: What the Hierarchy Means
+what's in a source folder: &id010 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/types.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/types.txt
+  :linetext: What's In a Source Folder
+scalar directives: &id019 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/scalardirectives.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/scalardirectives.txt
+  :linetext: Scalar Directives
+user settings: &id020 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/user.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/user.txt
+  :linetext: User Settings
+snippets: 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/snippets.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/snippets.txt
+  :linetext: Snippets
+nextprevs: &id016 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/nextprevs.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/nextprevs.txt
+  :linetext: Links to the Next and Previous Page
+tech: &id024 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/tech.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/tech.txt
+  :linetext: Technical Details
+rubyfrontier documentation: &id002 
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/default.txt
   :path: !ruby/object:Pathname 
     path: default.html
   :linetext: RubyFrontier Documentation
-the page table: &id002 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/pagetable.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/pagetable.html
-  :linetext: The Page Table
-how to create a web site with rubyfrontier: &id003 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/startrf.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/startrf.html
-  :linetext: How to Create a Web Site with RubyFrontier
-howsapage: &id010 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapage.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapage.html
-  :linetext: How a Page Object Gets Rendered
-nextprevs: &id016 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/nextprevs.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/nextprevs.html
-  :linetext: Links to the Next and Previous Page
-user settings: *id001
-pagetable: *id002
-scalar directives: &id021 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/scalardirectives.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/scalardirectives.html
-  :linetext: Scalar Directives
-what's in a source folder: &id013 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/types.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/types.html
-  :linetext: What's In a Source Folder
-hierarchy: &id006 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/hierarchy.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/hierarchy.html
-  :linetext: What the Hierarchy Means
-startrf: *id003
-the page header: &id007 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/pageheader.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/pageheader.html
-  :linetext: The Page Header
-snippets: 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/snippets.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/snippets.html
-  :linetext: Snippets
-standardmacros: &id004 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/standardmacros.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/standardmacros.html
-  :linetext: Standard Macros and Other Convenience Methods
-standard macros and other convenience methods: *id004
-template: &id020 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/template.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/template.html
-  :linetext: The Template
-rubyfrontier documentation: *id005
-directiveobjects: &id009 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/directiveobjects.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/directiveobjects.html
-  :linetext: Directive Objects
-filters: 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/filters.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/filters.html
-  :linetext: Filters
-bundle commands: &id014 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/commands.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/commands.html
-  :linetext: Bundle Commands
-what the hierarchy means: *id006
-autoglossary: &id022 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/autoglossary.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/autoglossary.html
-  :linetext: The Autoglossary
-images: &id011 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/images.txt
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/images.html
-  :linetext: Images and IMG Tags
-pageheader: *id007
-start: &id008 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/start.txt
+default: *id002
+creating a new source folder: &id007 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/start.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/start.txt
   :linetext: Creating a New Source Folder
-creating a new source folder: *id008
-directive objects: *id009
-how a page object gets rendered: *id010
-images and img tags: *id011
-macros: &id019 
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/macros.txt
+standardmacros: &id009 
   :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/macros.html
-  :linetext: Macros and Macro Scoping
-outlinerenderers: *id012
-types: *id013
-commands: *id014
-glossary: *id015
-links to the next and previous page: *id016
-what: &id017 
+    path: defaultfolder/techfolder/howsapagefolder/standardmacros.html
   :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/what.txt
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/standardmacros.txt
+  :linetext: Standard Macros and Other Convenience Methods
+the page header: &id015 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/pageheader.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/pageheader.txt
+  :linetext: The Page Header
+howsapage: &id012 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapage.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapage.txt
+  :linetext: How a Page Object Gets Rendered
+what the hierarchy means: *id003
+how to create a web site with rubyfrontier: &id004 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/startrf.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/startrf.txt
+  :linetext: How to Create a Web Site with RubyFrontier
+startrf: *id004
+outlinerenderers: *id005
+directive objects: &id006 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/directiveobjects.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/directiveobjects.txt
+  :linetext: Directive Objects
+directiveobjects: *id006
+start: *id007
+template: *id008
+standard macros and other convenience methods: *id009
+images: &id022 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/images.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/images.txt
+  :linetext: Images and IMG Tags
+autoglossary: &id017 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/autoglossary.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/autoglossary.txt
+  :linetext: The Autoglossary
+bundle commands: &id018 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/commands.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/commands.txt
+  :linetext: Bundle Commands
+types: *id010
+stylesheets: *id011
+filters: 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/filters.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/filters.txt
+  :linetext: Filters
+how a page object gets rendered: *id012
+whyrf: *id013
+what is rubyfrontier?: &id014 
   :path: !ruby/object:Pathname 
     path: defaultfolder/what.html
-  :linetext: What is RubyFrontier?
-what is rubyfrontier?: *id017
-technical details: *id018
-macros and macro scoping: *id019
-stylesheets: 
   :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/stylesheets.txt
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/what.txt
+  :linetext: What is RubyFrontier?
+what: *id014
+pageheader: *id015
+links to the next and previous page: *id016
+glossary: &id023 
   :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/stylesheets.html
-  :linetext: Stylesheets
-the template: *id020
-scalardirectives: *id021
-the autoglossary: *id022
-whyrf: *id023
+    path: defaultfolder/techfolder/howsapagefolder/glossary.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/glossary.txt
+  :linetext: Glossary Expansion
+the autoglossary: *id017
+commands: *id018
+scalardirectives: *id019
+user: *id020
+macros and macro scoping: &id021 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/macros.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/macros.txt
+  :linetext: Macros and Macro Scoping
+macros: *id021
+images and img tags: *id022
+glossary expansion: *id023
+technical details: *id024

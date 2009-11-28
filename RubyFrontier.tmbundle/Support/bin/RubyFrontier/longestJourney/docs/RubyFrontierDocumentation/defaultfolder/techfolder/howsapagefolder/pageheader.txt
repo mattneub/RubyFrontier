@@ -59,17 +59,7 @@ But before the prefixing takes place, the [macros](macros) within that page head
 	
 * The **`linkstylesheets()`** call writes stylesheet files to disk and inserts links to them. (Also, it can [embed a stylesheet](standardmacros).) For a discussion of how you tell this macro *what* stylesheet files to link to or embed, see the discussion of [stylesheets](stylesheets).
 
-* The **`linkjavascripts()`** call writes javascript files to disk and inserts links to them.
-
-  * The javascript files themselves should be located in a [`#javascripts` folder](directiveobjects), and should be `.js` files.
-
-  * If there are any [scalar directives](scalardirectives) whose name is of the form **`javascriptxx`** (the value of such a directive doesn't matter; `true` is a good choice), a file `xxx.js` is sought in the `#javascripts` folder. The file is copied out to disk (into a `javascripts` folder at the top level of the Web site), and a `<script>` tag pointing to it is inserted into the document. For example:
-
-              #javascripttogglediv true
-
-      would result in the file `togglediv.js` being copied out to disk, and a tag similar to this:
-
-              <script src="javascripts/togglediv.js" type="text/javascript" ></script>
+* The **`linkjavascripts()`** call writes javascript files to disk and inserts links to them. For a discussion of how you tell this macro *what* javascript files to link to or embed, see the discussion of [JavaScript](stylesheets).
 	
 * The value of the [**`:title`** directive](scalardirectives) is inserted as the `<title>` tag, and the `<head>` area comes to an end.
 	
