@@ -36,7 +36,7 @@ Initial public release, version 0.9, July 23, 2009. Quickly followed by 0.9.1 to
 
 VERSION
 
-Version 0.9.4. After some initial flurry following the public release, I think we have handled the business of escaping shell paths so that RubyFrontier should work on machines where there's a space in TM_SUPPORT_PATH. Also, suppress defaults read error msg in case user has never set user.rb path. July 25, 2009.
+Version 0.9.5. LESS (http://lesscss.org/) is now supported for coding CSS. Syntax for loading and linking to JavaScript files is now extended in a manner parallel to that of CSS files, so that it's easy to specify a particular set of JavaScript files to be loaded and linked in a particular order. November 30, 2009.
 
 =======
 
