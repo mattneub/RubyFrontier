@@ -33,3 +33,26 @@ An optional second parameter in the `imageref()` call is a hash of names and val
 So, for example, an `imageref()` call that includes some of these optional values might look like this:
 
         \<%= imageref("myimage", {:border => "1", :alt => "A great image"}) %>
+
+###Images Without `imageref()`
+
+All of the above presumes that you're calling `imageref()` to generate an `<img>` tag. But there are circumstances where you want to refer to an image within your site, *without* using an `<img>` tag. For example, you might do this from a [JavaScript or CSS](stylesheets) file.
+
+In this case, you're going to need to use some other strategy to get the image copied from the source folder into the Web site folder. There are two main strategies:
+
+* Put such images in a folder (within the source folder) that isn't a directive. For example, the folder might be called `otherimages`. In accordance with the [rules](types), RubyFrontier will copy the folder into the Web site, and since the images are not page objects, it will copy the images as well. You must then adjust any referencing URLs so that they refer to the images in the correct relative location. The disadvantage of this approach is that the copying only happens *when you [publish the entire site](commands)*. But it has the advantage of extreme simplicity.
+
+* Keep the images in the `#images` folder, and call `html.getImageData()` in a [macro](macros) explicitly for each image you want copied out to the Web site. The method `html.getImageData()` is a utility called by `imageref()`. It takes the same kind of string reference that `imageref()` does; it fetches a bunch of data about the image (such as its dimensions), but it has the side effect of causing the image to be copied out. The advantage of this is that you can make it happen as you render any page. A simplified approach is to copy out explicitly *all* the images in the `#images` folder every time *any* page is rendered, by calling a macro (let's call it `spit()`) in the [template](template):
+
+        def spit
+		  h = @adrPageTable["images"]
+		  h.keys.each do |img|
+		    html.getImageData(img)
+		  end
+		end
+		
+  This is not particularly inefficient, because `html.getImageData()` only performs an actual copy if an actual copy needs to be performed; if the image has already been copied into place in the Web site, and has the same modification date as the original, no copying takes place. The `spit` macro ignores the data returned by `html.getImageData`, and your call to `spit()` would also ignore *its* results, like this:
+
+        \<% spit() %>
+
+  (Note the lack of an equal-sign in the macro call; this means that no results are entered into the Web page being rendered at this point.) It is possible to use `html.getImageData` in more sophisticated ways, where you actually *do* care about the results it returns; for an example, look at the `caption()` macro used to generate the image-plus-caption pairs in this documentation.
