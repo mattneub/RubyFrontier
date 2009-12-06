@@ -26,7 +26,7 @@ In the face of all this, RubyFrontier must provide a mechanism that allows you, 
 
 The actual stylesheets are `.css` files in a `#stylesheets` folder. Typically there will be just one `#stylesheets` folder, located at the top level of the site.
 
-TextMate is good at editing `.css` files, so maintaining your stylesheets should be not problem.
+TextMate is good at editing `.css` files, so maintaining your stylesheets should be no problem.
 
 ### How Stylesheets Get Written to Disk and Linked
 
