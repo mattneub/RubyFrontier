@@ -14,13 +14,13 @@ As you know, an HTML page can link to one or more CSS stylesheets. Specifying wh
 
 In the face of all this, RubyFrontier must provide a mechanism that allows you, the programmer, to specify for each page object what stylesheet(s) it should link to, in a manner consistent with the structure of the [hierarchy](hierarchy) and [directives](scalardirectives). This is not something that the [original Frontier](http://frontier.userland.com/) handled terribly well. My solution is as follows:
 
-* The basic directive for specifying stylesheets to be linked to is the [scalar directive](scalardirectives) **`:linkstylesheets`**. Its value is an array of stylesheet names (without the `.css` suffix). Since this is a scalar directive, it can be encountered at any of the points where scalar directives are specified: in a `#prefs.yaml` file as we walk up the hierarchy, in the page object itself, or in the template — in that order. The order is significant, because the rule for how this directive is processed is special; and here it is:
+* The basic directive for specifying stylesheets to be linked to is the [scalar directive](scalardirectives) **`:linkstylesheets`**. Its value is an array of stylesheet names (without the `.css` suffix); so, for example, in a page object you might say `#linkstylesheets %w{main secondary}`. Since this is a scalar directive, it can be encountered at any of the points where scalar directives are specified: in a `#prefs.yaml` file as we walk up the hierarchy, in the page object itself, or in the template — [in that order](howsapage). The order is significant, because the rule for how this directive is processed is special; and here it is:
 
-  We maintain in the [page table](pagetable) an array (called, appropriately enough, `:linkstylesheets`). Every element of a `:linkstylesheets` directive's value is appended to the end of this array, in the order in which the elements appear, in the order in which the `:linkstylesheets` directives are encountered.
+  We maintain in the [page table](pagetable) an array (called, appropriately enough, `:linkstylesheets`). Every element of a `:linkstylesheets` directive's value is appended to the end of this array, in the order in which the elements appear, in the [order](howsapage) in which the `:linkstylesheets` directives are encountered.
 
 * In the above rule, there is no provision for overriding. But there needs to be a way, at a lower level of the hierarchy, to prevent a stylesheet specified at a higher level from being linked to at all. Therefore, there is another scalar directive **`:linkstylesheetsnot`**, whose value is also an array of stylesheet names; when encountered, every element of its value is *removed* from the page table's `:linkstylesheets` array.
 
-* You can alternatively have a scalar directive of the form `:stylesheetXXX`, where `"XXX"` is the name of a stylesheet. (The name of the stylesheet is drawn from the key name, so the value is unimportant; by convention, it is usually `true`.) This is treated precisely as if it had been `:linkstylesheets` with a value of `["XXX"]`. This approach is deprecated, and exists solely for compatibility with the way stylesheets used to work in RubyFrontier.
+* You can alternatively have a scalar directive of the form `:stylesheetXXX`, where `"XXX"` is the name of a stylesheet. (The name of the stylesheet is drawn from the key name, so the value is unimportant; by convention, it is usually `true`.) This is treated precisely as if it had been `:linkstylesheets` with a value of `["XXX"]`. This approach is deprecated, and exists solely for compatibility with the way stylesheets used to work in early versions of RubyFrontier.
 
 ### The Stylesheets Themselves
 
@@ -44,7 +44,7 @@ Another alternative is that you might want to embed a stylesheet in the page its
 
 Recently, I discovered [LESS](http://lesscss.org/docs.html), a more convenient way of writing and structuring CSS. I instantly added LESS support to RubyFrontier. (This had to be done at the core RubyFrontier level because it affects how two of the [standard macros](standardmacros) work.)
 
-So, the rule is, if the `:less` directive is defined, then any stylesheets will be passed through LESS.
+So, the rule is, if the `:less` directive is defined, then any stylesheets (which should still be `.css` files) will be passed through LESS.
 
 ### JavaScript Files
 

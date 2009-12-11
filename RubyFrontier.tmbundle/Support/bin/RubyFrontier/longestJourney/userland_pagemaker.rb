@@ -511,7 +511,7 @@ class UserLand::Html::PageMaker
     when ".opml"
       runOutlineDirectives(adrObject, d)
     end
-    arr = directiveName.map {|name| d[name]}
+    arr = directiveName.map {|name| d[name.to_sym]} # user might supply string by mistake
     return arr if is_arr
     return arr[0] # if a scalar was supplied
   end
