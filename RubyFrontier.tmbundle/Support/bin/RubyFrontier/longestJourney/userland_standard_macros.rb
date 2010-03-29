@@ -127,7 +127,9 @@ module UserLand::Html::StandardMacros
   def pagefooter(t="") # generate standard page footer, just closing body and html tags
     # t param is in case extra material needs to be inserted between the tags
     # for example, might want a comment to delimit things for dreamweaver or something
-    return "</body>\n#{t}\n</html>\n"
+    # NEW: we now return empty string and postpone until after glossary expansion, just like pageheader
+    adrPageTable[:pagefooter] = "</body>\n#{t}\n</html>\n"
+    return ""
   end
   def bodytag(adrPageTable=@adrPageTable) # generate body tag, drawing attributes from directives
     # really should not be using any of these attributes! that's what CSS is for; but hey, that's Frontier

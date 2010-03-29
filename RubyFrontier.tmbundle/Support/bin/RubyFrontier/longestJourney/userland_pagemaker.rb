@@ -164,6 +164,11 @@ class UserLand::Html::PageMaker
     # macros (except in pageheader, we haven't gotten there yet)
     s = processMacros(s, theBindingMaker.getBinding) unless !getPref("processmacros")
     
+    # NEW: post-macro filter stage
+    adrPageTable[:postmacrotext] = s
+    callFilter("postMacroFilter")
+    s = adrPageTable[:postmacrotext]
+    
     # glossary expansion (resolve local <a> tags)
     s = resolveLinks(s)
       
@@ -173,6 +178,11 @@ class UserLand::Html::PageMaker
     if ph = adrPageTable.fetch2(:pageheader)
       ph = File.read(ph) if ph.kind_of?(Pathname)
       s = processMacros(ph, theBindingMaker.getBinding) + s
+    end
+    
+    # NEW: pagefooter, same deal as pageheader only a lot simpler
+    if ph = adrPageTable.fetch2(:pagefooter)
+      s = s + ph
     end
   
     # linefeed thing, not implemented

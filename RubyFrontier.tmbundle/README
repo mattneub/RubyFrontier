@@ -30,13 +30,13 @@ HISTORY
 
 I started writing RubyFrontier in about January of 2008. It is very directly modelled after UserLand Frontier's Web framework. By about April of 2008 it was working well enough that I was maintaining my own Web sites with it. Then there was a long beta period where RubyFrontier was made available only to a small number of testers.
 
-Initial public release, version 0.9, July 23, 2009. Quickly followed by 0.9.1 to handle the case where libxml wasn't installed on the users machines. Then there was some kerfuffle over escaping shell paths.
+Initial public release, version 0.9, July 23, 2009. Quickly followed by 0.9.1 to handle the case where libxml wasn't installed on the users machines. Then there was some kerfuffle over escaping shell paths, which was settled by 0.9.4. In version 0.9.5, LESS (http://lesscss.org/) support was added, and syntax for loading and linking to JavaScript files was extended in a manner parallel to that of CSS files, making it easy to specify a particular set of JavaScript files to be loaded and linked in a particular order.
 
 =======
 
 VERSION
 
-Version 0.9.5. LESS (http://lesscss.org/) is now supported for coding CSS. Syntax for loading and linking to JavaScript files is now extended in a manner parallel to that of CSS files, so that it's easy to specify a particular set of JavaScript files to be loaded and linked in a particular order. November 30, 2009.
+Version 0.9.6. Added a new optional filter stage, postMacroFilter.rb, which runs after macro processing but before the autoglossary mechanism, and is expected to modify adrPageTable[:postmacrotext]. Also, modified pagefooter() to work similarly to pageheader(): it returns an empty string initially, so there's nothing there up through autoglossary time, and then the result is appended to the end of the page after the same sort of thing is done for the pageHeader(). March 30, 2010.
 
 =======
 

@@ -13,8 +13,8 @@ def finalFilter(adrPageTable)
     # also can generate <p>...<div>
     adrPageTable[:renderedtext] = adrPageTable[:renderedtext].gsub(%r{<p>\s*?<div}, "<div").gsub(%r{</div>\s*?</p>}, "</div>")
     adrPageTable[:renderedtext] = adrPageTable[:renderedtext].gsub(%r{(<div.*?>)</p>}, '\1').gsub(%r{<p></div>}, "</div>")
-    # also because of snippets I am generating some self-referential links, fix those
-    adrPageTable[:renderedtext] = adrPageTable[:renderedtext].gsub(/<a href="">(.*?)<\/a>/, '\1')
   end
+  # also because of snippets I am generating some self-referential links, fix those
+  adrPageTable[:renderedtext] = adrPageTable[:renderedtext].gsub(/<a href="">(.*?)<\/a>/, '\1')
   
 end 
