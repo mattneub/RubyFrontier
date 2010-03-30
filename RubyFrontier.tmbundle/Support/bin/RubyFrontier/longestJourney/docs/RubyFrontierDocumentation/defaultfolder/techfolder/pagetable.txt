@@ -2,7 +2,7 @@
 
 When RubyFrontier starts to render a [page object](types), it walks up the [hierarchy](hierarchy) from the page object gathering [directives](types). Some of these directives will be [directive objects](directiveobjects); others will be [scalar directives](scalardirectives). But I've already told you all that.
 
-What I have *not* yet made clear is what RubyFrontier is *doing* with all these directives. Here's the answer: RubyFrontier is gathering all these directives into a single hash. This hash is called the **page table**. The page table, clearly, is tremendously important; indeed, the whole rendering process revolves around it. As a page is [processed](howsapage), all important information is read from, or written into, the page table. This is partly for RubyFrontier's own convenience (a single hash to pass around and consult) and partly for *your* convenience, since your own customization scripts have a single, consistent place to go to fetch (and, if you know what you're doing, modify) values that affect the outcome of the rendering process. There are several points in the rendering process (such as the three [filter scripts](filters), [macro processing](macros), and [outline rendering](outlinerenderers)) where the page table is directly available to you, and are free to examine it and (at your own risk) to alter it.
+What I have *not* yet made clear is what RubyFrontier is *doing* with all these directives. Here's the answer: RubyFrontier is gathering all these directives into a single hash. This hash is called the **page table**. The page table, clearly, is tremendously important; indeed, the whole rendering process revolves around it. As a page is [processed](howsapage), all important information is read from, or written into, the page table. This is partly for RubyFrontier's own convenience (a single hash to pass around and consult) and partly for *your* convenience, since your own customization scripts have a single, consistent place to go to fetch (and, if you know what you're doing, modify) values that affect the outcome of the rendering process. There are several points in the rendering process (such as the four [filter scripts](filters), [macro processing](macros), and [outline rendering](outlinerenderers)) where the page table is directly available to you, and are free to examine it and (at your own risk) to alter it.
 
 ### The Structure of the Page Table
 
@@ -31,6 +31,8 @@ RubyFrontier works out and stores in the page table some key pieces of informati
 * **:f**. Pathname of the Web page file to be created; derived by applying :subdirectorypath to the :siterootfolder and adding :fname.
 
 * **:bodytext**. Temporary holding tank for the contents of the page object, stripped of any [internal directives](scalardirectives), *before* insertion into the [template](template). In general it should be left untouched, but your [pageFilter](filters), if implemented, is *expected* to modify it.
+
+* **:postmacrotext**. Temporary holding tank for the contents of the page object, *after* insertion into the [template](template) and after [macro processing](macros). In general it should be left untouched, but your [postMacroFilter](filters), if implemented, is *expected* to modify it.
 
 * **:renderedtext**. Ultimate text to be written to `:f`. In general it should be left untouched, but your [finalFilter](filters), if implemented, is *expected* to modify it.
 

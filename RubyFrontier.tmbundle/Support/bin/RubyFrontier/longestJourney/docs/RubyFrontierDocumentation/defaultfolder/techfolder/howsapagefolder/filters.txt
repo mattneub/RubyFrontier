@@ -1,6 +1,6 @@
 #title "Filters"
 
-At three points during the [rendering process](howsapage), RubyFrontier stops and turns control over to you, so that you can modify the outcome of the process. It does this via three "filter" scripts: the FirstFilter, the PageFilter, and the FinalFilter. These scripts are `.rb` files which, if they exist, will be sought in a [`#filters` folder](directiveobjects).
+At four points during the [rendering process](howsapage), RubyFrontier stops and turns control over to you, so that you can modify the outcome of the process. It does this via four "filter" scripts: the FirstFilter, the PageFilter, the PostMacroFilter, and the FinalFilter. These scripts are `.rb` files which, if they exist, will be sought in a [`#filters` folder](directiveobjects).
 
 The idea is to provide you with "hooks" or "callbacks" at key moments so that you can insert your own functionality into the rendering process.
 
@@ -17,7 +17,15 @@ Just before we locate the [template](template) and insert the page object into i
 This is your chance to modify the page table's `:bodytext` entry, which contains the [rendered page object](howsapage), not yet poured into its [template](template), and with [macros](macros) not yet processed nor [glossary expansion](autoglossary) yet performed.
 
 In my own sites, for example, this is the point at which I would pass a [Markdown](http://daringfireball.net/projects/markdown/) text page object through Markdown to turn it into HTML. There are various reasons why this is the correct moment for such a transformation. For example, Markdown lets me express a link like `[this](link)`. When we get to [glossary expansion](autoglossary), that link needs to have been re-expressed in the form expected by RubyFrontier, namely like `<a href="link">this<a>`. So clearly Markdown transformation needs to precede glossary expansion.
-	
+
+### The PostMacroFilter
+
+Just after [macro processing](macros), if there is a [`#filters` folder](directiveobjects) and it has a `postMacroFilter.rb` file in it, we call that file's top-level `postMacroFilter()` method with one parameter — the [page table](pagetable).
+
+This is your chance to modify the page table's `:postmacrotext` entry, which contains the [rendered page object](howsapage), poured into its [template](template) and with [macros](macros) already processed, but with [glossary expansion](autoglossary) not yet performed.
+
+This filter, which did not exist in the original Frontier, is implemented because this turns out to be a good moment for certain transformations. For example, if you're going to use something like [kramdown](http://kramdown.rubyforge.org/), instead of [Markdown](http://daringfireball.net/projects/markdown/) and [SmartyPants](http://daringfireball.net/projects/smartypants/), this is a good moment for it; kramdown transformation needs to occur before glossary expansion (for the same reasons as Markdown), but it behaves badly with unprocessed macros. (Indeed, if Markdown were capable of operating inside `<div>` tags, such as might be wrapped around the page content by the template, I'd run Markdown, and probably SmartyPants, at this point instead of the PageFilter).
+
 ### The FinalFilter
 
 At the very end of the [rendering process](howsapage), just before we write the completely rendered HTML out to disk, if there is a [`#filters` folder](directiveobjects) and it has a `finalFilter.rb` file in it, we call that file's top-level `finalFilter()` method with one parameter — the [page table](pagetable).

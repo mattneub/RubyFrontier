@@ -10,7 +10,7 @@ The macros are shown as they might be called in a macro under the rules of [macr
 
 * **pageheader()**. Asks for the default [page header](pageheader). If used, usually appears at the start of the template (but can actually appear anywhere).
 
-* **pagefooter()**. Generates the default page footer, which consists solely of the closing `</body>` and `</html>` tags. Usually appears at the end of the template.
+* **pagefooter()**. Generates the default page footer, which consists solely of the closing `</body>` and `</html>` tags. Usually appears at the end of the template (but can actually appear anywhere).
 
 * **html.getNextPrev()**. Returns identifiers for the next and previous pages, good for forming navigation links. For further discussion, see [here](nextprevs).
 

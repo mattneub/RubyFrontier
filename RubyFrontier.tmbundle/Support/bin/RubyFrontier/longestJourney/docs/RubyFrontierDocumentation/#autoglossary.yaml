@@ -42,13 +42,13 @@ what's in a source folder: &id010
   :linetext: What's In a Source Folder
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/types.txt
-scalar directives: &id019 
+scalar directives: &id018 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/scalardirectives.html
   :linetext: Scalar Directives
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/scalardirectives.txt
-user settings: &id020 
+user settings: &id019 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/howsapagefolder/user.html
   :linetext: User Settings
@@ -60,7 +60,7 @@ snippets:
   :linetext: Snippets
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/snippets.txt
-nextprevs: &id016 
+nextprevs: &id015 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/howsapagefolder/nextprevs.html
   :linetext: Links to the Next and Previous Page
@@ -91,12 +91,6 @@ standardmacros: &id009
   :linetext: Standard Macros and Other Convenience Methods
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/standardmacros.txt
-the page header: &id015 
-  :path: !ruby/object:Pathname 
-    path: defaultfolder/techfolder/howsapagefolder/pageheader.html
-  :linetext: The Page Header
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/pageheader.txt
 howsapage: &id012 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/howsapage.html
@@ -128,13 +122,13 @@ images: &id022
   :linetext: Images and IMG Tags
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/images.txt
-autoglossary: &id017 
+autoglossary: &id016 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/howsapagefolder/autoglossary.html
   :linetext: The Autoglossary
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/autoglossary.txt
-bundle commands: &id018 
+bundle commands: &id017 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/commands.html
   :linetext: Bundle Commands
@@ -157,18 +151,24 @@ what is rubyfrontier?: &id014
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/what.txt
 what: *id014
-pageheader: *id015
-links to the next and previous page: *id016
+pageheader: &id020 
+  :path: !ruby/object:Pathname 
+    path: defaultfolder/techfolder/howsapagefolder/pageheader.html
+  :linetext: The Page Header and Page Footer
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/pageheader.txt
+links to the next and previous page: *id015
 glossary: &id023 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/howsapagefolder/glossary.html
   :linetext: Glossary Expansion
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/glossary.txt
-the autoglossary: *id017
-commands: *id018
-scalardirectives: *id019
-user: *id020
+the autoglossary: *id016
+commands: *id017
+scalardirectives: *id018
+user: *id019
+the page header and page footer: *id020
 macros and macro scoping: &id021 
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/howsapagefolder/macros.html

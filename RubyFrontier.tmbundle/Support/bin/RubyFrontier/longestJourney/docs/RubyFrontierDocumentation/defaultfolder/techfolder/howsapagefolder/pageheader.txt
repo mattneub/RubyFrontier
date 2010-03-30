@@ -1,4 +1,4 @@
-#title "The Page Header"
+#title "The Page Header and Page Footer"
 
 The **page header** is a feature that lets you prefix the HTML prologue onto the page, [after](howsapage) the page's body has been inserted into the [template](template) and [macros](macros) have been processed.
 
@@ -85,3 +85,9 @@ There are two ways to supply your own pageheader:
 No matter how you supply the page header, and whether or not you use the default page header, RubyFrontier always does the same thing. Having obtained the text of the page header, and having processed any [macros](macros) within it, RubyFrontier simply jams the resulting text onto the front of the Web page as rendered [thus far](howsapage).
 
 (Thus, the ironical truth is that your [template](template) does *not* really have to *start* with a `pageheader()` call in order for you to obtain the default page header. The `pageheader()` call can actually appear *anywhere*. It does not mean, "Substitute the default page header at this point;" it just means, "I want to use the default page header when the time comes to jam a page header on the front of the page.")
+
+###The Page Footer
+
+The `pagefooter()` [macro](standardmacros) is similar to `pageheader()`, but much simpler. It generates the closing `</body>` and `</html>` tags, but it does not actually substitute them for the call. Instead, it stores them as `:pagefooter` in the [page table](pagetable), and then, after the page header has been jammed onto the front of the rendered page, this value is jammed onto the *end* of the rendered page.
+
+Thus, your [template](template) does not have to *end* with a `pagefooter()` call; the call can actually appear anywhere. And, instead of a `pagefooter()` call, you can do anything you like that causes a `:pagefooter` key-value pair to appear in the page table (such as using a [directive](scalardirectives)); as long as such a value exists at the right time in the [page-building process](howsapage), it will be jammed onto the end of the rendered page.
