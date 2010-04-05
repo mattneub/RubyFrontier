@@ -459,6 +459,7 @@ class UserLand::Html::PageMaker
       rest = $2
       # to count as a candidate, must be clearly "local":
       # if contains dot or colon-slash-slash, or starts with #, assume this is a real URL, don't touch
+      # TODO: I'm thinking of changing this test to dot or colon, to catch obscurantized mailto:
       # but user can override the first two checks by escaping (double-backslash), thus saying, yes, do process me
       unless href =~ /[^\\]\./ || href =~ %r{[^\\]\://} || href =~ /^#/
         if href =~ /([^\\])\^/ # remote-site semantics, site^id (escape to prevent this interpretation)
