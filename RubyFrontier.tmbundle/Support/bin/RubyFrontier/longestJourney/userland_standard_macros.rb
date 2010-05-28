@@ -51,6 +51,13 @@ module UserLand::Html::StandardMacros
     s = Less.parse(s) if adrPageTable[:less]
     %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
   end
+  def embedjavascript(sheetName, adrPageTable=@adrPageTable) # embed javascript
+    # you really ought to use linkjavascripts instead, it calls this for you
+    source = adrPageTable["javascripts"] + "#{sheetName}.js"
+    raise "javascript #{sheetName} does not seem to exist" unless source.exist?
+    s = source.read
+    %{\n<script type="text/javascript">\n/* <![CDATA[ */\n#{s}\n/* ]]> */\n</script>\n}
+  end
   def linkstylesheets(adrPageTable=@adrPageTable) # link to all stylesheets requested in directives
     # call this, not linkstylesheet; it lets you link to multiple stylesheets
     # new way, we maintain a "linkstylesheets" array (see incorporateDirective()), because with CSS, order matters
@@ -71,6 +78,9 @@ module UserLand::Html::StandardMacros
     s = ""
     Array(adrPageTable[:linkjavascripts]).each do |name|
       s << linkjavascript(name, adrPageTable)
+    end
+    if sheet = adrPageTable.fetch2(:embedjavascript)
+      s << embedjavascript(sheet)
     end
     s
   end
