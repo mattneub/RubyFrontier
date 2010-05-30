@@ -7,13 +7,11 @@ module UserLand::Html::StandardMacros
   def linkstylesheet(sheetName, adrPageTable=@adrPageTable) # link to one stylesheet
     # you really ought to use linkstylesheets instead, it calls this for you
     # TODO: Frontier's logic for finding the style sheet (source) is much more complex
-    # I just assume we have a #stylesheets folder containing .css files
-    # and I also just assume we'll write it into a folder called "stylesheets" at top level
-    sheetLoc = adrPageTable[:siteRootFolder] + "stylesheets" + (sheetName[0, getPref("maxfilenamelength", adrPageTable)] + ".css")
-    source = adrPageTable["stylesheets"] + "#{sheetName}.css"
-    raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
-    # write out the stylesheet if necessary
-    sheetLoc.dirname.mkpath
+    # NEW: attempt to locate sheet in all #stylesheets folders up the hierarchy
+    # and write it out into corresponding "stylesheets" folder in site
+    source, sheetLoc = getResourceAndTargetFolder("stylesheets", sheetName)
+    sheetLoc += source.basename # TODO: ignoring maxfilenamelength, though this might be fine
+    sheetLoc.dirname.mkpath # ensure folder, write out stylesheet if needed
     if sheetLoc.needs_update_from(source)
       puts "Writing css (#{sheetName})!"
       if adrPageTable[:less] # support for LESS
@@ -28,10 +26,10 @@ module UserLand::Html::StandardMacros
   def linkjavascript(sheetName, adrPageTable=@adrPageTable) # link to one javascript
     # you really ought to use linkjavascripts instead, it calls this for you
     # TODO: as with linkstylesheet, my logic is very simplified:
-    # I just assume we have a #javascripts folder and we write to top-level "javascripts"
-    sheetLoc = adrPageTable[:siteRootFolder] + "javascripts" + (sheetName[0, getPref("maxfilenamelength", adrPageTable)] + ".js")
-    source = adrPageTable["javascripts"] + "#{sheetName}.js"
-    raise "javascript #{sheetName} does not seem to exist" unless source.exist?
+    # NEW: attempt to locate script in all #javascripts folders up the hierarchy
+    # and write it out into corresponding "javascripts" folder in site
+    source, sheetLoc = getResourceAndTargetFolder("javascripts", sheetName)
+    sheetLoc += source.basename # TODO: ignoring maxfilenamelength, though this might be fine
     # write out the javascript if necessary
     sheetLoc.dirname.mkpath
     if sheetLoc.needs_update_from(source)
@@ -45,16 +43,15 @@ module UserLand::Html::StandardMacros
     # you really ought to use linkstylesheets instead, it calls this for you
     # TODO: as with linkstylesheet, unlike Frontier, my logic for finding the stylesheet is very simplified
     # must be in #stylesheets folder as css file, end of story
-    source = adrPageTable["stylesheets"] + "#{sheetName}.css"
-    raise "stylesheet #{sheetName} does not seem to exist" unless source.exist?
+    # NEW: attempt to locate sheet in all #stylesheets folders up the hierarchy
+    source, sheetLoc = getResourceAndTargetFolder("stylesheets", sheetName) # sheetLoc unused
     s = source.read
     s = Less.parse(s) if adrPageTable[:less]
     %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
   end
   def embedjavascript(sheetName, adrPageTable=@adrPageTable) # embed javascript
     # you really ought to use linkjavascripts instead, it calls this for you
-    source = adrPageTable["javascripts"] + "#{sheetName}.js"
-    raise "javascript #{sheetName} does not seem to exist" unless source.exist?
+    source, sheetLoc = getResourceAndTargetFolder("javascripts", sheetName) # sheetLoc unused
     s = source.read
     %{\n<script type="text/javascript">\n/* <![CDATA[ */\n#{s}\n/* ]]> */\n</script>\n}
   end
@@ -213,4 +210,3 @@ module UserLand::Html::StandardMacros
     htmlText
   end
 end
-

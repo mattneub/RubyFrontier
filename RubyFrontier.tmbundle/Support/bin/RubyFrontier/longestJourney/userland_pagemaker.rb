@@ -248,9 +248,11 @@ class UserLand::Html::PageMaker
     adrPageTable["glossary"] = LCHash.new
     adrPageTable["snippets"] = LCHash.new
     adrPageTable["images"] = LCHash.new
+    adrPageTable["stylesheets"] = LCHash.new
+    adrPageTable["javascripts"] = LCHash.new
     adrPageTable[:linkstylesheets] = Array.new
     adrPageTable[:linkjavascripts] = Array.new
-  
+
     # walk file hierarchy looking for things that start with "#"
     # add things only if they don't already exist; that way, closest has precedence
     # if it is #prefs or #glossary, load as a yaml hash and merge with existing hash
@@ -262,7 +264,7 @@ class UserLand::Html::PageMaker
         dir.each_entry do |f|
           if /^#/ =~ f
             dirf = dir + f
-            case f.simplename.to_s.downcase # special casing of certain directives
+            case (directive = f.simplename.to_s.downcase) # special casing of certain directives
             when "#tools"
               # gather tools into tools hash, hashing pathnames under simple filenames
               # new feature (non-Frontier), .txt files go into snippets hash
@@ -276,10 +278,11 @@ class UserLand::Html::PageMaker
                   end
                 end
               end
-            when "#images" # gather images into images hash, hashing pathnames under simple filenames
+            when "#images", "#stylesheets", "#javascripts" 
+              # gather contents into single hash, hashing pathnames under simple filenames
               dirf.each_entry do |ff|
-                unless /^\./ =~ (im_simplename = ff.simplename.to_s.downcase)
-                  adrPageTable["images"][im_simplename] ||= dirf + ff
+                unless /^\./ =~ (ref_simplename = ff.simplename.to_s.downcase)
+                  adrPageTable[directive[1..-1]][ref_simplename] ||= dirf + ff
                 end
               end
             when "#prefs" # flatten prefs out to become top-level entries of adrPageTable
@@ -561,14 +564,21 @@ class UserLand::Html::PageMaker
     return (arr.length > 0 ? arr : nil)
   end
   memoize :pagesInFolder
+  def getResourceAndTargetFolder(restype, resname, adrPageTable=@adrPageTable)
+    # utility, look in appropriate hash...
+    # return source pathname of resource and site pathname of its containing folder
+    raise "No '#{restype}' folder found" unless adrPageTable[restype]
+    resPath = adrPageTable[restype][resname]
+    raise "No '#{restype}' resource '#{resname}' found" unless resPath
+    # TODO: next line, use of restype wrong for images, should be getPref("imagefoldername", adrPageTable)
+    relpath = (resPath.dirname.dirname + restype).relative_path_from(adrPageTable[:adrSiteRootTable])
+    [resPath, adrPageTable[:siteRootFolder] + relpath]
+  end
   def getImageData(imageSpec, adrPageTable=@adrPageTable)
     # find image, get relative path, write out the image, get height and width
     # TODO: Frontier has fu for seeking the image, but I assume a single "images" hash gathered as we build page table
-    raise "No 'images' folder found" unless adrPageTable["images"]
-    imagePath = adrPageTable["images"][imageSpec]
-    raise "Image #{imageSpec} not found" unless imagePath
-    # TODO: I also assume single images folder at top level (but I leave folder name as a pref)
-    imagesFolder = adrPageTable[:siteRootFolder] + getPref("imagefoldername", adrPageTable)
+    # NEW: each #images folder becomes an images folder (with folder name as pref)
+    imagePath, imagesFolder = getResourceAndTargetFolder("images", imageSpec)
     # actually write the image; I've always thought this is an inappropriate place to do this...
     # ... and would eventually like to change it (TODO)
     imagesFolder.mkpath
