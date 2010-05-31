@@ -8,7 +8,7 @@ This is a lot of information, and it may seem at first like too much to take in.
 
   * Contents of any `#tools` folders are "[folded](directiveobjects)" to form the `"snippets"` and `"tools"` [hashes](pagetable). (The `"snippets"` hash will be used later to resolve [snippets](snippets). The `"tools"` hash will be used later to find [outline renderers](outlinerenderers) and methods referred to in [macros](macros).)
 
-  * Contents of any `#images` folders are "[folded](directiveobjects)" to form the `"images"` [hash](pagetable). (The `"images"` hash will be used later to find [images](images) that you ask to have included in the page.)
+  * Contents of any `#images` folders are "[folded](directiveobjects)" to form the `"images"` [hash](pagetable). (The `"images"` hash will be used later to find [images](images) that you ask to have included in the page.) The same sort of thing is done for the contents of any `#stylesheets` folders and the contents of any `#javascripts` folders.
 
   * Contents of any `#glossary.yaml` files are read as hashes and the keys of those hashes are "[folded](directiveobjects)" to form the `"glossary"` [hash](pagetable). (The `"glossary"` hash will be used later when resolving [links](glossary).)
 
@@ -74,7 +74,7 @@ This is a lot of information, and it may seem at first like too much to take in.
 	
   Since the page header usually involves processing [macros](macros), it may be asked why this step is not part of the macro processing which took place earlier. The answer is that, in practice, values in the page header, and specification of its source, often rely upon values that were set by the first round of macro processing.
 
-* **The [page footer](pagefooter)**, if any, is suffixed to the rendered page. The page footer is typically the closing `</body>` and `</html>` tags, and is usually brought into existence through the `pagefooter()` [standard macro](standardmacros) in the [template](template).
+* **The [page footer](pageheader)**, if any, is suffixed to the rendered page. The page footer is typically the closing `</body>` and `</html>` tags, and is usually brought into existence through the `pagefooter()` [standard macro](standardmacros) in the [template](template).
 
 * **[FinalFilter](filters) time.** If we found a `#filters` folder and there is a `finalFilter.rb` file in it, we call that file's top-level `finalFilter()` method with one parameter — the [page table](pagetable). This is your chance to modify the page table's `:renderedtext` entry, which contains the rendered page object, completely ready to write out to disk. In my own sites, for example, this is the point at which I often run [SmartyPants](http://daringfireball.net/projects/smartypants/) to turn the page's quotation marks into smart quotes.
 

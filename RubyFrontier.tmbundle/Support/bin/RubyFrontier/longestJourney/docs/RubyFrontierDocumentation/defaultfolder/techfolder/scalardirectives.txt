@@ -85,7 +85,7 @@ If a [page object](types) file is a renderable, RubyFrontier uses the page objec
 
 * **:fileextension**. The suffix to be added to the name. This will replace the current suffix. The default is `".html"`.
 
-* **:maxfilenamelength**. The maximum number of characters that the name may contain, including the suffix. The default is 31. This limit is also applied to stylesheet and javascript file names.
+* **:maxfilenamelength**. The maximum number of characters that the name may contain, including the suffix. The default is 31.
 
 * **:dropnonalphas**. A boolean (default `true`): Whether characters other than A through Z, 0 through 9, and underscore should be dropped from the name.
 
@@ -94,10 +94,6 @@ If a [page object](types) file is a renderable, RubyFrontier uses the page objec
 #### Outline objects
 
 * **:renderoutlinewith**. The name of the [outline renderer](outlinerenderers) to be used if the page object is an outline (`.opml`).
-
-#### Image files
-
-* **:imagefoldername**. The name of the folder at the top level of the Web site folder into which all [image files](images) will be written. The default is `"images"`.
 
 #### Template
 

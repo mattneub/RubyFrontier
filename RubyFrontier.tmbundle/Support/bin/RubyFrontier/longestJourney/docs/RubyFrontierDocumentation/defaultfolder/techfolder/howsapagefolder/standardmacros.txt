@@ -18,11 +18,13 @@ The macros are shown as they might be called in a macro under the rules of [macr
 
 * **metatags(), linkstylesheets(), linkjavascripts(), bodytag()**. See on the default [page header](pageheader) for full discussion.
 
-* **linkjavascript()**. Called by `linkjavascripts()`. Takes one parameter, the simple name of the javascript file. Finds that javascript file (in the [`#javascripts` folder](directiveobjects)), copies it out to disk, and returns a link to it from the page currently being rendered.
+* **linkjavascript()**. Called by `linkjavascripts()`. Takes one parameter, the simple name of the javascript file. Finds that javascript file (in a [`#javascripts` folder](directiveobjects)), copies it out to disk, and returns a link to it from the page currently being rendered.
 
-* **linkstylesheet()**. Called by `linkstylesheets()`. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in the `#stylesheets` folder), copies it out to disk, and returns a link to it from the page currently being rendered.
+* **embedjavascript()**. Called by `linkjavascripts()`. Takes one parameter, the simple name of the javascript file. Finds that javascript file (in a [`#javascripts` folder](directiveobjects)) and returns its text, wrapped up in a proper `<script>` tag.
 
-* **embedstylesheet()**. Called by `linkstylesheets()`. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in the `#stylesheets` folder) and returns its text, wrapped up in a proper `<script>` tag.
+* **linkstylesheet()**. Called by `linkstylesheets()`. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in a [`#stylesheets` folder](directiveobjects)), copies it out to disk, and returns a link to it from the page currently being rendered.
+
+* **embedstylesheet()**. Called by `linkstylesheets()`. Takes one parameter, the simple name of the stylesheet file. Finds that stylesheet file (in a [`#stylesheets` folder](directiveobjects)) and returns its text, wrapped up in a proper `<style>` tag.
 
 ###Typically used in the page body (or template) or macros
 

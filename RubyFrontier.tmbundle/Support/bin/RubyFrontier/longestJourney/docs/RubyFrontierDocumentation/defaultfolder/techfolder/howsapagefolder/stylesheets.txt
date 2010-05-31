@@ -24,7 +24,7 @@ In the face of all this, RubyFrontier must provide a mechanism that allows you, 
 
 ### The Stylesheets Themselves
 
-The actual stylesheets are `.css` files in a `#stylesheets` folder. Typically there will be just one `#stylesheets` folder, located at the top level of the site.
+The actual stylesheets are `.css` files in a `#stylesheets` folder. You can use as many `#stylesheets` folders as you like throughout your site; just keep in mind that stylesheets are gathered up the [hierarchy](hierarchy) as the [page is rendered](howsapage), so the page being rendered must be able to "see" a `#stylesheets` folder in order to use the stylesheets within it. And of course if there is a name conflict — that is, if there is more than one stylesheet with the same name in the `#stylesheets` folders found upwards through the hierarchy — it is the first such stylesheet encountered that will be designated by that name. This arrangement allows you to maintain multiple `#stylesheets` folders, each of which will become a folder in the rendered site. In the simplest and most common case, however, there will be just one `#stylesheets` folder, located at the top level of the site where all pages can see it.
 
 TextMate is good at editing `.css` files, so maintaining your stylesheets should be no problem.
 
@@ -38,7 +38,7 @@ Thus, the order of the stylesheet names in the the `:linkstylesheets` array is t
 
 The page header can call **`linkstylesheet()`** and supply a parameter value directly (a string representing the name of one stylesheet). The stylesheet is written to disk and a `<link>` tag to it is substituted for the macro call. (As already mentioned, a **`linkstylesheets()`** call is actually translated for you into a series of **`linkstylesheet()`** calls.)
 
-Another alternative is that you might want to embed a stylesheet in the page itself. To do so, the page header can call **`embedstylesheet()`**. But this isn't very flexible, so the **`linkstylesheets()`** [standard macro](standardmacros) calls **`embedstylesheet()`** for you if you've set a scalar directive **`embedstylesheet`** (whose value is the name of the stylesheet).
+Another alternative is that you might want to embed a stylesheet in the page itself. To do so, the page header can call **`embedstylesheet()`**. But this isn't very flexible, so a more common approach is to set a scalar directive **`:embedstylesheet`** (whose value is the name of the stylesheet) at the start of the page object; if you do so, the **`linkstylesheets()`** [standard macro](standardmacros) in the page header calls **`embedstylesheet()`** for you.
 
 ### Support for LESS
 
@@ -48,8 +48,14 @@ So, the rule is, if the `:less` directive is defined, then any stylesheets (whic
 
 ### JavaScript Files
 
-JavaScript files are handled almost exactly like stylesheet files; the only difference is that there is no support (at present) for embedding JavaScript in the page itself. So, the main points are precisely parallel to everything I've just said about stylesheets:
+JavaScript files are handled almost exactly like stylesheet files. So, the main points are precisely parallel to everything I've just said about stylesheets:
 
 * The page table maintains a `:linkjavascripts` array of javascript file names. You can specify this value with the **`:linkjavascripts`** directive, whose value is an array of javascript file names (without the `.js` suffix; the actual javascript files, with the `.js` suffix, should live in a `#javascripts` folder). The **`:linkjavascripts`** directive can appear in various places, so different parts of your site (such as the `#prefs.yaml` file and the current page object) can both contribute to the `:linkjavascripts` array. You can alternatively use a scalar directive of the form `:javascriptXXX`, where `"XXX"` is the name of a JavaScript file.
 
-* The [page header](pageheader) will typically contain a call to the **`linkjavascripts()`** [standard macro](standardmacros). This macro fetches the `:linkjavascripts` array from the page table and, for each element in turn, calls **`linkjavascript()`** with that element as parameter. The result is that (1) the javascript file itself is written out to disk, into a `javascripts` folder at the top level of the site, and (2) a `<script>` tag is inserted into the page's `<head>` region, linking to that javascript file. Alternatively, the page header can call **`linkjavascript()`** and supply a parameter value directly (a string representing the name of one javascript file).
+* You can use as many `#javascripts` folders as you like throughout your site; their contents are gathered and [folded](hierarchy) at the start of the [page rendering process](howsapage), and each will become a folder in your rendered site. The simplest case would be just one `#javascripts` folder, located at the top level of the site where all pages can see it.
+
+* The [page header](pageheader) will typically contain a call to the **`linkjavascripts()`** [standard macro](standardmacros). This macro fetches the `:linkjavascripts` array from the page table and, for each element in turn, calls **`linkjavascript()`** with that element as parameter. The result is that (1) the javascript file itself is written out to disk, into a `javascripts` folder at the top level of the site, and (2) a `<script>` tag is inserted into the page's `<head>` region, linking to that javascript file.
+	
+* Alternatively, the page header can call **`linkjavascript()`** and supply a parameter value directly (a string representing the name of one javascript file).
+
+* To embed a javascript in the page itself, the page header can call **`embedjavascript()`**, but a more common approach is to set a scalar directive **`:embedjavascript`** (whose value is the name of the javascript) and let the page header's **`linkjavascripts()`** call it for you.

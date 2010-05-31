@@ -59,7 +59,7 @@ But before the prefixing takes place, the [macros](macros) within that page head
 	
 * The **`linkstylesheets()`** call writes stylesheet files to disk and inserts links to them. (Also, it can [embed a stylesheet](standardmacros).) For a discussion of how you tell this macro *what* stylesheet files to link to or embed, see the discussion of [stylesheets](stylesheets).
 
-* The **`linkjavascripts()`** call writes javascript files to disk and inserts links to them. For a discussion of how you tell this macro *what* javascript files to link to or embed, see the discussion of [JavaScript](stylesheets).
+* The **`linkjavascripts()`** call writes javascript files to disk and inserts links to them. (Also, it can [embed a script](standardmacros).) For a discussion of how you tell this macro *what* javascript files to link to or embed, see the discussion of [JavaScript](stylesheets).
 	
 * The value of the [**`:title`** directive](scalardirectives) is inserted as the `<title>` tag, and the `<head>` area comes to an end.
 	
