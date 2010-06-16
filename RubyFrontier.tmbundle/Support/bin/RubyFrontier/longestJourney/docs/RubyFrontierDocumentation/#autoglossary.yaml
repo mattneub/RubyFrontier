@@ -15,7 +15,7 @@ the template: &id008
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/howsapagefolder/template.html
   :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/template.txt
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapagefolder/template.txt
   :linetext: The Template
 outline renderers: &id005 
   :path: !ruby/object:Pathname 
@@ -95,7 +95,7 @@ howsapage: &id012
   :path: !ruby/object:Pathname 
     path: defaultfolder/techfolder/howsapage.html
   :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/Library/Application Support/TextMate/Bundles/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapage.txt
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/defaultfolder/techfolder/howsapage.txt
   :linetext: How a Page Object Gets Rendered
 what the hierarchy means: *id003
 how to create a web site with rubyfrontier: &id004 

@@ -60,3 +60,9 @@ A template is a flexible beast, but certain features of templates are quite comm
   To understand what that does, read up on the [pageheader](pageheader) and [pagefooter](standardmacros) macros. That is also the default template when you [create a new site](startrf) in RubyFrontier, and it packs enough power that it should be sufficient for most purposes initially (as I've [already mentioned](howsapage)).
 
 * A template may also contain [scalar directives](scalardirectives). As with a page object, these should be clumped together at the very start of the template. This is actually quite a useful mechanism because of the fact (made clear by the narrative of [how a page gets rendered](howsapage)) that by the time the template's directives are handled, the page object's directives have been handled already; the one can thus depend upon the results of the other. 
+
+###Calculated Templates
+
+RubyFrontier also supplies a mechanism to permit a template to be calculated by some earlier step in the page rendering process. (For example, this might happen in the [page filter](filters).) The rule is that if the directive `:templateIsDirect` is true, the entire template-searching process is bypassed; instead, the directive `:template` will be taken to be a string that _is_ the template. In this case, scalar directives in the template are not evaluated, because it is assumed that, however you calculated the template and put it into the page table, at that moment you also modified any desired scalar directive values in the page table.
+
+The purpose of this mechanism is to allow you to produce templates by some pre-processing mechanism. This would probably be a fairly advanced technique, and most RubyFrontier users wouldn't use it.

@@ -132,25 +132,30 @@ class UserLand::Html::PageMaker
 
     #template
     # if named, it will be a string; if found or "indirect", it will be a Pathname
+    # NEW: can also be a string consisting of the template contents, thus allowing custom template preprocessing
+    # depends on directive :template_string
     raise "No template found or specified" unless (adrTemplate = adrPageTable.fetch2(:template))
-    if adrTemplate.kind_of?(String) # named template, look for it and convert to Pathname
-      catch (:done) do
-        [adrPageTable["templates"], $usertemplates].each do |f|
-          if f && f.exist?
-            f.children.each do |p|
-              if p.simplename.to_s == adrTemplate
-                adrTemplate = p
-                throw :done
+    template_is_direct = adrPageTable.fetch2(:templateIsDirect)
+    unless template_is_direct
+      if adrTemplate.kind_of?(String) # named template, look for it and convert to Pathname
+        catch (:done) do
+          [adrPageTable["templates"], $usertemplates].each do |f|
+            if f && f.exist?
+              f.children.each do |p|
+                if p.simplename.to_s == adrTemplate
+                  adrTemplate = p
+                  throw :done
+                end
               end
             end
           end
         end
+        raise "Template #{adrTemplate} named but not found" unless adrTemplate.kind_of?(Pathname)
       end
-      raise "Template #{adrTemplate} named but not found" unless adrTemplate.kind_of?(Pathname)
     end
     
     # run directives in the template
-    s = runDirectives(adrTemplate)
+    s = template_is_direct ? adrTemplate : runDirectives(adrTemplate)
     # TODO: omitting stuff about revising if #fileExtension was changed by template
       
     # if we have no title by now, that's an error
