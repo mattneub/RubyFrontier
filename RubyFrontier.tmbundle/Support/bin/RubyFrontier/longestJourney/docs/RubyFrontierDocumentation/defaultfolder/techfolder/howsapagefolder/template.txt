@@ -10,7 +10,9 @@ Thus, you need to know how the template is located and how this insertion is per
 
 The template associated with any given renderable page object can either be a [directive object](directiveobjects) or specified through a [scalar directive](scalardirectives).
 
-* If the template is a [directive object](directiveobjects), that means that, as the [page table](pagetable) is [being built](howsapage) and RubyFrontier starts walking up the folder [hierarchy](hierarchy) from the [page object](types) being rendered, if it encounters a file called `#template.txt`, that's the template.
+* If there is a scalar directive `:directTemplate`, its value is taken to be the string that constitutes the template, and that's the end of the search. (This is called a _direct template_.) This is to allow you to produce templates programatically. This would probably be a fairly advanced technique, and most RubyFrontier users wouldn't use it. For example, you might produce the template in the [page filter](filters) and stuff it into the [page table](pagetable) as the value of the `:directTemplate` directive.
+
+* If, as the [page table](pagetable) is [being built](howsapage) and RubyFrontier starts walking up the folder [hierarchy](hierarchy) from the [page object](types) being rendered, it encounters a file called `#template.txt`, that's the template (a [directive object](directiveobjects)). (This is called an _object template_.)
 
   It should not escape your attention that this fact immediately suggests a simple way of using the folder structure within your source folder as a way to group together page objects that share a common template. I have [already](hierarchy) made this point in a general way, but it is worth making again, explicity and with regard to templates specifically.
 
@@ -29,7 +31,9 @@ The template associated with any given renderable page object can either be a [d
 
   In the above schema, pages `A` and `B` will be handled by the `#template.txt` that is together with them in `folder1`, and pages `C` and `D` will be handled by the `#template.txt` that is together with them in `folder2`. In both cases, the top-level `#template.txt` is overshadowed and ignored. The page object `E`, on the other hand, will be handled by the top-level `#template.txt`.
 
-* If the template is specified through the [scalar directive](scalardirectives) `:template`, then the value of this directive should be the simple string name of a `.txt` file that is to function as the template. This file will be sought in the first [`#templates` folder](directiveobjects) discovered on the way up the [hierarchy](hierarchy), or, if that search fails, in the [`user/templates` folder](user). (Note that `#templates` is not a "folded" directive; the usual approach is to have just one `#templates` folder, at the top level of the site.)
+* If the template is specified through the [scalar directive](scalardirectives) `:template`, and if its value is a Pathname, this Pathname is taken to be a file whose contents are the template. (This is called an _address template_.)
+
+* If the template is specified through the [scalar directive](scalardirectives) `:template`, and if its value is a String, this value is taken to be the simple string name of a `.txt` file that is to function as the template. This file will be sought in the first [`#templates` folder](directiveobjects) discovered on the way up the [hierarchy](hierarchy), or, if that search fails, in the [`user/templates` folder](user). Note that `#templates` is not a "folded" directive; the usual approach is to have just one `#templates` folder, at the top level of the site. (This is called a _named template_.)
 
   So, for example, imagine in a text page object this line appears at the start:
 
@@ -59,10 +63,7 @@ A template is a flexible beast, but certain features of templates are quite comm
 
   To understand what that does, read up on the [pageheader](pageheader) and [pagefooter](standardmacros) macros. That is also the default template when you [create a new site](startrf) in RubyFrontier, and it packs enough power that it should be sufficient for most purposes initially (as I've [already mentioned](howsapage)).
 
-* A template may also contain [scalar directives](scalardirectives). As with a page object, these should be clumped together at the very start of the template. This is actually quite a useful mechanism because of the fact (made clear by the narrative of [how a page gets rendered](howsapage)) that by the time the template's directives are handled, the page object's directives have been handled already; the one can thus depend upon the results of the other. 
+* A template (unless it is a direct template) may also contain [scalar directives](scalardirectives). As with a page object, these should be clumped together at the very start of the template. This is actually quite a useful mechanism because of the fact (made clear by the narrative of [how a page gets rendered](howsapage)) that by the time the template's directives are handled, the page object's directives have been handled already; the one can thus depend upon the results of the other. 
+  
+  The reason a direct template is not processed for scalar directives is that it is assumed that, when you calculated the template and put it into the page table, at that moment you also put any desired scalar directive values directly in the page table.
 
-###Calculated Templates
-
-RubyFrontier also supplies a mechanism to permit a template to be calculated by some earlier step in the page rendering process. (For example, this might happen in the [page filter](filters).) The rule is that if the directive `:templateIsDirect` is true, the entire template-searching process is bypassed; instead, the directive `:template` will be taken to be a string that _is_ the template. In this case, scalar directives in the template are not evaluated, because it is assumed that, however you calculated the template and put it into the page table, at that moment you also modified any desired scalar directive values in the page table.
-
-The purpose of this mechanism is to allow you to produce templates by some pre-processing mechanism. This would probably be a fairly advanced technique, and most RubyFrontier users wouldn't use it.
