@@ -44,11 +44,24 @@ module UserLand::Html
   def self.publishSite(adrObject, preflight=true)
     adrObject = Pathname(adrObject).expand_path
     self.guaranteePageOfSite(adrObject) # raises if not
+    puts "publishing site"
     self.preflightSite(adrObject) if preflight
     self.everyPageOfSite(adrObject).each do |p|
       puts "publishing '#{p}'"
       self.releaseRenderedPage(p, (p == adrObject)) # the only one to open in browser is the one we started with
     end
+    puts "finished publishing site"
+  end
+  def self.publishFolder(adrObject, preflight=true)
+    adrObject = Pathname(adrObject).expand_path
+    self.guaranteePageOfSite(adrObject) # raises if not
+    puts "publishing folder #{adrObject.dirname.basename}"
+    self.preflightSite(adrObject) if preflight
+    self.everyPageOfFolder(adrObject.dirname).each do |p|
+      puts "publishing '#{p}'"
+      self.releaseRenderedPage(p, (p == adrObject)) # the only one to open in browser is the one we started with
+    end
+    puts "finished publishing folder #{adrObject.dirname.basename}"
   end
   def self.getFtpSiteFile(p)
     # walk upwards to the first folder containing an #ftpSite file, and return that file as a Pathname

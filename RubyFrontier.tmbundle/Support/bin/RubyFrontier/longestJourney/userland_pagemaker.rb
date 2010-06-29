@@ -403,7 +403,8 @@ class UserLand::Html::PageMaker
     n = n.to_s
     n = n.dropNonAlphas if getPref("dropnonalphas", adrPageTable)
     n = n.downcase if getPref("lowercasefilenames", adrPageTable)
-    n[0, getPref("maxfilenamelength", adrPageTable) - getPref("fileextension", adrPageTable).length]
+    # n[0, getPref("maxfilenamelength", adrPageTable) - getPref("fileextension", adrPageTable).length]
+    n
   end
   def getSiteFolder(adrPageTable=@adrPageTable)
     # where shall we render/copy pages into? set :siteRootFolder, and return it as well
@@ -607,7 +608,7 @@ class UserLand::Html::PageMaker
     case s.to_s.downcase
     when "fileextension"
       ".html"
-    when "maxfilenamelength"
+    when "maxfilenamelength" // no longer used
       31
     when "defaulttemplate"
       "normal"

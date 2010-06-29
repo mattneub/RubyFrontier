@@ -85,8 +85,6 @@ If a [page object](types) file is a renderable, RubyFrontier uses the page objec
 
 * **:fileextension**. The suffix to be added to the name. This will replace the current suffix. The default is `".html"`.
 
-* **:maxfilenamelength**. The maximum number of characters that the name may contain, including the suffix. The default is 31.
-
 * **:dropnonalphas**. A boolean (default `true`): Whether characters other than A through Z, 0 through 9, and underscore should be dropped from the name.
 
 * **:lowercasefilenames**. A boolean (default `true`): Whether the name should be downcased.

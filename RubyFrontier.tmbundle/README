@@ -34,14 +34,15 @@ Initial public release, version 0.9, July 23, 2009. Quickly followed by 0.9.1 to
 
 In version 0.9.5, LESS (http://lesscss.org/) support was added, and syntax for loading and linking to JavaScript files was extended in a manner parallel to that of CSS files, making it easy to specify a particular set of JavaScript files to be loaded and linked in a particular order.
 
-In version 0.9.6, added a new optional filter stage, postMacroFilter.rb, which runs after macro processing but before the autoglossary mechanism, and is expected to modify adrPageTable[:postmacrotext]. Also, modified pagefooter() to work similarly to pageheader(): it returns an empty string initially, so there's nothing there up through autoglossary time, and then the result is appended to the end of the page after the same sort of thing is done for the pageHeader(). Also, fixed the bug where html.getOneDirective was not accepting a string argument. March 30, 2010.
+In version 0.9.6, added a new optional filter stage, postMacroFilter.rb, which runs after macro processing but before the autoglossary mechanism, and is expected to modify adrPageTable[:postmacrotext]. Also, modified pagefooter() to work similarly to pageheader(): it returns an empty string initially, so there's nothing there up through autoglossary time, and then the result is appended to the end of the page after the same sort of thing is done for the pageHeader(). Also, fixed the bug where html.getOneDirective was not accepting a string argument.
 
+In version 0.9.7, JavaScript material is now embeddable in the <head> area. Also, modified the behavior with respect to #images, #stylesheets, and #javascripts folders so that you can have as many as you like in the source folder and they will be written out into the rendered site. (The :imagefoldername directive is withdrawn and the :maxfilenamelength is no longer obeyed for JavaScript and stylesheet files.)
 
 =======
 
 VERSION
 
-Version 0.9.7. JavaScript material is now embeddable in the <head> area. Also, modified the behavior with respect to #images, #stylesheets, and #javascripts folders so that you can have as many as you like in the source folder and they will be written out into the rendered site. (The :imagefoldername directive is withdrawn and the :maxfilenamelength is no longer obeyed for JavaScript and stylesheet files.)
+Version 0.9.8. :maxfilenamelength is now completely withdrawn, since no one could possibly be using RubyFrontier on an old HFS file system. Added the Publish Folder command.
 
 =======
 

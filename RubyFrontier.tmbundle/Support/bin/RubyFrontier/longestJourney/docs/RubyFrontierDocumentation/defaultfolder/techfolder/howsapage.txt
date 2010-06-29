@@ -1,6 +1,6 @@
 #title "How a Page Object Gets Rendered"
 
-At last we come to the sequence of steps by which a [page object](types) is rendered. In other words, you start with some renderable page object and choose RubyFrontier > Publish Page, and this is what happens to that page object. Or, you choose RubyFrontier > Publish Site, and this is what happens to *each* page object of the site.
+At last we come to the sequence of steps by which a [page object](types) is rendered. In other words, you start with some renderable page object and choose RubyFrontier > Publish Page, and this is what happens to that page object. Or, you choose RubyFrontier > Publish Folder or RubyFrontier > Publish Site, and this is what happens to *each* page object of the site.
 
 This is a lot of information, and it may seem at first like too much to take in. But even if you can't take it all in, read over this sequence! You are going to want to consult it later, as a guide to the rendering process. Knowing the rendering process is how you know what customizations you can make to that process. Plus, you can use this page for its links to details on various specific topics along the way.
 
