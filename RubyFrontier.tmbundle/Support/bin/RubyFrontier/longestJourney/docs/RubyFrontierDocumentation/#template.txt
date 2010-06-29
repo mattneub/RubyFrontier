@@ -7,7 +7,9 @@
 <%= navbars() %>
 <h1><%= title %></h1>
 <div class="heart">
-<bodytext>
+<p id="bodytext">
+	The body text will replace this entire p tag.
+</p>
 </div>
 <div class="nextbar">
 	<%= truenext() %>

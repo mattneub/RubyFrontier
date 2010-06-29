@@ -54,7 +54,7 @@ This is a lot of information, and it may seem at first like too much to take in.
 
 * Any [scalar directives](scalardirectives) at the start of the [template](template) are evaluated and stripped (unless the `:directTemplate` directive is in force). 
 
-* The `:bodytext` is **embedded in the [template](template)** by substituting it for the pseudo-tag `<bodytext>`.
+* The `:bodytext` is **embedded in the [template](template)** by substituting it for the pseudo-tag `<bodytext>` or for a tag `<p id="bodytext"></p>`.
 
 * **[Macros](macros) are processed** (except in the highly unlikely circumstance that the [scalar directive](scalardirectives) `:processmacros` is `false`). A macro is an [ERB](ERB) expression in your page object or template (the two have been combined by the previous step into a single string). This is when calculated content (such as [images](images) and automatically generated navigation) is substituted into the Web page.
 

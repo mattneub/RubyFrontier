@@ -24,7 +24,7 @@ Now, at first this entire prospect seemed an improbable one. Frontier, after all
 
 True, but then I got to thinking: For Web site generation, the database isn't really necessary. Scripts are just scripts; it doesn't matter how they are stored, so they can just as well be methods in one or more Ruby script files. Texts can be represented by text files, and the hierarchical arrangement of texts and tables in the Frontier database can be represented by the hierarchical arrangement of files and folders on disk. This, after all, is how most Web site frameworks work these days (e.g. [Rails](http://www.rubyonrails.org/)); and there was once even a variant of the Frontier Web site framework that worked this way (the so-called "BBSite suite"). In the distant past, repeated reading from files would have been considered "thrashing the disk", but modern virtual memory and disk usage patterns have outmoded such concerns. Furthermore, thanks to [TextMate](http://macromates.com/), viewing and navigating a big hierarchy of files and folders is just as easy as navigating Frontier's object hierarchy.
 
-And what about Frontier's "tables" of "scalars"? Well, Ruby has internal "tables" (hashes). In fact, they are a lot more efficient than Frontier's, plus they have an on-disk human-readable representation — [YAML](http://yaml4r.sourceforge.net/cookbook/).
+And what about Frontier's "tables" of "scalars"? Well, Ruby has internal "tables" (hashes). In fact, they are a lot more efficient than Frontier's, plus they have an on-disk human-readable representation — [YAML](http://yaml.org/YAML_for_ruby.html).
 
 So, it was starting to look like the project might be possible after all.
 

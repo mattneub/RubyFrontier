@@ -49,11 +49,11 @@ A template is a flexible beast, but certain features of templates are quite comm
 
 * There *must* be a template. It is an error if there isn't one.
 
-* The template should contain the pseudo-tag `<bodytext>`. This is the point at which the page object will be substituted — that is to say, the page object, as rendered [up to that point](howsapage) in the `:bodytext` entry of the [page table](pagetable), will replace the `<bodytext>` tag. There is no law requiring the template to contain this tag, but if it doesn't, the page object will effectively be thrown away, so a template without a `<bodytext>` tag would be stupid.
+* The template should contain the pseudo-tag `<bodytext>`. Alternatively, it can contain a `<p>` tag whose `id` is `"bodytext"`, like this: `<p id="bodytext"></p>`. (The regular expression by which this `<p>` tag is located is rather crude, so try to imitate the example.) This is the point at which the page object will be substituted — that is to say, the page object, as rendered [up to that point](howsapage) in the `:bodytext` entry of the [page table](pagetable), will replace the tag. It is an error if no place to embed the page object is found.
 	
   Indeed, the minimum template would consist of *only* the pseudo-tag `<bodytext>`. There are times when this strategy is useful, and so such a template is included in [the `user/templates` folder](user): it is called (for Frontier-related historical reasons) `bbedit`. You would use this template if your page object itself consists of *all* the HTML required for your Web page, the use of the template being a superfluous (though necessary) formality.
 
-* Apart from the `<bodytext>` tag, the template should consist of, or should contain macros to generate, literal HTML. The typical strategy is to have the template generate, at least, all the HTML from the start of the page up to and including the `<body>` tag, and, at the end of the page, the closing `</body>` and `</html>` tags.
+* The template should consist of, or should contain macros to generate, literal HTML. The typical strategy is to have the template generate, at least, all the HTML from the start of the page up to and including the `<body>` tag, and, at the end of the page, the closing `</body>` and `</html>` tags.
 	
   And, again, this strategy is sufficiently common that such a template is included in [the `user/templates` folder](user): it is called (for Frontier-related historical reasons) `white`. It goes like this:
 

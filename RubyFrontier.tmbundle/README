@@ -42,7 +42,7 @@ In version 0.9.7, JavaScript material is now embeddable in the <head> area. Also
 
 VERSION
 
-Version 0.9.8. :maxfilenamelength is now completely withdrawn, since no one could possibly be using RubyFrontier on an old HFS file system. Added the Publish Folder command.
+Version 0.9.8. Added support for direct (calculated) templates; you can now insert the template as a string directly into the page table, instead of having to refer to a file on disk. Added support for embedding page at a legal <p> tag instead of the old <bodytext>. Added Publish Folder command. :maxfilenamelength is now completely withdrawn, since no one could possibly be using RubyFrontier on an old HFS file system. 
 
 =======
 
