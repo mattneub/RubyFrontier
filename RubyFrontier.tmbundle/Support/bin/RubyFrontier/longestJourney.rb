@@ -16,7 +16,7 @@ def myrequire(*what)
     end
   end
 end
-myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "exifr", "enumerator", "less"
+myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "exifr", "enumerator", "less", "kramdown", "haml"
 
 def myraise(what)
   raise RuntimeError, what, caller[0] # reduce callstack to line where "myraise" was called

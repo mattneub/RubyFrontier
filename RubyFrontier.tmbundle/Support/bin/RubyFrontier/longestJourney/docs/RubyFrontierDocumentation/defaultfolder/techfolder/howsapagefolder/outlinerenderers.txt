@@ -36,7 +36,7 @@ To help you manipulate the outline, RubyFrontier defines a subset of the [Fronti
 
 When using the `Opml` instance methods, there is always a "current line" of the outline to which we are pointing (because that's how Frontier did things). A brief description of the `Opml` instance methods follows.
 
-<%= %{<div style="margin-left:20px">} %>
+<%= %{<div style="margin-left:20px" markdown="1">} %>
 
 **firstSummit()**. Moves the current line pointer to the earliest, leftmost line of the outline. When the outline arrives at your renderer, `firstSummit()` has already been called. [Frontier users note: no verbs for expanding and collapsing are provided; the outline is completely expanded when it arrives at your renderer.]
 

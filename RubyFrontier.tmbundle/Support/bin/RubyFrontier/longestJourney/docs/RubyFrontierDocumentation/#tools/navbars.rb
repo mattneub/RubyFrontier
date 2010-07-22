@@ -29,7 +29,7 @@ def get_pages(dir)
     else
       html.getLink(title, what)
     end
-    arr << %{<span style="white-space:nowrap">#{s}</span>}
+    arr << %{<span style="white-space:nowrap" markdown="1">#{s}</span>}
   end
   arr
 end

@@ -8,11 +8,11 @@ To generate references to images within the site, you do two things, as follows:
 
 1. First, you have to have an image file. Place it in an [`#images` folder](directiveobjects) in your source folder, in a location such that it will be found when the [page table](pagetable) is [built](howsapage). (Personally, I usually just keep all images in a single top-level `#images` folder.)
 
-* Second, in the page body or template, use the `imageref()` call in a [macro](macros). For example, you might say this:
+2. Second, in the page body or template, use the `imageref()` call in a [macro](macros). For example, you might say this:
 
-        \<%= imageref("myimage") %>
+        <%%= imageref("myimage") %>
 
-  If the image file's simple name (without the extension) is `myimage` (for instance, it might be `myimage.png`), it will be located (in the `#images` folder) and copied out into the Web site folder. The macro call then returns an `<img>` tag whose `src` attribute is a relative URL from the page being built to the image file. The `<img>` tag will also have a `height`, `width`, and `alt` attribute.
+    If the image file's simple name (without the extension) is `myimage` (for instance, it might be `myimage.png`), it will be located (in the `#images` folder) and copied out into the Web site folder. The macro call then returns an `<img>` tag whose `src` attribute is a relative URL from the page being built to the image file. The `<img>` tag will also have a `height`, `width`, and `alt` attribute.
 
 Every `#images` folder containing an image file that is actually referred to by an `imageref()` call results in a folder in the Web site at the same relative location, called `images`, and the image file is copied into this folder. Thus you can have many `images` folders throughout your site, though the simplest and most common situation is probably to have a single `#images` folder at the top level of your source folder, where all pages can see it, and thus a single `images` folder in the rendered site.
 
@@ -32,7 +32,7 @@ An optional second parameter in the `imageref()` call is a hash of names and val
 
 So, for example, an `imageref()` call that includes some of these optional values might look like this:
 
-        \<%= imageref("myimage", {:border => "1", :alt => "A great image"}) %>
+        <%%= imageref("myimage", {:border => "1", :alt => "A great image"}) %>
 
 ###Images Without `imageref()`
 
@@ -53,6 +53,6 @@ In this case, you're going to need to use some other strategy to get the image c
 		
   This is not particularly inefficient, because `html.getImageData()` only performs an actual copy if an actual copy needs to be performed; if the image has already been copied into place in the Web site, and has the same modification date as the original, no copying takes place. The `spit` macro ignores the data returned by `html.getImageData`, and your call to `spit()` would also ignore *its* results, like this:
 
-        \<% spit() %>
+        <%% spit() %>
 
   (Note the lack of an equal-sign in the macro call; this means that no results are entered into the Web page being rendered at this point.) It is possible to use `html.getImageData` in more sophisticated ways, where you actually *do* care about the results it returns; for an example, look at the `caption()` macro used to generate the image-plus-caption pairs in this documentation.

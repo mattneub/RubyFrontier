@@ -8,6 +8,8 @@ RubyFrontier embodies several principles:
 
 * **Form vs. content**. You write the *substance* of a Web page (the content). That is poured for you into a template (the form). A particular template can apply to one, several, or all of the pages in a Web site. The notion is illustrated here, where the same content is poured into several different templates.
 
+^
+
 <%= caption("tripleoutput", "One page object, rendered through three different templates.")%>
 
 * **Ease of linkage**. A link to another page within the site is easy to make, and keeps working even if you move the source page, the target page, or both.

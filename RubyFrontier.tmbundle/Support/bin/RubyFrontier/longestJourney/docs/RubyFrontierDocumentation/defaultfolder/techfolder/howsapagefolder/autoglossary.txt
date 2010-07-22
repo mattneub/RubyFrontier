@@ -6,18 +6,18 @@ Links are not hard to make, and you could easily construct a relative link from 
 
 * Constructing a relative link manually is a labor-intensive, error-prone business, especially as your Web site becomes large and starts to consist of many pages. You have to get the relative path exactly right or the link will fail, and the path can become long and complicated.
 
-  But with the autoglossary mechanism, *the relative path is automatically constructed for you*. All you have to know is the name or title of the page you want to link to. Thus it's fast and easy to make links via the autoglossary mechanism. And when it's fast and easy to make links, you *will* make links; you won't hesitate on the grounds that it's "such a pain" to make them. So you'll heavily interlink your pages. And your Web site will be better because of that!
+    But with the autoglossary mechanism, *the relative path is automatically constructed for you*. All you have to know is the name or title of the page you want to link to. Thus it's fast and easy to make links via the autoglossary mechanism. And when it's fast and easy to make links, you *will* make links; you won't hesitate on the grounds that it's "such a pain" to make them. So you'll heavily interlink your pages. And your Web site will be better because of that!
 
 * Hard-coded relative links are fragile. The relative path is written right into the link. This freezes the structure of your Web site. You dare not move a page to different folder within your site, or rename any folders, or anything, because all your relative links can break if you do so.
 
-  But with the autoglossary mechanism, *links don't break when you move pages around within your site*. That's because, even if the page moves, its title and/or filename stays the same. So the autoglossary mechanism finds the target page in its new location and constructs the relative path correctly for you. (And if you do change a title or filename so that an autoglossary-based link breaks, RubyFrontier notifies you so you can fix the link.)
+    But with the autoglossary mechanism, *links don't break when you move pages around within your site*. That's because, even if the page moves, its title and/or filename stays the same. So the autoglossary mechanism finds the target page in its new location and constructs the relative path correctly for you. (And if you do change a title or filename so that an autoglossary-based link breaks, RubyFrontier notifies you so you can fix the link.)
 
 ### Executive Summary of the Autoglossary Mechanism
 
 Every time you render (publish) a [page object](types), RubyFrontier automatically adds information about that page object into the `#autoglossary.yaml` file. It keys that information twice: under the *simple name* of the page object (the filename without the extension) and under the *title* of the page object if there is one (probably, the value of the page object's [`#title` scalar directive](scalardirectives)).
 
 Then, later, when you want to form a link from one page in your site to another page in your site, you create an `<a>` tag just as you would expect, but you do *not* hard-code a relative URL into its `href` attribute. Instead, for the `<a>` tag's `href` attribute, you use the target page's key in the `#autoglossary.yaml` file. As I just said, that can be either the *simple name* of the target source page file or the *title* of the target page. RubyFrontier then looks up that key in the `#autoglossary.yaml` file, calculates the relative URL, and substitutes it for your `href` value, [as the page is rendered](howsapage).
-	
+
 ### How Stuff Gets Into the Autoglossary
 
 The autoglossary is maintained for you. You should never have to tweak it or edit it in any way. There are two ways in which the autoglossary gets built.
@@ -32,7 +32,7 @@ The second way of getting info into the autoglossary is more important than you 
 
 To get RubyFrontier to consult the autoglossary for you, in a renderable page object, form a link where the `href` attribute is the title or simple name of a page object file:
 
-		<a href="otherpage">Click me!</a>
+        <a href="otherpage">Click me!</a>
 
 In that example, RubyFrontier looks up `otherpage` in the autoglossary and, if it finds it, it works out the relative URL from the page being rendered to that other page, and substitutes the resulting relative URL as the value of the `href` attribute.
 
@@ -56,13 +56,13 @@ In that example, `otherpage` will be looked up in the autoglossary and the prope
 
 How does RubyFrontier know whether to look up an `href` value in the autoglossary? The answer is that if the `href` value contains a dot (`.`), or a colon-slash-slash (`://`), or starts with a pound-sign (`#`), RubyFrontier assumes that this is an absolute URL and leaves it alone; it *won't* look up that `href` value in the autoglossary. But in the first two cases, you can signal to RubyFrontier that it *should* look up the `href` value in the autoglossary, by "escaping" the dot or the colon-slash-slash with a preceding backslash.  
 
-###What If Autoglossary Lookup Fails?
+### What If Autoglossary Lookup Fails?
 
 If RubyFrontier looks up an `href` value in the autoglossary and doesn't find it, it then looks up the value in the normal [glossary](glossary).
 
 If lookup in both the autoglossary and the normal glossary fails, RubyFrontier assumes you've made an error. This error is not fatal; rendering of the page object continues. But an error message is issued, and RubyFrontier substitutes, as the value of the `href` attribute, `"errorRefGlossaryFailedHere"`. So you can find failed autoglossary substitutions in a generated Web page by searching for `"errorRefGlossaryFailedHere"` in the Web page's HTML.
 
-###<a name="external"></a>Links to Other RubyFrontier Sites
+### Links to Other RubyFrontier Sites {#external}
 
 RubyFrontier can also use the autoglossary mechanism to generate URLs to other RubyFrontier-based sites that you maintain. For example, I maintain pages at www.tidbits.com and at www.apeth.com. What if a page in the TidBITS site wants to link to a page in the Apeth site? Of course I can do this with an absolute URL; but this means that I must get the URL right, plus if I move a page within the Apeth site I have to remember to change any links to it from within the TidBITS site. Instead, I let RubyFrontier's autoglossary mechanism help me.
 

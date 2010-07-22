@@ -8,7 +8,7 @@ You can prefix any page header you like, or you can accept RubyFrontier's defaul
 
 To get the default page header, start your [template](template) with a [macro](macros) that says:
 
-        \<%= pageheader() %>
+        <%%= pageheader() %>
 
 (The default template, which is identical to the "white" template in [user/templates](user), does start this way.)
 
@@ -18,12 +18,12 @@ The result of that call is that following page header will be prefixed to your p
 	      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	    <html xmlns="http://www.w3.org/1999/xhtml">
 	    <head>
-	    \<%= metatags() %>
-	    \<%= linkstylesheets() %>
-	    \<%= linkjavascripts() %>
-	    <title>\<%= title %></title>
+	    <%%= metatags() %>
+	    <%%= linkstylesheets() %>
+	    <%%= linkjavascripts() %>
+	    <title><%%= title %></title>
 	    </head>
-	    \<%= bodytag() %>
+	    <%%= bodytag() %>
 
 But before the prefixing takes place, the [macros](macros) within that page header are themselves processed. These are [standard macros](standardmacros) — that is, they are calls to stock methods included within RubyFrontier itself. Let's walk through the default page header, and I'll comment on each of its parts.
 
@@ -31,40 +31,40 @@ But before the prefixing takes place, the [macros](macros) within that page head
 
 * The `<head>` area begins. The **`metatags()`** call inserts tags at the start of the `<head>` area, as follows:
 
-  * If the [scalar directive **`:metacharset`**](scalardirectives) is true, a character set `<meta>` tag is inserted, in accordance with the value of the [`:charset` scalar directive](scalardirectives). The default is that `:metacharset` is true, and `:charset` is `"utf-8"`. For example:
+    * If the [scalar directive **`:metacharset`**](scalardirectives) is true, a character set `<meta>` tag is inserted, in accordance with the value of the [`:charset` scalar directive](scalardirectives). The default is that `:metacharset` is true, and `:charset` is `"utf-8"`. For example:
 
               <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
-  * If the [scalar directive **`:includemetagenerator`**](scalardirectives) is true (the default), a generator `<meta>` tag is inserted with the value `"RubyFrontier"`. For example:
+    * If the [scalar directive **`:includemetagenerator`**](scalardirectives) is true (the default), a generator `<meta>` tag is inserted with the value `"RubyFrontier"`. For example:
 
               <meta name="generator" content="RubyFrontier" />
 
-  * If there are any [scalar directives](scalardirectives) whose name is of the form **`metaxxx`**, a tag of the form `<meta name="xxx" content="yyy">` is inserted, where `xxx` is whatever occurs after `meta` in the directive's name, and `yyy` is the directive's value. For example:
+    * If there are any [scalar directives](scalardirectives) whose name is of the form **`metaxxx`**, a tag of the form `<meta name="xxx" content="yyy">` is inserted, where `xxx` is whatever occurs after `meta` in the directive's name, and `yyy` is the directive's value. For example:
 
               #metakeywords "RubyFrontier, coolness"
 
-      would result in:
+        would result in:
 
               <meta name="keywords" content="RubyFrontier, coolness" />
 
-  * If there are any [scalar directives](scalardirectives) whose name is of the form **`metaequivxxx`**, a tag of the form `<meta http-equiv="xxx" content="yyy">` is inserted, where `xxx` is whatever occurs after `meta` in the directive's name, and `yyy` is the directive's value. For example:
+    * If there are any [scalar directives](scalardirectives) whose name is of the form **`metaequivxxx`**, a tag of the form `<meta http-equiv="xxx" content="yyy">` is inserted, where `xxx` is whatever occurs after `meta` in the directive's name, and `yyy` is the directive's value. For example:
 
               #metaequivrobots "noindex"
 
-      would result in:
+        would result in:
 
               <meta name="robots" content="noindex" /> 
 
-  * If there is a [scalar directive](scalardirectives) whose name is **`:meta`**, its value is inserted as a tag without alteration. The intention here is to give you a chance to place other miscellaneous material into the document's `<head>` area.
-	
+    * If there is a [scalar directive](scalardirectives) whose name is **`:meta`**, its value is inserted as a tag without alteration. The intention here is to give you a chance to place other miscellaneous material into the document's `<head>` area.
+
 * The **`linkstylesheets()`** call writes stylesheet files to disk and inserts links to them. (Also, it can [embed a stylesheet](standardmacros).) For a discussion of how you tell this macro *what* stylesheet files to link to or embed, see the discussion of [stylesheets](stylesheets).
 
 * The **`linkjavascripts()`** call writes javascript files to disk and inserts links to them. (Also, it can [embed a script](standardmacros).) For a discussion of how you tell this macro *what* javascript files to link to or embed, see the discussion of [JavaScript](stylesheets).
-	
+
 * The value of the [**`:title`** directive](scalardirectives) is inserted as the `<title>` tag, and the `<head>` area comes to an end.
-	
+
 * The **`bodytag()`** call generates the opening `<body>` tag. A number of standard attributes can be inserted into this `<body>` tag by supplying them as [scalar directives](scalardirectives):
-	
+
 	* **:background**. The name (with no extension) of a file in an `#images` folder.
 	* **:bgcolor, :text, :link, :alink, :vlink**. A color string; if hex, you may omit the initial "#".
 	* **:topmargin, :leftmargin, :marginheight, :marginwidth**.

@@ -1,3 +1,5 @@
 --- 
 :linkstylesheets: normal
-:markdown: true
+:kramdown: true
+:less: true
+:haml: true

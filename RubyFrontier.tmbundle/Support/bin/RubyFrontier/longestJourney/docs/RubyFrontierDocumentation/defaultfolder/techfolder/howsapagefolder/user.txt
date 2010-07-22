@@ -10,7 +10,7 @@ Whenever you give a RubyFrontier command, such as Publish Page, as RubyFrontier 
 
 The primary location for RubyFrontier's own code is a file called `longestJourney.rb`. In the same folder, side by side with this file, is a folder called `longestJourney`. Inside the folder `longestJourney` you are permitted to keep two things: a file called `user.rb`, and a folder called `user`.
 
-<%= caption("userfolder", "The layout of the user folder. You can use the named templates in the user/templates folder, and you can install additional template files there; and you can modify user.rb to add features that all your sites can use.") %>
+<%%= caption("userfolder", "The layout of the user folder. You can use the named templates in the user/templates folder, and you can install additional template files there; and you can modify user.rb to add features that all your sites can use.") %>
 
 I will now explain the purposes of these two items.
 

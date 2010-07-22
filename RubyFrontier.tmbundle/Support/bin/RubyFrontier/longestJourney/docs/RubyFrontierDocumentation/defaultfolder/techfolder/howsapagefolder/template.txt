@@ -57,9 +57,9 @@ A template is a flexible beast, but certain features of templates are quite comm
 	
   And, again, this strategy is sufficiently common that such a template is included in [the `user/templates` folder](user): it is called (for Frontier-related historical reasons) `white`. It goes like this:
 
-            \<%= pageheader() %>
+            <%%= pageheader() %>
 		    <bodytext>
-		    \<%= pagefooter() %>
+		    <%%= pagefooter() %>
 
   To understand what that does, read up on the [pageheader](pageheader) and [pagefooter](standardmacros) macros. That is also the default template when you [create a new site](startrf) in RubyFrontier, and it packs enough power that it should be sufficient for most purposes initially (as I've [already mentioned](howsapage)).
 
