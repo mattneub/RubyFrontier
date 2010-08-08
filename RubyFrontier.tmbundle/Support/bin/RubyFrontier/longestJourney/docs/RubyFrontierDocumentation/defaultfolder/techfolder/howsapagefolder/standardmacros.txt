@@ -2,7 +2,8 @@
 
 RubyFrontier includes a number of convenience methods, to be called as needed during [macros](macros) to assist with common tasks.
 
-> <span style="font-size:80%">NOTE: Where these methods are located in RubyFrontier's code, and how they are called, depends in part upon how Frontier did these things (since I wanted to make my own transition from Frontier to RubyFrontier as easy as possible). Not all Frontier convenience methods have been provided, and RubyFrontier does some things differently from Frontier. But this could all evolve further in future, and meanwhile, since this is Ruby, it's very easy to add your own methods and inject them into the relevant classes (the [`user.rb`](user) file is a good place to do this).</span>
+> NOTE: Where these methods are located in RubyFrontier's code, and how they are called, depends in part upon how Frontier did these things (since I wanted to make my own transition from Frontier to RubyFrontier as easy as possible). Not all Frontier convenience methods have been provided, and RubyFrontier does some things differently from Frontier. But this could all evolve further in future, and meanwhile, since this is Ruby, it's very easy to add your own methods and inject them into the relevant classes (the [`user.rb`](user) file is a good place to do this).
+{:style="font-size:80%"}
 
 The macros are shown as they might be called in a macro under the rules of [macro scoping](macros).
 

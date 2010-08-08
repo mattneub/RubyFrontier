@@ -43,7 +43,8 @@ Your source folder supplies scalar directives to RubyFrontier in three places:
 
 The following scalar directives are "known" to RubyFrontier: they are meaningful to RubyFrontier out of the box, and will be obeyed if defined.
 
-> <span style="font-size:80%">NOTE on capitalization of known scalar directive names: Frontier's UserTalk is case-insensitive, but Ruby is not. Accordingly, I have had to pick a capitalization rule. The minimal simplest convention is all-lowercase, and this requires the least effort in migrating from Frontier (conversion to lowercase is a built-in TextMate command).</span>
+> NOTE on capitalization of known scalar directive names: Frontier's UserTalk is case-insensitive, but Ruby is not. Accordingly, I have had to pick a capitalization rule. The minimal simplest convention is all-lowercase, and this requires the least effort in migrating from Frontier (conversion to lowercase is a built-in TextMate command).
+{:style="font-size:80%"}
 
 #### Pageheader
 

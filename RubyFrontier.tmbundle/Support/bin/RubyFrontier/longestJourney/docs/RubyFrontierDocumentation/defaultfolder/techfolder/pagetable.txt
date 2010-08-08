@@ -16,7 +16,8 @@ Folded values other than scalar directives — namely, pathnames and name-value 
 
 RubyFrontier works out and stores in the page table some key pieces of information of its own (i.e. these are not values supplied to RubyFrontier as directives). It is well to be aware of these, since they can be useful to your scripts, and also because you should not accidentally tromp on them.
 
-> <span style="font-size:80%">NOTE on the names: These names are pretty terrible, but they are mostly inherited from Frontier, and I have left them unchanged (except for making them lowercase) to ease migration.</span>
+> NOTE on the names: These names are pretty terrible, but they are mostly inherited from Frontier, and I have left them unchanged (except for making them lowercase) to ease migration.
+{:style="font-size:80%"}
 
 * **:adrsiteroottable**. Pathname of the source folder (discovered by looking for `#ftpSite.yaml`).
 
