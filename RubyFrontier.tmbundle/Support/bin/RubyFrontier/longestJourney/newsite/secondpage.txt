@@ -1,0 +1,21 @@
+#title "My Second Web Page"
+#markdown 1
+#template "secondtemplate"
+#linkstylesheets ["s1"]
+
+# <%= title %>
+
+This page illustrates use of Markdown. I don't recommend using Markdown any longer because:
+
+* it is somewhat indeterminate in its behavior
+
+* it is no longer actively supported
+
+* it has many quirks that need to be worked around
+
+I now use kramdown instead; look at the [third page](thirdpage) for an example. Oooh, did you notice how easy it was for me to make a link?
+
+This page also illustrates use of a named template. You can tell because the template colors the background.
+
+Plus, it illustrates use of CSS. You can tell because the stylesheet colors the text.
+

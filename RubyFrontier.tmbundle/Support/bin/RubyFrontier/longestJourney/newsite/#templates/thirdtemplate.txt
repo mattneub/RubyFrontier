@@ -1,0 +1,9 @@
+<%= pageheader() %>
+/ this is a Haml template intended to support kramdown
+/ notice that kramdown is rigorous about where it applies,
+/ so you have to enable it explicitly in a div surrounding the embedded body using "markdown"=1
+.heart{:markdown => "1"}
+  %p(id="bodytext")
+%hr
+<%= nextprevlinks() %>
+<%= pagefooter() %>

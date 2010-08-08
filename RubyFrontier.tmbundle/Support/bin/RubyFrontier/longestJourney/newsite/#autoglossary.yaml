@@ -1,8 +1,22 @@
 --- 
-default: &id001 
+firstpage: &id001 
   :path: !ruby/object:Pathname 
-    path: default.html
-  :linetext: My Cool Web Page
+    path: firstpage.html
   :adr: !ruby/object:Pathname 
-    path: /Volumes/gromit/Users/matt2/desire/ruby/rubyFrontier/longestJourney/newsite/default.txt
-My Cool Web Page: *id001
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/firstpage.txt
+  :linetext: My First Web Page
+thirdpage: &id002 
+  :path: !ruby/object:Pathname 
+    path: thirdpage.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/thirdpage.txt
+  :linetext: My Third and Greatest Web Page
+my first web page: *id001
+my third and greatest web page: *id002
+secondpage: &id003 
+  :path: !ruby/object:Pathname 
+    path: secondpage.html
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/secondpage.txt
+  :linetext: My Second Web Page
+my second web page: *id003

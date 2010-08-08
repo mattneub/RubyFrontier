@@ -1,3 +1,4 @@
+#bgcolor "lightblue"
 <%= pageheader() %>
 <p id="bodytext"></p>
 <hr />
