@@ -38,13 +38,15 @@ In version 0.9.6, added a new optional filter stage, postMacroFilter.rb, which r
 
 In version 0.9.7, JavaScript material is now embeddable in the <head> area. Also, modified the behavior with respect to #images, #stylesheets, and #javascripts folders so that you can have as many as you like in the source folder and they will be written out into the rendered site. (The :imagefoldername directive is withdrawn and the :maxfilenamelength is no longer obeyed for JavaScript and stylesheet files.)
 
-In version 0.9.8, added support for direct (calculated) templates; you can now insert the template as a string directly into the page table, instead of having to refer to a file on disk. Added support for embedding page at a legal <p> tag instead of the old <bodytext>. Added Publish Folder command. :maxfilenamelength is now completely withdrawn, since no one could possibly be using RubyFrontier on an old HFS file system. 
+In version 0.9.8, added support for direct (calculated) templates; you can now insert the template as a string directly into the page table, instead of having to refer to a file on disk. Added support for embedding page at a legal <p> tag instead of the old <bodytext>. Added Publish Folder command. :maxfilenamelength is now completely withdrawn, since no one could possibly be using RubyFrontier on an old HFS file system.
+
+In version 0.9.9, rejiggered the documentation so that it no longer uses Markdown and SmartyPants. Instead, the documentation now uses kramdown (http://kramdown.rubyforge.org/). This is faster and more predictable than using Markdown. Also, the CSS for the documentation uses LESS, and the template uses Haml (http://haml-lang.com/). Thus the documentation itself exemplifies a modern RubyFrontier site (plus, it builds much faster now). 
 
 =======
 
 VERSION
 
-Version 0.9.9. Rejiggered the documentation so that it no longer uses Markdown and SmartyPants. Instead, the documentation now uses kramdown (http://kramdown.rubyforge.org/). This is faster and more predictable than using Markdown. Also, the CSS for the documentation uses LESS, and the template uses Haml (http://haml-lang.com/). Thus the documentation itself exemplifies a modern RubyFrontier site (plus, it builds much faster now). 
+This is version 0.9.9.1. The model site (what you get when you say RubyFrontier > New Site) has been rejiggered to demonstrate "modern" features such as use of kramdown, Haml, and LESS. The documentation now takes slightly better advantage of kramdown features.
 
 =======
 
