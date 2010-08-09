@@ -46,7 +46,7 @@ In version 0.9.9, rejiggered the documentation so that it no longer uses Markdow
 
 VERSION
 
-This is version 0.9.9.1. The model site (what you get when you say RubyFrontier > New Site) has been rejiggered to demonstrate "modern" features such as use of kramdown, Haml, and LESS. The documentation now takes slightly better advantage of kramdown features.
+This is version 0.9.9.1. The model site (what you get when you say RubyFrontier > New Site) has been rejiggered to demonstrate "modern" features such as use of kramdown, Haml, and LESS. The documentation now takes slightly better advantage of kramdown and Haml features.
 
 =======
 
