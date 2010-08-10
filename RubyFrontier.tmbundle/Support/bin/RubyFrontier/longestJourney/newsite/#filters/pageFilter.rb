@@ -22,7 +22,7 @@ def pageFilter(adrPageTable)
   end
   # still another example:
   # support for template being written as Haml
-  if adrPageTable[:hamltemplate] and (t = adrPageTable.fetch2(:template)) and t.kind_of?(Pathname)
+  if adrPageTable[:hamltemplate] and (t = adrPageTable.fetch2(:template))
     adrPageTable[:directTemplate] = Haml::Engine.new(File.read(t), :attr_wrapper => '"', :ugly => true).render
   end
 end

@@ -5,18 +5,18 @@ firstpage: &id001
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/firstpage.txt
   :linetext: My First Web Page
+my first web page: *id001
 thirdpage: &id002 
   :path: !ruby/object:Pathname 
     path: thirdpage.html
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/thirdpage.txt
   :linetext: My Third and Greatest Web Page
-my first web page: *id001
-my third and greatest web page: *id002
 secondpage: &id003 
   :path: !ruby/object:Pathname 
     path: secondpage.html
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/secondpage.txt
   :linetext: My Second Web Page
+my third and greatest web page: *id002
 my second web page: *id003

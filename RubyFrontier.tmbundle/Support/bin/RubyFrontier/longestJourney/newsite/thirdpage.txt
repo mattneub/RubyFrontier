@@ -1,6 +1,6 @@
 #title "My Third and Greatest Web Page"
 #kramdown 1
-#template adrPageTable["templates"] + "thirdtemplate.txt"
+#template "thirdtemplate"
 #hamltemplate true
 #linkstylesheets ["s2"]
 #less true
@@ -29,4 +29,9 @@ Also, I'd like to demonstrate one way to embed explicit HTML written as HAML:
     %td Is this cool?
     %td Yes, it is!
 %%%>
+
+(Of course, that table was so simple we could have done the same thing with kramdown alone:)
+
+|Is this cool?|Yes, it is!|
+{:border="1"}
 

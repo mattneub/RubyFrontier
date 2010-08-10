@@ -121,21 +121,12 @@ class UserLand::Html::PageMaker
         $&
       end
     end
-          
-    # pagefilter, handed adrPageTable, expected to access :bodytext
-    callFilter("pageFilter")
     
-    # early exit option; provided because...
-    # ...it may be, as in the case of a blog, where bodytext from many pages is embedded in a single page...
-    # ...that there is no reason to go on, since we are only rendering to get the :bodytext
-    return if adrPageTable[:stopAfterPageFilter]
-
-    #template
-    # if named, it will be a string; if found or "indirect", it will be a Pathname
-    # NEW: can also be a string consisting of the template contents, thus allowing custom template preprocessing
-    directTemplate = adrPageTable.fetch2(:directTemplate)
-    unless directTemplate
-      raise "No template found or specified" unless (adrTemplate = adrPageTable.fetch2(:template))
+    # NEW: moved determination of template location to before pagefilter
+    # this is so that the pagefilter can rely on the template being already found
+    # thus we can preprocess the template in the pagefilter (as for haml)
+    # it is okay for the template to be nil at this stage
+    if (adrTemplate = adrPageTable.fetch2(:template))
       if adrTemplate.kind_of?(String) # named template, look for it and convert to Pathname
         catch (:done) do
           [adrPageTable["templates"], $usertemplates].each do |f|
@@ -152,6 +143,21 @@ class UserLand::Html::PageMaker
         raise "Template #{adrTemplate} named but not found" unless adrTemplate.kind_of?(Pathname)
       end
     end
+    adrPageTable[:template] = adrTemplate
+    # template is now nil or a pathname
+    
+    # pagefilter, handed adrPageTable, expected to access :bodytext
+    callFilter("pageFilter")
+    
+    # early exit option; provided because...
+    # ...it may be, as in the case of a blog, where bodytext from many pages is embedded in a single page...
+    # ...that there is no reason to go on, since we are only rendering to get the :bodytext
+    return if adrPageTable[:stopAfterPageFilter]
+
+    # NEW: template can be a string consisting of the template contents, thus allowing custom template preprocessing
+    directTemplate = adrPageTable.fetch2(:directTemplate)
+    # either directTemplate or template must exist at this point or we can't embed!
+    raise "No template found or specified" unless (adrTemplate or directTemplate)
     
     # run directives in the template (or, if direct template, just use it)
     s = directTemplate || runDirectives(adrTemplate)
