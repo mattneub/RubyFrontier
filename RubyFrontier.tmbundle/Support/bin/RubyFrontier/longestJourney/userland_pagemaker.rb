@@ -217,7 +217,20 @@ class UserLand::Html::PageMaker
   
     # walk hierarchy collecting directives
     buildPageTable(adrObject)
-      
+    
+    # load or create autoglossary
+    # the address should be present as "autoglossary" but now we must read in the data as :autoglossary
+    # this is here rather than in buildPageTable because it must not be memoized per directory:
+    # the address won't change per directory, but the contents may, since this file is writable by a page
+    # (and is in fact written out after the rendering of every page)
+    adrGlossTable = adrPageTable["autoglossary"]
+    adrPageTable[:autoglossary] = if adrGlossTable && adrGlossTable.exist?
+      LCHash[YAML.load_file(adrGlossTable)]
+    else
+      LCHash.new
+    end
+    
+    
     # firstfilter
     callFilter("firstFilter")
   
@@ -322,12 +335,12 @@ class UserLand::Html::PageMaker
     end
     # if we found an autoglossary, yaml-load it into :autoglossary
     # (nothing like this in Frontier, we need this for our own autoglossary mechanism)
-    adrGlossTable = adrPageTable["autoglossary"]
-    adrPageTable[:autoglossary] = if adrGlossTable && adrGlossTable.exist?
-      LCHash[YAML.load_file(adrGlossTable)]
-    else
-      LCHash.new
-    end
+    # adrGlossTable = adrPageTable["autoglossary"]
+    # adrPageTable[:autoglossary] = if adrGlossTable && adrGlossTable.exist?
+    #   LCHash[YAML.load_file(adrGlossTable)]
+    # else
+    #   LCHash.new
+    # end
     # url-setting and some other stuff (fname, f) not yet done
     # there is an inefficiency in Frontier here: this is all done again after tenderRender
     # so I'm just omitting it here for now
