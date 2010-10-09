@@ -16,6 +16,11 @@ def myrequire(*what)
     end
   end
 end
+
+# temp change to new kramdown, for testing purposes
+# f = '/Users/mattleopard/Downloads/gettalong-kramdown-7e6e1d7/lib'
+# $:.unshift f unless $:[0] == f
+
 myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "exifr", "enumerator", "less", "kramdown", "haml"
 
 def myraise(what)
