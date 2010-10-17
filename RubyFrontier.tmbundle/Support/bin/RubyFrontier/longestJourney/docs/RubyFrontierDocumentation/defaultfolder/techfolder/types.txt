@@ -16,8 +16,8 @@ Everything in a RubyFrontier source folder is one of the following:
 
 * A normal **folder**. A normal folder is a folder which is not, and is not inside, a directive folder. If a folder contains any page objects, a folder by the same name and in the same relative location will be created in the Web site.
 
-    <%= caption("types", "Various kinds of thing inside a source folder: directive files, directive folders, and page objects.") %>
+    <%= caption("types", "Various kinds of thing inside a source folder: directive files, directive folders, and page objects.", "FIGtypes") %>
 
-    Thus, when RubyFrontier generates the actual Web site from the source folder, the [hierarchical](hierarchy) structure of the Web site will be essentially the same as that of the folders and page objects in the source folder. So, in the above screen shot, start at the top: The Web site will contain a Web page rendered from the file `scriptde.txt`, and it will also contain a folder called `scriptdefolder`, inside which will be a Web page rendered from the file `develop.txt`, and so on.
+    Thus, when RubyFrontier generates the actual Web site from the source folder, the [hierarchical](hierarchy) structure of the Web site will be essentially the same as that of the folders and page objects in the source folder. So, in <%= xref "FIGtypes", :fignum, true %>, start at the top: The Web site will contain a Web page rendered from the file `scriptde.txt`, and it will also contain a folder called `scriptdefolder`, inside which will be a Web page rendered from the file `develop.txt`, and so on.
 
     <%= caption("structureOutput", "The hierarchical structure of a Web site depends on the hierarchical structure of the source folder.") %>

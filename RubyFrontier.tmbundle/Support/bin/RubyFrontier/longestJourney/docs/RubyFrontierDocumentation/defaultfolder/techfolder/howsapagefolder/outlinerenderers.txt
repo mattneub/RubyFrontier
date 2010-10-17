@@ -16,13 +16,13 @@ For every outline page object, you *must* tell RubyFrontier what outline rendere
 
 An outline renderer script *must* have, at the least, the following schema:
 
-		module UserLand::Renderers
-		  class Myrenderer < SuperRenderer
-		    def render(op)
-			  # do stuff, return result
-		    end
-		  end
-		end
+      module UserLand::Renderers
+        class Myrenderer < SuperRenderer
+          def render(op)
+          # do stuff, return result
+          end
+        end
+      end
 
 The name "Myrenderer" should be replaced by whatever you want to call this outline renderer. This class name is the value you will use when you specify the [`:renderoutlinewith` scalar directive](scalardirectives) so that RubyFrontier knows to apply this renderer to this particular outline page object.
 

@@ -1,7 +1,7 @@
 #title "Glossary Expansion"
 
 The **glossary expansion** mechanism in RubyFrontier is used solely as a way of allowing `href` attributes in `<a>` tags to be abbreviated. For example, if you frequently want to say `http://www.apple.com`, you could code that as `"apple"` in an `href` attribute. In other words, you might say `<a href="apple">` and this would be turned for you into `<a href="http://www.apple.com">` at the appropriate moment in the [page-rendering process](howsapage).
-	
+
 The glossary is a hash, so glossary entries are hash entries (key-value pairs). To get an entry into the glossary, put it either in a [`#glossary.yaml` file](directiveobjects) in the source folder or in the [user glossary](user). When the [page table](pagetable) is built, `#glossary.yaml` entries are [folded](directiveobjects) together. Glossary entry keys should be strings (not symbols).
 
 The main requirement for use of the glossary mechanism is that the key should not contain a dot or a colon-slash-slash. That's because the glossary mechanism is [run as part of](howsapage) the [autoglossary](autoglossary) mechanism, which will not consider an `href` attribute eligible for glossary expansion if it looks like a real URL.

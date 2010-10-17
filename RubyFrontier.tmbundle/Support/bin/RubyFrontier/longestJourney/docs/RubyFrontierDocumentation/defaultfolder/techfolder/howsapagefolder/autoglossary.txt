@@ -47,7 +47,7 @@ If your link contains any other attributes, RubyFrontier will leave them alone. 
         <a href="otherpage" class="someclass">Click me!</a>
 
 In that example, `otherpage` will be looked up in the autoglossary and the proper relative URL substituted for it in the `href` attribute, and the `class` attribute will remain present as part of the `<a>` tag.
-	
+
 If your link includes an anchor, the anchor will remain. So, for example, this will work:
 
         <a href="otherpage#someanchor">Click me!</a>

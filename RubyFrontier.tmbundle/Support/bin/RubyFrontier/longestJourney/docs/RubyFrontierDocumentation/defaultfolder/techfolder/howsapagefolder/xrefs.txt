@@ -32,37 +32,37 @@ A little thought will reveal that together, `makexref()` and `xref()` provide ev
 
 Let's say that a page has a section with a heading called "About This Page". If we know we're going to want to form a cross-reference to that heading, we can set this up by giving that heading an `id` attribute, and calling `makexref()` with the value of that `id`. I'll cleverly pick an `id` value that is unlikely to be used elsewhere, so I don't accidentally tromp on anything in the autoglossary (that's why my `id` value starts with `SEC`). And I'll cleverly store the content of the heading in the hash, under the symbol name `:sectitle`.
 
-    <%% makexref("SECAboutThisPage", :sectitle => "About This Page") %>
-    <h2 id="SECAboutThisPage">About This Page</h2>
+      <%% makexref("SECAboutThisPage", :sectitle => "About This Page") %>
+      <h2 id="SECAboutThisPage">About This Page</h2>
 
 Now on some other page, when we want to form a cross-reference to that heading, here's all we have to do:
 
-    <%%= xref "SECAboutThisPage", :sectitle %>
+      <%%= xref "SECAboutThisPage", :sectitle %>
 
 That macro will be turned into the phrase "About This Page", wrapped up as a link pointing to the heading on the first page!
 
 Once you understand the basic principles, you will undoubtedly be able to think of ways to set up our original `makexref()` call with less repetition. For example, we are repeating the phrase "About This Page". This is unnecessary, since we just finished storing it in the autoglossary. So we can reliably fetch it right back out again, like this:
 
-    <%% makexref("SECAboutThisPage", :sectitle => "About This Page") %>
-    <h2 id="SECAboutThisPage"><%%= xref "SECAboutThisPage", :sectitle, false %></h2>
-    
+      <%% makexref("SECAboutThisPage", :sectitle => "About This Page") %>
+      <h2 id="SECAboutThisPage"><%%= xref "SECAboutThisPage", :sectitle, false %></h2>
+
 That shows exactly what the third parameter is for. By setting the third parameter to false, we are able to fetch and substitute the section title without forming a link (which would be very silly, since it would be a link to the heading we are already in).
 
 That was good: we eliminated the repetition of "About This Page". But we are now repeating the `id` value `"aboutthispage"`, not once but twice. So let's take an even better approach. We'll supply a macro to form both the `makexref()` call and the section heading, all in a single move. Let's call our macro `section()`. So I'll write the macro as a file `section.rb` in the `#tools` area of my site. The file looks like this:
 
-    def section(s)
-      xref = "SEC" + s.dropNonAlphas
-      makexref(xref, :sectitle => s)
-      %{<h2 id="#{xref}">#{s}</h2>}
-    end
+      def section(s)
+        xref = "SEC" + s.dropNonAlphas
+        makexref(xref, :sectitle => s)
+        %{<h2 id="#{xref}">#{s}</h2>}
+      end
 
 Now we can form our heading with a single macro call, like this:
 
-    <%%= section "About This Page" %>
+      <%%= section "About This Page" %>
 
 The call to the `section()` macro forms the `id` as `"SECAboutThisPage"`, uses it to call `makexref()`, and returns the `<h2>` tag with the correct `id` and the contents "About This Page", all in a single move. And our other call still works perfectly to form a cross-reference:
 
-    <%%= xref "SECAboutThisPage", :sectitle %>
+      <%%= xref "SECAboutThisPage", :sectitle %>
 
 ## Publish Site (No Preflight)
 
@@ -76,9 +76,9 @@ A book will often have numbered or captioned figures and examples, and will ofte
 
 It's important to understand that auto-numbering, of itself, does not involve cross-references at all. Auto-numbering, of itself, is easy, and doesn't require any special action on your part (except that you should write a macro of some sort). For example, you may have noticed that the figures in this document are auto-numbered. All the figures are formed by calling a `caption()` macro, which forms the nice box around the picture and the caption, and incidentally also numbers the figure:
 
-    @adrPageTable[:fignum] ||= 0
-    @adrPageTable[:fignum] += 1
-    fignum = "Figure " + @adrPageTable[:fignum].to_s
+      @adrPageTable[:fignum] ||= 0
+      @adrPageTable[:fignum] += 1
+      fignum = "Figure " + @adrPageTable[:fignum].to_s
 
 All we're doing here is using the page table as global storage, making sure we restart figure numbering for each rendered page, and incrementing the current number every time we encounter the `caption()` call. So, no cross-referencing is needed merely in order to _label_ a figure with a number.
 
@@ -90,6 +90,6 @@ For example, here's a picture of me:
 
 Now I can refer to that picture as <%= xref "FIGmoi", :fignum, false %>, even if I don't want to form a link. The words "<%= xref "FIGmoi", :fignum, false %>" were not typed manually; rather, they are the result of a macro call:
 
-    <%%= xref "FIGmoi", :fignum, false %>
+      <%%= xref "FIGmoi", :fignum, false %>
 
-Thus, references to figures will keep working even if more figures are added or the figures are rearranged, and the auto-numbering changes. And of course if I do want the reference to be a link, it can be: See <%= xref "FIGmoi", :fignum, true %>.
+Thus, references to figures will keep working even if more figures are added or the figures are rearranged, and the auto-numbering changes. And of course if I do want the reference to be a link, it can be: See <%= xref "FIGmoi", :fignum, true %>. I use this device on various pages in this documentation, such as [here](directiveobjects).

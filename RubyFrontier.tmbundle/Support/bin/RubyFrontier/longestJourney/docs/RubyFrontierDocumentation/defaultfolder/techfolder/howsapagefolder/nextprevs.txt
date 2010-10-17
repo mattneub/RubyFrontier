@@ -8,20 +8,20 @@ The chief issue here is that the order of page objects within a folder, which is
 
 The members of the nextprevs list should be identifiers suitable for lookup in the [autoglossary](autoglossary). That way, you can use further method calls to form the actual links. For example, the nextprevs list for the folder containing this page looks like this:
 
-    images
-    outlinerenderers
-    snippets
-    template
-    macros
-    autoglossary
-    glossary
-    filters
-    pageheader
-    stylesheets
-    standardmacros
-    nextprevs
-    xrefs
-    user
+      images
+      outlinerenderers
+      snippets
+      template
+      macros
+      autoglossary
+      glossary
+      filters
+      pageheader
+      stylesheets
+      standardmacros
+      nextprevs
+      xrefs
+      user
 
 If you examine this page, you can see the nextprevs list being used. The second navigation bar at the top of the page consists of the titles of the pages in this folder, in exactly the order of the nextprevs list. And at the bottom right of the page is a "next" link; since this page is the one coded as `nextprevs`, the "next" page should be the one coded as `users`, and so, indeed, it is.
 

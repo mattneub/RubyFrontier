@@ -55,7 +55,7 @@ JavaScript files are handled almost exactly like stylesheet files. So, the main 
 * You can use as many `#javascripts` folders as you like throughout your site; their contents are gathered and [folded](hierarchy) at the start of the [page rendering process](howsapage), and each will become a folder in your rendered site. The simplest case would be just one `#javascripts` folder, located at the top level of the site where all pages can see it.
 
 * The [page header](pageheader) will typically contain a call to the **`linkjavascripts()`** [standard macro](standardmacros). This macro fetches the `:linkjavascripts` array from the page table and, for each element in turn, calls **`linkjavascript()`** with that element as parameter. The result is that (1) the javascript file itself is written out to disk, into a `javascripts` folder at the top level of the site, and (2) a `<script>` tag is inserted into the page's `<head>` region, linking to that javascript file.
-	
+
 * Alternatively, the page header can call **`linkjavascript()`** and supply a parameter value directly (a string representing the name of one javascript file).
 
 * To embed a javascript in the page itself, the page header can call **`embedjavascript()`**, but a more common approach is to set a scalar directive **`:embedjavascript`** (whose value is the name of the javascript) and let the page header's **`linkjavascripts()`** call it for you.

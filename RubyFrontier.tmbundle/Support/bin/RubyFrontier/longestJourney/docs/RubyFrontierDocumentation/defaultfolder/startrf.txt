@@ -24,7 +24,7 @@ Personally, I think RubyFrontier is pretty simple, but that's because I've been 
 
 1. **Make links.** Pages can refer to each other via [links](autoglossary) using their simple filenames or titles. For example, suppose a page object file is called `otherpage.txt`. Then, in pure HTML you can say `<a`&nbsp;`href="otherpage">this kind of thing</a>`; in Markdown or kramdown you can also say `[this kind of thing](otherpage)`.
 
-1. **Keep testing.** As you work, keep saying RubyFrontier > Publish Page to check that things are going okay. If a link to another page fails, it might be because you've never published it (a page doesn't go into the [autoglossary](autoglossary) until it is published). Totally ignore the look of the page! You'll fix the CSS and the template in later steps. Oh, one more thing: To regenerate *every* page of the site, choose RubyFrontier > Publish Site.	
+1. **Keep testing.** As you work, keep saying RubyFrontier > Publish Page to check that things are going okay. If a link to another page fails, it might be because you've never published it (a page doesn't go into the [autoglossary](autoglossary) until it is published). Totally ignore the look of the page! You'll fix the CSS and the template in later steps. Oh, one more thing: To regenerate *every* page of the site, choose RubyFrontier > Publish Site.
 
 1. **Images.** To add an [image](images) to a page, at first, keep it simple. Put the image file in the `#images` folder. In the page object, say (if, for example, the image file is called `myimage.png`):
 
@@ -37,7 +37,7 @@ Personally, I think RubyFrontier is pretty simple, but that's because I've been 
     (The value, "normal", must match the name of the stylesheet file.)
 
 1. **Template.** Editing the [template](template) is trickier. It will really help if you have some idea what you want the template to do. You can directly edit the existing `#template.txt` file if you wish. It is already quite powerful to begin with. The `<p id="bodytext">` tag is where each page's content is inserted into the template. The preceding and following `pageheader()` and `pagefooter()` calls are generating HTML and bringing a lot of other RubyFrontier features into play, so initially you should keep them too. Anything you write, therefore, needs to be after the `pageheader()` call and before the `pagefooter()` call. You might, for example, wrap the `<p id="bodytext">` pseudo-tag in some kind of table or div structure. The template also demonstrates an extremely simple automatic mechanism for generating a link to the next and previous pages at the same level (by means of a macro).
-	
+
 1. **Macros.** Sooner or later you're going to want to write a [macro](macros). In the template or page object, where you want the macro to be evaluated, put:
 
             <%%= mymacro() %>

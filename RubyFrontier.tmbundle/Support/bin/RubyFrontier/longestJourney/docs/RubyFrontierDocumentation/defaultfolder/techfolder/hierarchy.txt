@@ -2,23 +2,23 @@
 
 The hierarchical structure of [non-directive folders and page object files](types) has *two* simultaneous meanings in a RubyFrontier [source folder](start).
 
-<%= caption("structure", "A typical source folder.") %>
+<%= caption("structure", "A typical source folder.", "FIGstructure") %>
 
 * **Physical meaning (Web site layout):** As I [already said](types), the hierarchy of non-directive folders and page object files in the source folder will be mirrored into an identical hierarchy in the resulting Web site.
 
 * **Conceptual meaning (directives):** When a page object is [processed](howsapage), the first thing that happens is that RubyFrontier walks the hierarchy *upwards* from the page object, looking for [directives](directiveobjects) (and gathering them into the [page table](pagetable)), *starting with the folder that contains the page object*. Most directives can be located anywhere in the source folder. So, as RubyFrontier walks the hierarchy upwards, it might encounter the same directive more than once (because the directive is present both in a folder and in another folder that contains it).
 
-    > Indeed, you can see that this will happen in the screen shot above. When the file `executet.txt` is processed, no directives are found in the folder that contains it (`breakpoifolder`). But as RubyFrontier walks up the hierarchy, a `#nextprevs.txt` directive will be found in the folder containing *that* (`debugfolder`). And than *another* `#nextprevs.txt` directive will be found in the folder containing *that* (`developfolder`). And so on until we reach the top level and encounter all the rest of the directives.
+    > Indeed, you can see that this will happen in <%= xref "FIGstructure", :fignum, true %>. When the file `executet.txt` is processed, no directives are found in the folder that contains it (`breakpoifolder`). But as RubyFrontier walks up the hierarchy, a `#nextprevs.txt` directive will be found in the folder containing *that* (`debugfolder`). And than *another* `#nextprevs.txt` directive will be found in the folder containing *that* (`developfolder`). And so on until we reach the top level and encounter all the rest of the directives.
 
     Now, if RubyFrontier encounters just one copy of a certain directive as it walks up the hierarchy, there's no problem. But you need to understand what happens if RubyFrontier encounters *more* than one copy of the same directive. There are actually two different rules for what happens:
 
     * In most cases, the *first* copy of a directive encountered will be the one that counts.
 
-        > So, for example, in the above screen shot, the only `#nextprevs.txt` that will apply when `executet.txt` is rendered is the one in `debugfolder`; copies of `#nextprevs.txt` higher up the hierarchy will be ignored. In other words, the directive that counts is the one *closest* to the page object being rendered. 
+        > So, for example, in <%= xref "FIGstructure", :fignum, true %>, the only `#nextprevs.txt` that will apply when `executet.txt` is rendered is the one in `debugfolder`; copies of `#nextprevs.txt` higher up the hierarchy will be ignored. In other words, the directive that counts is the one *closest* to the page object being rendered. 
 
         This means that you can use the folder hierarchy to give different renderable page objects different behavior. Thinking about it, you can see that all page objects in any folder at any depth share all the directives at the top level, *unless* a directive is overshadowed by a same-named directive at a lower level closer to a particular page object. 
 
-        > For instance, in the screen shot above, all page objects share certain behavior dictated by the directives at top level, but some page objects at lower levels have a `#nextprevs.txt` directive that overshadows the `#nextprevs.txt` directive at higher levels. 
+        > For instance, in <%= xref "FIGstructure", :fignum, true %>, all page objects share certain behavior dictated by the directives at top level, but some page objects at lower levels have a `#nextprevs.txt` directive that overshadows the `#nextprevs.txt` directive at higher levels. 
 
         In general, you can use the hierarchical structure of a source folder, by means of a folder and the directives that apply to it, to give a group of Web pages a similar appearance, as opposed to other pages outside that folder.
 

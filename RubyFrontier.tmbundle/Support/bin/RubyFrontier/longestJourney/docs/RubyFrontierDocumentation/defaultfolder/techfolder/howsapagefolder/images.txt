@@ -45,12 +45,12 @@ In this case, you're going to need to use some other strategy to get the image c
 * Keep the images in the `#images` folder, and call `html.getImageData()` in a [macro](macros) explicitly for each image you want copied out to the Web site. The method `html.getImageData()` is a utility called by `imageref()`. It takes the same kind of string reference that `imageref()` does; it fetches a bunch of data about the image (such as its dimensions), but it has the side effect of causing the image to be copied out. The advantage of this is that you can make it happen as you render any page. A simplified approach is to copy out explicitly *all* the images in the `#images` folder every time *any* page is rendered, by calling a macro (let's call it `spit()`) in the [template](template):
 
         def spit
-		  h = @adrPageTable["images"]
-		  h.keys.each do |img|
-		    html.getImageData(img)
-		  end
-		end
-		
+          h = @adrPageTable["images"]
+          h.keys.each do |img|
+            html.getImageData(img)
+          end
+        end
+
   This is not particularly inefficient, because `html.getImageData()` only performs an actual copy if an actual copy needs to be performed; if the image has already been copied into place in the Web site, and has the same modification date as the original, no copying takes place. The `spit` macro ignores the data returned by `html.getImageData`, and your call to `spit()` would also ignore *its* results, like this:
 
         <%% spit() %>

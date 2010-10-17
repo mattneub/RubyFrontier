@@ -15,15 +15,15 @@ To get the default page header, start your [template](template) with a [macro](m
 The result of that call is that following page header will be prefixed to your page:
 
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-	    <html xmlns="http://www.w3.org/1999/xhtml">
-	    <head>
-	    <%%= metatags() %>
-	    <%%= linkstylesheets() %>
-	    <%%= linkjavascripts() %>
-	    <title><%%= title %></title>
-	    </head>
-	    <%%= bodytag() %>
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+        <%%= metatags() %>
+        <%%= linkstylesheets() %>
+        <%%= linkjavascripts() %>
+        <title><%%= title %></title>
+        </head>
+        <%%= bodytag() %>
 
 But before the prefixing takes place, the [macros](macros) within that page header are themselves processed. These are [standard macros](standardmacros) — that is, they are calls to stock methods included within RubyFrontier itself. Let's walk through the default page header, and I'll comment on each of its parts.
 
@@ -65,10 +65,10 @@ But before the prefixing takes place, the [macros](macros) within that page head
 
 * The **`bodytag()`** call generates the opening `<body>` tag. A number of standard attributes can be inserted into this `<body>` tag by supplying them as [scalar directives](scalardirectives):
 
-	* **:background**. The name (with no extension) of a file in an `#images` folder.
-	* **:bgcolor, :text, :link, :alink, :vlink**. A color string; if hex, you may omit the initial "#".
-	* **:topmargin, :leftmargin, :marginheight, :marginwidth**.
-	* **:onload, :onunload**.
+  * **:background**. The name (with no extension) of a file in an `#images` folder.
+  * **:bgcolor, :text, :link, :alink, :vlink**. A color string; if hex, you may omit the initial "#".
+  * **:topmargin, :leftmargin, :marginheight, :marginwidth**.
+  * **:onload, :onunload**.
 
 ###Supplying Your Own Page Header
 

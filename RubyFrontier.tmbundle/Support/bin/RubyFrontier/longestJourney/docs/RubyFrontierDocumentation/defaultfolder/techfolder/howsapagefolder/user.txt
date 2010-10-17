@@ -29,17 +29,17 @@ When file `user.rb` is loaded, here are the sorts of thing it can do:
 
   How you structure the `glossary()` method is up to you; here's how I like to do it:
 
-		module UserLand::User
-		  def self.glossary
-		    s = <<END
-		Frontier
-		http://frontier.userland.com
-		thebookontheweb
-		http://pages.sbcglobal.net/mattneub/frontierDef/ch00.html
-		END
-	        Hash[*s.split("\n")]
-		  end
-		end
+        module UserLand::User
+          def self.glossary
+            s = <<END
+        Frontier
+        http://frontier.userland.com
+        thebookontheweb
+        http://pages.sbcglobal.net/mattneub/frontierDef/ch00.html
+        END
+            Hash[*s.split("\n")]
+          end
+        end
 
 * **Supply outline renderers**. If `user.rb` defines any subclasses of `SuperRenderer` within a module `UserLand::Renderers`, those classes will be available as [outline renderers](outlinerenderers) (that is, the name of such a class can be used as the value of the [`:renderoutlinewith` directive](scalardirectives)).
 
