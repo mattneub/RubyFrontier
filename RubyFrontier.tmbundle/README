@@ -46,12 +46,13 @@ In version 0.9.9.1, the model site (what you get when you say RubyFrontier > New
 
 In version 0.9.9.2, moved template-determination process forward so that adrPageTable[:template] is a correct Pathname by the time of the pageFilter. Rejiggered model site to match. Removed #nextprevs from model site as it was just getting in the way in new site.
 
+In version 0.9.9.3, weaked the way the autoglossary.yaml file is loaded so that it is loaded fresh in connection with the start of each page rendering; since it is also saved at the end of each page rendering, it can now be used by macros as a persistent store. (The fact that this was not the case previously was probably always a bug.) In connection with this, added a command Publish Site (No Preflight) which does not zero out and rebuild the autoglossary file before publishing a site, thus taking advantage of the autoglossary created the previous time the site was published. This mechanism can be used, for example, to implement intelligent cross-referencing.
 
 =======
 
 VERSION
 
-This is version 0.9.9.3. Tweaked the way the autoglossary.yaml file is loaded so that it is loaded fresh in connection with the start of each page rendering; since it is also saved at the end of each page rendering, it can now be used by macros as a persistent store. (The fact that this was not the case previously was probably always a bug.) In connection with this, added a command Publish Site (No Preflight) which does not zero out and rebuild the autoglossary file before publishing a site, thus taking advantage of the autoglossary created the previous time the site was published. This mechanism can be used, for example, to implement intelligent cross-referencing.
+This is version 0.9.9.4. Added actual cross-referencing macros, and documented them. Also, fixed a bug in a bottleneck routine, incorporateDirective (this bug was probably introduced in version 0.9.5, but it was exposed only under rare circumstances).
 
 =======
 

@@ -47,6 +47,7 @@ module UserLand::Html
     puts "publishing site"
     self.preflightSite(adrObject) if preflight
     self.everyPageOfSite(adrObject).each do |p|
+      puts ""
       puts "publishing '#{p}'"
       self.releaseRenderedPage(p, (p == adrObject)) # the only one to open in browser is the one we started with
     end
