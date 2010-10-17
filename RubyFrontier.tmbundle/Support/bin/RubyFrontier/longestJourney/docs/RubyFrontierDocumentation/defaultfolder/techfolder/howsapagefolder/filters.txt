@@ -8,7 +8,7 @@ The idea is to provide you with "hooks" or "callbacks" at key moments so that yo
 
 After the initial [building](hierarchy) of the [page table](pagetable), and before the [page object](types) itself has been examined, if there is a [`#filters` folder](directiveobjects) and it has a `firstFilter.rb` file in it, we call that file's top-level firstFilter() method with one parameter — the [page table](pagetable).
 
-I don't use this feature in any of my sites, so it's a little hard for me to suggest what you might use it for; but it's a Frontier feature so RubyFrontier does it. I imagine you might use this moment to manipulate the directive contents of the page table in some tricky way. For example, you could set the `:siterootfolder` dynamically if you didn't want to use the static `:folder` entry of [`#ftpsite.yaml`](pagetable).
+I don't use this feature in any of my sites, so it's a little hard for me to suggest what you might use it for; but it's a Frontier feature so RubyFrontier does it. I imagine you might use this moment to manipulate the directive contents of the page table in some tricky way. For example, you could set the `:siterootfolder` dynamically if you didn't want to use the static `:folder` entry of [`#ftpsite.yaml`](pagetable). Also, since a filter script is an ordinary Ruby script and is loaded by executing it in the ordinary Ruby way, you could, if you were a power-user, take advantage of this moment to modify RubyFrontier itself dynamically, for instance by opening `UserLand::Html::PageMaker` and adding or changing a method. This would be similar to the code injection behavior of [the `user.rb` file](user), except that here you'd be doing it for each page of a single site rather than for all sites.
 
 ### The PageFilter
 
@@ -30,5 +30,13 @@ This filter, which did not exist in the original Frontier, is implemented becaus
 
 At the very end of the [rendering process](howsapage), just before we write the completely rendered HTML out to disk, if there is a [`#filters` folder](directiveobjects) and it has a `finalFilter.rb` file in it, we call that file's top-level `finalFilter()` method with one parameter — the [page table](pagetable).
 
-This is your chance to modify the page table's `:renderedtext` entry, which contains the completely rendered page object, ready to write out to disk. In my own sites, for example, this is the point at which I typically run [SmartyPants](http://daringfireball.net/projects/smartypants/) to turn the page's quotation marks into smart quotes. Why do I wait until the last moment to do this? Well, for one thing, it isn't necessary to do it any earlier. For another, events such as [macro processing](macros) and even insertion of the title into the [page header](pageheader) may generate text that SmartyPants needs to deal with, so clearly it makes sense for SmartPants to come into play later than these events.
+This is your chance to modify the page table's `:renderedtext` entry, which contains the completely rendered page object, ready to write out to disk.
+
+In my own sites, for example, this is the point at which I might run [SmartyPants](http://daringfireball.net/projects/smartypants/) to turn the page's quotation marks into smart quotes. Why do I wait until the last moment to do this? Well, for one thing, it isn't necessary to do it any earlier. For another, events such as [macro processing](macros) and even insertion of the title into the [page header](pageheader) may generate text that SmartyPants needs to deal with, so clearly it makes sense for SmartPants to come into play later than these events.
+
+Another use of the FinalFilter might be to pass the page through an XSL transform. I do this in some sites in order to give each page a table of contents, for example.
+
+### The Extra Parameter
+
+Although I have said that every filter is called with a single parameter, the page table, in actual fact if you are a power-user you might define a filter method to take two parameters, in which case the second parameter will be the PageMaker object. Filter scripts are not called with macro scoping, so this second parameter provides an easy way for a filter script to call PageMaker methods.
 

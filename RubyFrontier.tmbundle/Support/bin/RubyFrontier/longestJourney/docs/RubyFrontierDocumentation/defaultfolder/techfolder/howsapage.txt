@@ -16,9 +16,7 @@ This is a lot of information, and it may seem at first like too much to take in.
 
     When we find the `#ftpsite.yaml` file, we stop walking up [hierarchy](hierarchy); we have reached the top of the source folder, and [`:adrsiteroottable`](pagetable) (the top of the source folder) is now known. Obviously, we also know [`:adrobject`](pagetable) (the pathname of the page object we are to render). We have now constructed most (but not all) of the [page table](pagetable).
 
-1. **[FirstFilter](filters) time.** If we found a `#filters` folder and there is a `firstFilter.rb` file in it, we call that file's top-level `firstFilter()` method with one parameter — the [page table](pagetable).
-
-    I don't use this feature in any of my sites, so it's a little hard for me to suggest what you might use it for; but it's a Frontier feature so RubyFrontier does it. The page object has not yet been read from disk, so I imagine you might use this moment to manipulate the directive contents of the page table in some tricky way. (For example, you could set the [`:siterootfolder`](pagetable) dynamically if you didn't want to use the static `:folder` entry of `#ftpsite.yaml`.)
+1. **[FirstFilter](filters) time.** If we found a `#filters` folder and there is a `firstFilter.rb` file in it, we call that file's top-level `firstFilter()` method with one parameter — the [page table](pagetable). This is your opportunity to modify what happens during this rendering after the page table is formed based on the site but before the page object is loaded.
 
 1. We now **read the page object file itself**. We break the file into two pieces: any [scalar directives](scalardirectives) at the start of the file, and everything else.
 
@@ -76,6 +74,6 @@ This is a lot of information, and it may seem at first like too much to take in.
 
 1. **The [page footer](pageheader)**, if any, is suffixed to the rendered page. The page footer is typically the closing `</body>` and `</html>` tags, and is usually brought into existence through the `pagefooter()` [standard macro](standardmacros) in the [template](template).
 
-1. **[FinalFilter](filters) time.** If we found a `#filters` folder and there is a `finalFilter.rb` file in it, we call that file's top-level `finalFilter()` method with one parameter — the [page table](pagetable). This is your chance to modify the page table's `:renderedtext` entry, which contains the rendered page object, completely ready to write out to disk. In my own sites, for example, this is the point at which I often run [SmartyPants](http://daringfireball.net/projects/smartypants/) to turn the page's quotation marks into smart quotes.
+1. **[FinalFilter](filters) time.** If we found a `#filters` folder and there is a `finalFilter.rb` file in it, we call that file's top-level `finalFilter()` method with one parameter — the [page table](pagetable). This is your chance to modify the page table's `:renderedtext` entry, which contains the rendered page object, completely ready to write out to disk. In my own sites, for example, this is where I do final cleanup or formatting that depends on the entire page HTML being fully formed: it's the point at which I would run [SmartyPants](http://daringfireball.net/projects/smartypants/) to turn the page's quotation marks into smart quotes, if I haven't endowed the page with smart quotes at some earlier point, and in some sites I pass the page through an XSL transform at this point.
 
 The rendering process is now over. The resulting `:renderedtext` entry from the page table is written out to disk into the Web site folder.

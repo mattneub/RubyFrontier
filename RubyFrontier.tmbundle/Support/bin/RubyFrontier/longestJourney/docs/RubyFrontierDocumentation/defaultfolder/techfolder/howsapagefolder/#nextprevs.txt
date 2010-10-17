@@ -10,4 +10,5 @@ pageheader
 stylesheets
 standardmacros
 nextprevs
+xrefs
 user

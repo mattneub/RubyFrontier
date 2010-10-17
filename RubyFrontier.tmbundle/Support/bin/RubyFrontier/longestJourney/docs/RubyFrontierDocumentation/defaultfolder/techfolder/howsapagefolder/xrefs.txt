@@ -1,0 +1,95 @@
+#title "Cross-References and Auto-Numbering"
+
+Let's say I want to link from one page in a site to a particular section of another page. To do this, I might supply the heading for the section in the target page with an `id` attribute, and form my link using the page identifier and the `id` attribute value. If I want the content of this link to be the text of the heading, I must also supply that text. So, my link might look like this: `<a href=otherpage#theID>My Cool Section</a>`. This works, but it's rather fussy, since in the linking page I must know not one but three things about my target: the identifier for the target page, the `id` for the heading in the target page, and the text of the heading in the target page. Wouldn't it be nice to know just _one_ thing, the heading `id` attribute, and to be able to form the _whole_ link from this one piece of information?
+
+What I'm describing here is a _cross-reference_. Most decent software for constructing a book or a book-like object, such as [FrameMaker](http://www.adobe.com/products/framemaker/) or [AsciiDoc](http://www.methods.co.nz/asciidoc/userguide.html), provides an easy way of making cross-references, and it seems only reasonable that RubyFrontier should do likewise. To help you with this, RubyFrontier provides two [standard macros](standardmacros), **`makexref()`** and **`xref()`**. These macros take advantage of (some might say "misuse") the [autoglossary mechanism](autoglossary) to make cross-references possible.
+
+**`makexref()`** takes two parameters, an identifier and a hash. It simply pops that hash into the autoglossary, keyed by the identifier. Making sure your identifiers are unique and don't trample on one another or on any of the automatically generated identifiers for page objects is entirely up to you. The purpose of the hash will be made clear when you read about `xref()`. The identifier for the current page is automatically added to your hash, under the key `:page_id` (so don't use that key for anything).
+
+**`xref()`** is effectively the converse of `makexref()`. It takes three parameters, of which the third is optional:
+
+* The first parameter is the identifier. This should be the same identifier you used in `makexref()`; `xref()` simply reaches into the autoglossary and pulls out the very same hash you put in previously.
+
+* The second parameter is the format. It can be either a string or a symbol. If it's a string, it is used as is. But (and this is the really important part) if it's a symbol, it is used as a key into the hash that we just pulled out of the autoglossary. Thus, the idea is that when you call `makexref()`, you store in its hash any value you might want to pull out later. 
+
+* The third parameter is optional, and is true by default; it has to do with what `xref()` returns, and in particular with whether or not you want `xref()` to form a link for you:
+
+    * If the format is a string and the third parameter is false, the string is returned (and the hash isn't even consulted).
+    
+    * If the format is a symbol and the third parameter is false, the format is used as a key into the hash from the autoglossary, and that key's value is returned.
+    
+    * If the third parameter is true:
+    
+        * If the format is a string, the string is used.
+        
+        * If the format is a symbol, it is used as a key into the hash from the autoglossary, and that key's value replaces the symbol.
+        
+      And now (drum roll, please) a link is returned, structured like this: `<a href="page_id#identifier">Value of the format</a>`.
+
+A little thought will reveal that together, `makexref()` and `xref()` provide everything you need to make various types of cross-reference. Perhaps this will be clearer through an example, so here is one.
+
+## Section Cross-References
+
+Let's say that a page has a section with a heading called "About This Page". If we know we're going to want to form a cross-reference to that heading, we can set this up by giving that heading an `id` attribute, and calling `makexref()` with the value of that `id`. I'll cleverly pick an `id` value that is unlikely to be used elsewhere, so I don't accidentally tromp on anything in the autoglossary (that's why my `id` value starts with `SEC`). And I'll cleverly store the content of the heading in the hash, under the symbol name `:sectitle`.
+
+    <%% makexref("SECAboutThisPage", :sectitle => "About This Page") %>
+    <h2 id="SECAboutThisPage">About This Page</h2>
+
+Now on some other page, when we want to form a cross-reference to that heading, here's all we have to do:
+
+    <%%= xref "SECAboutThisPage", :sectitle %>
+
+That macro will be turned into the phrase "About This Page", wrapped up as a link pointing to the heading on the first page!
+
+Once you understand the basic principles, you will undoubtedly be able to think of ways to set up our original `makexref()` call with less repetition. For example, we are repeating the phrase "About This Page". This is unnecessary, since we just finished storing it in the autoglossary. So we can reliably fetch it right back out again, like this:
+
+    <%% makexref("SECAboutThisPage", :sectitle => "About This Page") %>
+    <h2 id="SECAboutThisPage"><%%= xref "SECAboutThisPage", :sectitle, false %></h2>
+    
+That shows exactly what the third parameter is for. By setting the third parameter to false, we are able to fetch and substitute the section title without forming a link (which would be very silly, since it would be a link to the heading we are already in).
+
+That was good: we eliminated the repetition of "About This Page". But we are now repeating the `id` value `"aboutthispage"`, not once but twice. So let's take an even better approach. We'll supply a macro to form both the `makexref()` call and the section heading, all in a single move. Let's call our macro `section()`. So I'll write the macro as a file `section.rb` in the `#tools` area of my site. The file looks like this:
+
+    def section(s)
+      xref = "SEC" + s.dropNonAlphas
+      makexref(xref, :sectitle => s)
+      %{<h2 id="#{xref}">#{s}</h2>}
+    end
+
+Now we can form our heading with a single macro call, like this:
+
+    <%%= section "About This Page" %>
+
+The call to the `section()` macro forms the `id` as `"SECAboutThisPage"`, uses it to call `makexref()`, and returns the `<h2>` tag with the correct `id` and the contents "About This Page", all in a single move. And our other call still works perfectly to form a cross-reference:
+
+    <%%= xref "SECAboutThisPage", :sectitle %>
+
+## Publish Site (No Preflight)
+
+However, there's a slight glitch. The cross-reference mechanism depends on the autoglossary. But the autoglossary is completely erased and rebuilt every time you use the RubyFrontier > Publish Site command. This means that if the order of pages is such that a page containing an `xref()` call is processed before the corresponding `makexref()` call is processed, the autoglossary won't yet contain the specified cross-reference hash. You'll get an error message warning that the cross-reference wasn't resolved, and the page with the `xref()` call won't contain the desired cross-reference.
+
+The solution is simple! Instead of (or, even better, right after) using RubyFrontier > Publish Site, you use RubyFrontier > Publish Site (No Preflight). This is exactly what this command is for! It publishes the site _without_ rebuilding the autoglossary. Instead, it uses the autoglossary that you generated the last time you published the site. A typical approach, in a site with cross-references, is to publish the site _twice_ — first with preflighting, then without. This assures that the autoglossary is correctly built, the first time, and then used to form the cross-references, the second time.
+
+## Auto-Numbering
+
+A book will often have numbered or captioned figures and examples, and will often refer to these elsewhere by number or caption. Thus, although auto-numbering is not exactly the same as cross-references, it makes sense to mention it in connection with the cross-reference mechanism.
+
+It's important to understand that auto-numbering, of itself, does not involve cross-references at all. Auto-numbering, of itself, is easy, and doesn't require any special action on your part (except that you should write a macro of some sort). For example, you may have noticed that the figures in this document are auto-numbered. All the figures are formed by calling a `caption()` macro, which forms the nice box around the picture and the caption, and incidentally also numbers the figure:
+
+    @adrPageTable[:fignum] ||= 0
+    @adrPageTable[:fignum] += 1
+    fignum = "Figure " + @adrPageTable[:fignum].to_s
+
+All we're doing here is using the page table as global storage, making sure we restart figure numbering for each rendered page, and incrementing the current number every time we encounter the `caption()` call. So, no cross-referencing is needed merely in order to _label_ a figure with a number.
+
+But as soon as you want to _refer_ to a figure by its number, _now_ you need cross-referencing. In my sites that use references to figures, my macro that forms and auto-numbers a figure also stores the number in the autoglossary by calling `makexref()`, under some reasonable identifier, such as `"FIGmyCoolFigure"`. And of course the macro also uses this identifier as the `id` attribute of the figure's caption. So now it is trivial to form a reference elsewhere to this figure, a reference that uses the figure's number, by calling `xref()` with the same identifier. This works right within the same page, as well as in other pages. And the reference doesn't have to be a link; I can call `xref()` with the third parameter set to false.
+
+For example, here's a picture of me:
+
+<%= caption "moi", "A picture of me", "FIGmoi" %>
+
+Now I can refer to that picture as <%= xref "FIGmoi", :fignum, false %>, even if I don't want to form a link. The words "<%= xref "FIGmoi", :fignum, false %>" were not typed manually; rather, they are the result of a macro call:
+
+    <%%= xref "FIGmoi", :fignum, false %>
+
+Thus, references to figures will keep working even if more figures are added or the figures are rearranged, and the auto-numbering changes. And of course if I do want the reference to be a link, it can be: See <%= xref "FIGmoi", :fignum, true %>.
