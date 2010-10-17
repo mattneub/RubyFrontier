@@ -19,6 +19,8 @@ Okay, now things are really getting insanely cool:
 
 I formed those external links easily using the Glossary feature.
 
+<%= section "About This Page" %>
+
 Now I'd like to demonstrate snippets: [[blurb]]
 
 Also, I'd like to demonstrate one way to embed explicit HTML written as HAML:

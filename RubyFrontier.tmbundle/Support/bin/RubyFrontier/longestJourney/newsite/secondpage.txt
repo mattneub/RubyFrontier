@@ -15,6 +15,8 @@ This page illustrates use of Markdown. I don't recommend using Markdown any long
 
 I now use kramdown instead; look at the [third page](thirdpage) for an example. Oooh, did you notice how easy it was for me to make a link?
 
+I can also make a cross-reference. For example, here's a cross-reference to the <%= xref "SECAboutThisPage", :sectitle %> section of a different page. Cool, eh?
+
 This page also illustrates use of a named template. You can tell because the template colors the background.
 
 Plus, it illustrates use of CSS. You can tell because the stylesheet colors the text.
