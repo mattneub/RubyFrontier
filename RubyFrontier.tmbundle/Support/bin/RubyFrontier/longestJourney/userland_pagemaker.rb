@@ -204,7 +204,7 @@ class UserLand::Html::PageMaker
     # fatpages, not implemented
   
     adrPageTable[:renderedtext] = s
-    
+
     # finalfilter, handed adrPageTable, expected to access :renderedtext
     callFilter("finalFilter")
   
@@ -400,6 +400,8 @@ class UserLand::Html::PageMaker
     # there is NO OVERRIDE: stylesheet names are appended to :linkstylesheets array in order encountered,
     # and that is the order in which linkstysheets() macro will insert the links
     # NEW: exactly the same thing for javascript link directives
+    adrPageTable[:linkstylesheets] ||= Array.new
+    adrPageTable[:linkjavascripts] ||= Array.new
     if s =~ /^stylesheet./i
       adrPageTable[:linkstylesheets] << s[10..-1]
     elsif s.downcase == "linkstylesheets"

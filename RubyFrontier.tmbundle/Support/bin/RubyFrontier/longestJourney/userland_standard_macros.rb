@@ -209,4 +209,30 @@ module UserLand::Html::StandardMacros
     end
     htmlText
   end
+  def makexref(name, h)
+    g = @adrPageTable[:autoglossary]
+    if g
+      # add identifier to incoming hash
+      h[:page_id] = @adrPageTable[:f].simplename.to_s.downcase
+      # insert xref hash by name into autoglossary
+      g[name] = h
+    end
+  end
+  def xref(name, format, link = true)
+    g = @adrPageTable[:autoglossary]
+    h = g[name]
+    unless h # no penalty for no xref; just emit contents and warning
+      puts "Failed to resolve xref #{name}"
+      return format
+    end
+    # two possibilities for format: string literal, symbol hash key
+    # if symbol, might be just fetching stored string, so can decline link
+    s = format
+    s = h[format] if Symbol === format
+    raise "xref #{name} called with nil format #{format}" unless s
+    raise "malformed xref #{name}, no page_id" unless h[:page_id]
+    return s unless link
+    href = h[:page_id] + "#" + name
+    return %{<a href="#{href}">#{s}</a>}
+  end
 end
