@@ -2,7 +2,7 @@
 
 ## Why RubyFrontier?
 
-There are plenty of Web site frameworks and generators out there, from the massive [Dreamweaver](http://www.adobe.com/products/dreamweaver/) or [FrontPage](http://office.microsoft.com/en-us/frontpage/default.aspx) down to alternative Ruby-based systems such as [Webby](http://webby.rubyforge.org/) and [nanoc](http://nanoc.stoneship.org/) and [webgen](http://webgen.rubyforge.org/documentation/) and many others, so who needs another one?
+There are plenty of Web site frameworks and generators out there, from the massive [Dreamweaver](http://www.adobe.com/products/dreamweaver/) or [FrontPage](http://office.microsoft.com/en-us/frontpage/default.aspx) down to alternative Ruby-based systems such as [Webby](http://webby.rubyforge.org/) and [nanoc](http://nanoc.stoneship.org/) and [webgen](http://webgen.rubyforge.org/documentation/) and [jekyll](http://github.com/mojombo/jekyll) and many others, so who needs another one?
 
 I do. RubyFrontier was written for *me*. It does what I want it to do. I had a particular problem and RubyFrontier solves it.
 

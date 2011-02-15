@@ -315,11 +315,21 @@ class UserLand::Html::PageMaker
               end
             when "#prefs" # flatten prefs out to become top-level entries of adrPageTable
               # we do NOT downcase this key; arbitrary directives can have meaningful case (as in #metaAppleTitle)
-              YAML.load_file(dirf).each {|k,v| incorporateDirective(k, v, true, adrPageTable)}
+              begin
+                YAML.load_file(dirf).each {|k,v| incorporateDirective(k, v, true, adrPageTable)}
+              rescue
+                puts "Fatal error: Unable to deal with #prefs.yaml file. Are you sure it's a valid expression of a hash?"
+                exit
+              end
             when "#glossary" # gather user glossary entries into glossary hash
               g = adrPageTable["glossary"]
-              YAML.load_file(dirf).each do |k,v|
-                g[k.downcase] = v unless g[k]
+              begin
+                YAML.load_file(dirf).each do |k,v|
+                  g[k.downcase] = v unless g[k]
+                end
+              rescue
+                puts "Fatal error: Unable to deal with #glossary.yaml file. Are you sure it's a valid expression of a hash?"
+                exit
               end
             when "#ftpsite"
               found_ftpsite = true
