@@ -113,6 +113,7 @@ module UserLand::Html::StandardMacros
   def pageheader(adrPageTable=@adrPageTable) # generate standard page header from html tag to body tag
     # if pageheader directive exists, assume macro was explicitly called in error
     # cool because template can contain pageheader() call with or without #pageheader directive elsewhere
+    # also, page can demand standard pageheader with page directive #pageheader false
     return "" if adrPageTable.fetch2(:pageheader)
     # our approach is simply to provide a standard header
     # note that we do not return it! we slot it into the #pageheader directive for later processing...

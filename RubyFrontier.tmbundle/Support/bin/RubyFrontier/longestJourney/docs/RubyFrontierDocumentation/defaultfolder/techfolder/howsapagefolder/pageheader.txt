@@ -80,6 +80,8 @@ There are two ways to supply your own pageheader:
 
 * Supply a `#pageheader` [directive](scalardirectives). It should be a Pathname pointing to a text file. The contents of the text file are used as the page header, and any [macros](macros) in it are processed.
 
+If you supply a `#pageheader.txt` directive object, you can override it in an individual page or lower-level folder with a `#pageheader` directive whose value is `false`, thus causing the `pageheader()` macro call in your template to result in the default template.
+
 ###Prefixing, Not Substitution
 
 No matter how you supply the page header, and whether or not you use the default page header, RubyFrontier always does the same thing. Having obtained the text of the page header, and having processed any [macros](macros) within it, RubyFrontier simply jams the resulting text onto the front of the Web page as rendered [thus far](howsapage).

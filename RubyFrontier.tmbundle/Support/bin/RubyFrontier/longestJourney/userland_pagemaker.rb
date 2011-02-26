@@ -318,8 +318,7 @@ class UserLand::Html::PageMaker
               begin
                 YAML.load_file(dirf).each {|k,v| incorporateDirective(k, v, true, adrPageTable)}
               rescue
-                puts "Fatal error: Unable to deal with #prefs.yaml file. Are you sure it's a valid expression of a hash?"
-                exit
+                myraise "Unable to deal with #prefs.yaml file #{dirf.to_s}. Are you sure it's a valid expression of a hash?"
               end
             when "#glossary" # gather user glossary entries into glossary hash
               g = adrPageTable["glossary"]
@@ -328,8 +327,7 @@ class UserLand::Html::PageMaker
                   g[k.downcase] = v unless g[k]
                 end
               rescue
-                puts "Fatal error: Unable to deal with #glossary.yaml file. Are you sure it's a valid expression of a hash?"
-                exit
+                myraise "Unable to deal with #glossary.yaml file #{dirf.to_s}. Are you sure it's a valid expression of a hash?"
               end
             when "#ftpsite"
               found_ftpsite = true
