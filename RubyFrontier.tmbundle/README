@@ -50,12 +50,14 @@ In version 0.9.9.3, tweaked the way the autoglossary.yaml file is loaded so that
 
 In version 0.9.9.4, added actual cross-referencing macros, and documented them. Also, fixed a bug in a bottleneck routine, incorporateDirective (this bug was probably introduced in version 0.9.5, but it was exposed only under rare circumstances).
 
+In version 0.9.9.5, added begin/rescue/end to catch invalid #prefs.yaml and #glossary.yaml files.
+
 
 =======
 
 VERSION
 
-This is version 0.9.9.5. Added begin/rescue/end to catch invalid #prefs.yaml and #glossary.yaml files.
+This is version 0.9.9.5.5. Very minor tweaks: improved on rescue messages from previous commit; minor edits in documentation.
 
 =======
 
