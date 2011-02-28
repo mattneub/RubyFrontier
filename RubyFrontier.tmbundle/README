@@ -57,7 +57,7 @@ In version 0.9.9.5, added begin/rescue/end to catch invalid #prefs.yaml and #glo
 
 VERSION
 
-This is version 0.9.9.5.5. Very minor tweaks: improved on rescue messages from previous commit; minor edits in documentation.
+This is version 0.9.9.6. Added ERB (macro) processing of CSS stylesheets and JavaScript scripts; this is intended to make it easier for them to refer to images. Some additional very minor tweaks: improved on rescue messages from previous commit; minor edits in documentation.
 
 =======
 

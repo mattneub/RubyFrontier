@@ -14,11 +14,17 @@ module UserLand::Html::StandardMacros
     sheetLoc.dirname.mkpath # ensure folder, write out stylesheet if needed
     if sheetLoc.needs_update_from(source)
       puts "Writing css (#{sheetName})!"
-      if adrPageTable[:less] # support for LESS
-        sheetLoc.open("w") {|io| io.write(Less.parse(source.read))}
-      else
-        FileUtils.cp(source, sheetLoc, :preserve => true)
-      end
+      adrPageTable[:sheetLoc] = sheetLoc; # so macros in the stylesheet can get at it
+      # if adrPageTable[:less] # support for LESS
+      #   sheetLoc.open("w") {|io| io.write(Less.parse(source.read))}
+      # else
+      #   FileUtils.cp(source, sheetLoc, :preserve => true)
+      # end
+      # new feature: support for macros in stylesheet!
+      s = source.read
+      s = processMacros(s, binding)
+      s = Less.parse(s) if adrPageTable[:less] # support for LESS
+      sheetLoc.open("w") {|io| io.write(s)}
     end
     pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
     %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />\n}
@@ -34,7 +40,11 @@ module UserLand::Html::StandardMacros
     sheetLoc.dirname.mkpath
     if sheetLoc.needs_update_from(source)
       puts "Writing javascript (#{sheetName})!"
-      FileUtils.cp(source, sheetLoc, :preserve => true)
+      # FileUtils.cp(source, sheetLoc, :preserve => true)
+      adrPageTable[:sheetLoc] = sheetLoc; # so macros in the script can get at it
+      s = source.read
+      s = processMacros(s, binding) # new: support for macros in script
+      sheetLoc.open("w") {|io| io.write(s)}
     end
     pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
     %{<script src="#{pageToSheet}" type="text/javascript" ></script>\n}
@@ -46,6 +56,7 @@ module UserLand::Html::StandardMacros
     # NEW: attempt to locate sheet in all #stylesheets folders up the hierarchy
     source, sheetLoc = getResourceAndTargetFolder("stylesheets", sheetName) # sheetLoc unused
     s = source.read
+    s = processMacros(s, binding) # new: support for macros in stylesheet
     s = Less.parse(s) if adrPageTable[:less]
     %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
   end
@@ -53,6 +64,7 @@ module UserLand::Html::StandardMacros
     # you really ought to use linkjavascripts instead, it calls this for you
     source, sheetLoc = getResourceAndTargetFolder("javascripts", sheetName) # sheetLoc unused
     s = source.read
+    s = processMacros(s, binding) # new: support for macros in script
     %{\n<script type="text/javascript">\n/* <![CDATA[ */\n#{s}\n/* ]]> */\n</script>\n}
   end
   def linkstylesheets(adrPageTable=@adrPageTable) # link to all stylesheets requested in directives

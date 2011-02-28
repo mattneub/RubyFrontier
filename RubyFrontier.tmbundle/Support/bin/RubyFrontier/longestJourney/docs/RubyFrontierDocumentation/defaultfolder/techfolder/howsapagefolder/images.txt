@@ -42,7 +42,24 @@ In this case, you're going to need to use some other strategy to get the image c
 
 * Put such images in a folder (within the source folder) that isn't a directive. For example, the folder might be called `otherimages`. In accordance with the [rules](types), RubyFrontier will copy the folder into the Web site, and since the images are not page objects, it will copy the images as well. You must then adjust any referencing URLs so that they refer to the images in the correct relative location. The disadvantage of this approach is that the copying only happens *when you [publish the entire site](commands)*. But it has the advantage of extreme simplicity.
 
-* Keep the images in the `#images` folder, and call `html.getImageData()` in a [macro](macros) explicitly for each image you want copied out to the Web site. The method `html.getImageData()` is a utility called by `imageref()`. It takes the same kind of string reference that `imageref()` does; it fetches a bunch of data about the image (such as its dimensions), but it has the side effect of causing the image to be copied out. The advantage of this is that you can make it happen as you render any page. A simplified approach is to copy out explicitly *all* the images in the `#images` folder every time *any* page is rendered, by calling a macro (let's call it `spit()`) in the [template](template):
+* Keep the images in the `#images` folder, and call `html.getImageData()` in a [macro](macros) explicitly for each image you want copied out to the Web site. The method `html.getImageData()` is a utility called by `imageref()`. It takes the same kind of string reference that `imageref()` does; it fetches a bunch of data about the image (such as its dimensions), but it has the side effect of causing the image to be copied out. The advantage of this is that you can make it happen as you render any page.
+
+To help with this, starting in RubyFrontier 0.9.9.6, [JavaScript and CSS files](stylesheets) are now [macro-processed](macros) by the [standard macros](standardmacros) that deal with them. This not full macro-processing; it's really just a call to ERB in the current context. But the current context is the PageMaker object, so calling `getImageData()` _without_ the `.html` prefix will work. Moreover, in the case of a stylesheet or JavaScript file that's going to be linked to (not embedded), `adrPageTable[:sheetLoc]` will be the path to that file, so this can be used to work out the relative URL to the image.
+
+For example, here's how a CSS stylesheet file might refer to a background image:
+
+        <%% def writeAndGetRelativeURI(im)
+           getImageData(im)[:path].relative_uri_from(adrPageTable[:sheetLoc])
+        end %>
+        
+        body {
+          background-image: url(<%%= writeAndGetRelativeURI("body_bg") %>);
+          background-repeat: repeat;
+        }
+
+The method `writeAndGetRelativeURI()` does just what it says: it causes the named image to be written into the Web site, and works out its URL relative to the stylesheet itself within the Web site. That relative URL is substituted within the CSS, in the `url(...)` construct, and thus the relative URL works — it is correct, and the image is present. Meanwhile, the `def` stuff at the top of the stylesheet is removed (note the lack of an equal-sign in the macro call; this means that nothing is substituted into the stylesheet at this point), and so the stylesheet is legal.
+
+Nevertheless, in some cases (where, for example, there are a lot of images), you might like to take a simpler batch approach and copy out explicitly *all* the images in the `#images` folder every time *any* page is rendered, by calling a macro (let's call it `spit()`) in the [template](template):
 
         def spit
           h = @adrPageTable["images"]
@@ -51,8 +68,8 @@ In this case, you're going to need to use some other strategy to get the image c
           end
         end
 
-  This is not particularly inefficient, because `html.getImageData()` only performs an actual copy if an actual copy needs to be performed; if the image has already been copied into place in the Web site, and has the same modification date as the original, no copying takes place. The `spit` macro ignores the data returned by `html.getImageData`, and your call to `spit()` would also ignore *its* results, like this:
+This is not particularly inefficient, because `html.getImageData()` only performs an actual copy if an actual copy needs to be performed; if the image has already been copied into place in the Web site, and has the same modification date as the original, no copying takes place. The `spit` macro ignores the data returned by `html.getImageData`, and your call to `spit()` would also ignore *its* results, like this:
 
         <%% spit() %>
 
-  (Note the lack of an equal-sign in the macro call; this means that no results are entered into the Web page being rendered at this point.) It is possible to use `html.getImageData` in more sophisticated ways, where you actually *do* care about the results it returns; for an example, look at the `caption()` macro used to generate the image-plus-caption pairs in this documentation.
+(Note the lack of an equal-sign in the macro call; this means that no results are entered into the Web page being rendered at this point.) It is possible to use `html.getImageData` in more sophisticated ways, where you actually *do* care about the results it returns; for an example, look at the `caption()` macro used to generate the image-plus-caption pairs in this documentation.
