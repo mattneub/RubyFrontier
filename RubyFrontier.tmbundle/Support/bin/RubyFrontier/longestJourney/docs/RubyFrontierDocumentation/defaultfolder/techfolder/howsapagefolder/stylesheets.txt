@@ -59,3 +59,9 @@ JavaScript files are handled almost exactly like stylesheet files. So, the main 
 * Alternatively, the page header can call **`linkjavascript()`** and supply a parameter value directly (a string representing the name of one javascript file).
 
 * To embed a javascript in the page itself, the page header can call **`embedjavascript()`**, but a more common approach is to set a scalar directive **`:embedjavascript`** (whose value is the name of the javascript) and let the page header's **`linkjavascripts()`** call it for you.
+
+### ERB Support
+
+Both CSS and JavaScript files are passed through ERB as they are processed. Essentially, this means they are [macro](macros)-processed, except that the snazzy name-resolution of full-fledged macro-processing is not present. But the current context is the PageMaker object, so its methods are available, and the page table is available (as `adrPageTable`). Moreover, if the stylesheet or JavaScript file is being linked to (as opposed to being embedded), its file URL within the Web site folder is available as `adrPageTable[:sheetLoc]`.
+
+The purpose of this feature (introduced in RubyFrontier 0.9.9.6) is to make it easier for a CSS or JavaScript file to link to an image file, or similar, via a relative URL. For a full example, see the page discussing [images](images).
