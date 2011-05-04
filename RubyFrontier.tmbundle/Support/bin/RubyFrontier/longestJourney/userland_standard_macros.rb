@@ -23,11 +23,14 @@ module UserLand::Html::StandardMacros
       # new feature: support for macros in stylesheet!
       s = source.read
       s = processMacros(s, binding)
-      s = Less.parse(s) if adrPageTable[:less] # support for LESS
+      # s = Less.parse(s) if adrPageTable[:less] # support for LESS
+      s = Sass::Engine.new(s, :syntax => :scss, :style => :expanded).render if adrPageTable[:scss] # support for SASS
       sheetLoc.open("w") {|io| io.write(s)}
     end
     pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
-    %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />\n}
+    less = adrPageTable[:less] ? "/less" : ""
+    puts "Warning: LESS support in RubyFrontier has changed. Incorporating the proper JavaScript is up to you." if adrPageTable[:less]
+    %{<link rel="stylesheet#{less}" href="#{pageToSheet}" type="text/css" />\n}
   end
   def linkjavascript(sheetName, adrPageTable=@adrPageTable) # link to one javascript
     # you really ought to use linkjavascripts instead, it calls this for you
@@ -57,7 +60,8 @@ module UserLand::Html::StandardMacros
     source, sheetLoc = getResourceAndTargetFolder("stylesheets", sheetName) # sheetLoc unused
     s = source.read
     s = processMacros(s, binding) # new: support for macros in stylesheet
-    s = Less.parse(s) if adrPageTable[:less]
+    # s = Less.parse(s) if adrPageTable[:less]
+    s = Sass::Engine.new(s, :syntax => :scss, :style => :expanded).render if adrPageTable[:scss] # support for SASS
     %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
   end
   def embedjavascript(sheetName, adrPageTable=@adrPageTable) # embed javascript

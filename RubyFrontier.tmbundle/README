@@ -52,12 +52,13 @@ In version 0.9.9.4, added actual cross-referencing macros, and documented them. 
 
 In version 0.9.9.5, added begin/rescue/end to catch invalid #prefs.yaml and #glossary.yaml files.
 
+In version 0.9.9.6, added ERB (macro) processing of CSS stylesheets and JavaScript scripts; this is intended to make it easier for them to refer to images. Some additional very minor tweaks: improved on rescue messages from previous commit; minor edits in documentation.
 
 =======
 
 VERSION
 
-This is version 0.9.9.6. Added ERB (macro) processing of CSS stylesheets and JavaScript scripts; this is intended to make it easier for them to refer to images. Some additional very minor tweaks: improved on rescue messages from previous commit; minor edits in documentation.
+This is version 0.9.9.7. Support for SASS is added, and the documentation now uses it instead of LESS. (Support for LESS is modified, because the developer of LESS stopped supporting it as a Ruby gem. He now provides it as JavaScript; you have to use his JavaScript file and link to your CSS as rel="stylesheet/less", and the JavaScript file then transforms from LESS to CSS dynamically and embeds it in the page's HTML. I support this by generating the rel="stylesheet/less" attribute if :less is defined. This way, if you've been using LESS, you have a way to keep using it. But this switch to JavaScript is unfortunate and I cannot recommend use of LESS going forward.) Also, started writing unit tests.
 
 =======
 

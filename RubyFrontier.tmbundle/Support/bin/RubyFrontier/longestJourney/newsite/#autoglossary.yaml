@@ -2,21 +2,24 @@
 firstpage: &id001 
   :path: !ruby/object:Pathname 
     path: firstpage.html
+  :linetext: My First Web Page
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/firstpage.txt
-  :linetext: My First Web Page
-my first web page: *id001
+SECAboutThisPage: 
+  :page_id: thirdpage
+  :sectitle: About This Page
 thirdpage: &id002 
   :path: !ruby/object:Pathname 
     path: thirdpage.html
+  :linetext: My Third and Greatest Web Page
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/thirdpage.txt
-  :linetext: My Third and Greatest Web Page
+my first web page: *id001
+my third and greatest web page: *id002
 secondpage: &id003 
   :path: !ruby/object:Pathname 
     path: secondpage.html
+  :linetext: My Second Web Page
   :adr: !ruby/object:Pathname 
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/secondpage.txt
-  :linetext: My Second Web Page
-my third and greatest web page: *id002
 my second web page: *id003

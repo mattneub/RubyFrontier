@@ -1,5 +1,5 @@
 --- 
-:linkstylesheets: normal
+:linkstylesheets: normal2
 :kramdown: true
-:less: true
+:scss: true
 :haml: true
