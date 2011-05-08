@@ -1,7 +1,7 @@
 
 require "test/unit"
 
-require File.dirname(File.dirname(__FILE__)) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
+require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
 
 class TestMyRequire < Test::Unit::TestCase
   def test_myrequire
@@ -73,6 +73,7 @@ class TestMyRequireOutput < Test::Unit::TestCase
   end
 end
 
+=begin
 require 'test/unit/ui/console/testrunner'
 class TestMyRequireSuite
   def self.suite
@@ -83,5 +84,6 @@ class TestMyRequireSuite
   end
 end
 Test::Unit::UI::Console::TestRunner.run(TestMyRequireSuite)
+=end
 
 

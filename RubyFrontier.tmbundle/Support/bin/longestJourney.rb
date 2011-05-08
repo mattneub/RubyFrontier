@@ -9,10 +9,10 @@ require "#{ENV["TM_SUPPORT_PATH"]}/lib/escape.rb"
 #require "#{ENV["TM_SUPPORT_PATH"]}/lib/exit_codes.rb"
 
 # trampoline for html-output commands
-# they call RubyFrontier::perform;
+# they call RubyFrontier::perform (syntax is :method_name, trueOrFalse, argsForMethodCall...)
 # we interpose our fake stdout and then do the require and call UserLand.Html
 module RubyFrontier
-  # utility for making nice pre output where we say "puts" (actuall two "write" calls)
+  # utility for making nice pre output where we say "puts" (actually two "write" calls)
   # use with "open"; on init, substitutes itself for stdout, then runs block, then on close undoes the substitution
   # by inserting <br> we keep the messages flowing to the HTML window
   class FakeStdout
@@ -21,7 +21,7 @@ module RubyFrontier
       yield
     rescue Exception => e
       fs.close
-      puts e.message
+      print e.message, "<br>"
       p e.backtrace.join("<br>")
     ensure
       fs.close

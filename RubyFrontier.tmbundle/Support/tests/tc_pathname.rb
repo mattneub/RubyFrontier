@@ -1,6 +1,6 @@
 require "test/unit"
 
-require File.dirname(File.dirname(__FILE__)) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
+require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
 
 myrequire 'rubygems', 'exifr'
 

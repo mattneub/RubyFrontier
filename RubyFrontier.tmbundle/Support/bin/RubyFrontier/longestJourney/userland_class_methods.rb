@@ -153,4 +153,14 @@ module UserLand::Html
     end
     puts "Not found." # appears in tooltip in TM
   end
+  def self.test_output
+    s = <<END
+this is a test
+and this is a test
+END
+    puts s
+  end
+  def self.test_raise
+    raise "oops"
+  end
 end

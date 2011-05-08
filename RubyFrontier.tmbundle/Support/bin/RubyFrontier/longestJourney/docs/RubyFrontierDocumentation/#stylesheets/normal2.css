@@ -1,0 +1,110 @@
+<% def writeAndGetRelativeURI(im)
+   getImageData(im)[:path].relative_uri_from(adrPageTable[:sheetLoc])
+end %>
+
+$bg_color: #e1e4ec;
+
+body {
+	font: 13px "Lucida Grande", Arial, Verdana;
+	margin: 0px;
+	background: #FFFFEE;
+}
+
+.logobar {
+	background: $bg_color;
+	height: 110px;
+	padding: 5px;
+	position: relative;
+	img {
+		width: 100px;
+		height: auto;
+		float: left;
+	}
+	p {
+		margin: 0px;
+		padding: 0px;
+		font-size: 50px;
+		text-align: right;
+		position: absolute;
+		right: 0px;
+		bottom: 0px;
+		width: 80%;
+	}
+}
+
+.blue_underlined {
+	text-decoration:underline;
+	color:blue;
+}
+
+.heart {
+	margin: 30px;
+	h2, h3, h4, h5 {
+		margin-left: -10px;
+	}
+	a {
+		&:link {
+			@extend .blue_underlined;
+		}
+		&:visited {
+			@extend .blue_underlined;
+		}
+	}
+}
+
+h1 {
+	text-align: center;
+}
+
+.red_simple {
+	text-decoration:none;
+	color:red;
+}
+
+.navbar {
+	background: {
+		image: url(<%= writeAndGetRelativeURI("background") %>);
+		repeat: repeat-x;
+	}
+	padding: 10px;
+	text-align: center;
+	line-height: 180%;
+	a:link {
+		@extend .red_simple;
+	}
+	a:visited {
+		@extend .red_simple;
+	}
+}
+
+.parent {
+	font-weight:bold;
+}
+
+a {
+	&:hover {
+		background-color:$bg_color;
+	}
+	&:active {
+		background-color:purple;
+	}
+}
+
+
+.pic {
+	background:lightgrey;
+	padding:10px; 
+	border:2px black solid;
+	text-align:center
+}
+
+.caption {
+	text-align:center;
+	font-size:80%;
+	border:1px black solid;
+}
+
+.nextbar {
+	text-align:right;
+	margin: 5px 30px 20px 5px;
+}
