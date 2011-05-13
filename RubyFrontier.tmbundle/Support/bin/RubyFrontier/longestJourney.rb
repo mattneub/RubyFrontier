@@ -5,9 +5,7 @@ require 'longestJourneyUtilities.rb'
 myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "exifr", "enumerator", "kramdown", "haml", "sass"
 
 =begin make 'load' and 'require' include folder next to, and with same name as, this file 
-that is where supplementary files go:
-(1) stuff to keep this file from getting too big
-(2) user.rb, where the user can maintain the UserLand::User class
+that is where supplementary files go
 uses our Pathname convenience method so we couldn't do this until now
 =end
 p = Pathname.new(__FILE__)
@@ -105,8 +103,11 @@ myrequire 'userland_standard_macros'
 myrequire 'userland_pagemaker'
 
 # load user.rb last of all, so user can define SuperRenderer subclass and use "user.rb" for overrides of anything
-# location of user.rb is outside the bundle and is defined in a global $userrb which the user must set
+# location of user.rb is outside the bundle and is defined in a global $userrb
+# we supply an easy way to do this via "Locate user.rb File" command, which puts value into user defaults
 
-myrequire $userrb rescue puts "No $userrb specified, did not load a user file."
+f = `defaults read com.neuburg.matt.rubyFrontier userrb 2>/dev/null`
+$userrb = f.chomp
+myrequire $userrb rescue puts "No $userrb specified, did not load a user.rb file. If you have a user.rb file, specify it with Locate user.rb File command."
 
 

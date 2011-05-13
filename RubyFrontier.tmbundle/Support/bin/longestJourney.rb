@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-f = `defaults read com.neuburg.matt.rubyFrontier userrb 2>/dev/null`
-$userrb = f.chomp
-
 # require built-in utils for outputting html
 require "#{ENV["TM_SUPPORT_PATH"]}/lib/web_preview.rb"
 require "#{ENV["TM_SUPPORT_PATH"]}/lib/escape.rb"

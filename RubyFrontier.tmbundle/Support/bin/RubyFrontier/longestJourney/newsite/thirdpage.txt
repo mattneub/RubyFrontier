@@ -3,7 +3,6 @@
 #template "thirdtemplate"
 #hamltemplate true
 #linkstylesheets ["s2"]
-#scss true
 #embeddedhaml true
 
 

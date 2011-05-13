@@ -24,13 +24,18 @@ module UserLand::Html::StandardMacros
       s = source.read
       s = processMacros(s, binding)
       # s = Less.parse(s) if adrPageTable[:less] # support for LESS
-      s = Sass::Engine.new(s, :syntax => :scss, :style => :expanded).render if adrPageTable[:scss] # support for SASS
+      # s = Sass::Engine.new(s, :syntax => :scss, :style => :expanded).render if adrPageTable[:scss] # support for SASS
+      # cssFilter, handed adrPageTable, expected to access :csstext
+      adrPageTable[:csstext] = s
+      callFilter("cssFilter")
+      s = adrPageTable[:csstext]
+      # write out
       sheetLoc.open("w") {|io| io.write(s)}
     end
     pageToSheet = sheetLoc.relative_uri_from(adrPageTable[:f]).to_s
-    less = adrPageTable[:less] ? "/less" : ""
-    puts "Warning: LESS support in RubyFrontier has changed. Incorporating the proper JavaScript is up to you." if adrPageTable[:less]
-    %{<link rel="stylesheet#{less}" href="#{pageToSheet}" type="text/css" />\n}
+    # less = adrPageTable[:less] ? "/less" : ""
+    # puts "Warning: LESS support in RubyFrontier has changed. Incorporating the proper JavaScript is up to you." if adrPageTable[:less]
+    %{<link rel="stylesheet" href="#{pageToSheet}" type="text/css" />\n}
   end
   def linkjavascript(sheetName, adrPageTable=@adrPageTable) # link to one javascript
     # you really ought to use linkjavascripts instead, it calls this for you
