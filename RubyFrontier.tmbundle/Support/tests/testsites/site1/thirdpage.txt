@@ -1,0 +1,38 @@
+#title "My Third and Greatest Web Page"
+#kramdown 1
+#template "thirdtemplate"
+#hamltemplate true
+#embedstylesheet "s2"
+#embeddedhaml true
+
+
+# <%= title %>
+
+Okay, now things are really getting insanely cool:
+
+* Instead of Markdown, as on the [second page](secondpage), *this* page is using [kramdown](kramdown).
+
+* We're using an explicitly specified template, and that template is constructed using [Haml](haml).
+
+* We're also specifying a stylesheet (you can tell because the text is red and the background is white), and that stylesheet is written using [SASS](sass). Plus, the stylesheet is embedded, just to demonstrate how that's done.
+
+I formed those external links easily using the Glossary feature.
+
+<%= section "About This Page" %>
+
+Now I'd like to demonstrate snippets: [[blurb]]
+
+Also, I'd like to demonstrate one way to embed explicit HTML written as HAML:
+
+<%%%
+%table(border="1")
+  %tr
+    %td Is this cool?
+    %td Yes, it is!
+%%%>
+
+(Of course, that table was so simple we could have done the same thing with kramdown alone:)
+
+|Is this cool?|Yes, it is!|
+{:border="1"}
+
