@@ -54,11 +54,13 @@ In version 0.9.9.5, added begin/rescue/end to catch invalid #prefs.yaml and #glo
 
 In version 0.9.9.6, added ERB (macro) processing of CSS stylesheets and JavaScript scripts; this is intended to make it easier for them to refer to images. Some additional very minor tweaks: improved on rescue messages from previous commit; minor edits in documentation.
 
+In version 0.9.9.7, replaced LESS support with SASS support. Also, started writing unit tests.
+
 =======
 
 VERSION
 
-This is version 0.9.9.7. Support for SASS is added, and the documentation now uses it instead of LESS. (Support for LESS is modified, because the developer of LESS stopped supporting it as a Ruby gem. He now provides it as JavaScript; you have to use his JavaScript file and link to your CSS as rel="stylesheet/less", and the JavaScript file then transforms from LESS to CSS dynamically and embeds it in the page's HTML. I support this by generating the rel="stylesheet/less" attribute if :less is defined. This way, if you've been using LESS, you have a way to keep using it. But this switch to JavaScript is unfortunate and I cannot recommend use of LESS going forward.) Also, started writing unit tests.
+This is version 0.9.9.8. Removed both LESS and SASS support, and in their place introduced a cssFilter which leaves it up to you whether and how you want to process CSS; this is clearly the most flexible approach going forward - but if you were using SASS (or LESS) in your CSS files, you will have to rewrite your sites. The documentation and the New Site model site are recast to demonstrate the new technique. Also, improved the `nextprevlinks.rb` tool script that comes with the New Site model site (and PageMaker's pagesInFolder utility now filters out empty lines from the #nextprevs.txt file instead of throwing an error).
 
 =======
 

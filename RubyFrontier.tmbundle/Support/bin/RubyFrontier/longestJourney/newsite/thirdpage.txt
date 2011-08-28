@@ -2,7 +2,7 @@
 #kramdown 1
 #template "thirdtemplate"
 #hamltemplate true
-#linkstylesheets ["s2"]
+#embedstylesheet "s2"
 #embeddedhaml true
 
 
@@ -14,7 +14,7 @@ Okay, now things are really getting insanely cool:
 
 * We're using an explicitly specified template, and that template is constructed using [Haml](haml).
 
-* We're also specifying a stylesheet, and that stylesheet is written using [SASS](sass).
+* We're also specifying a stylesheet (you can tell because the text is red and the background is white), and that stylesheet is written using [SASS](sass). Plus, the stylesheet is embedded, just to demonstrate how that's done.
 
 I formed those external links easily using the Glossary feature.
 

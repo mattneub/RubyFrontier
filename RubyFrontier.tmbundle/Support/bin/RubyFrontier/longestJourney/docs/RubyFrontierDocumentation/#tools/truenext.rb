@@ -34,6 +34,6 @@ def truenext()
     return ""
   end
   # link has been set to an id suitable for use in autoglossary consultation
-  title, path = html.getTitleAndPath(link)
+  title, path = html.getTitleAndPaths(link)
   return html.getLink("Next: " + title, link, :markdown => "span")
 end

@@ -21,7 +21,7 @@ end
 def get_pages(dir)
   arr = Array.new
   html.pagesInFolder(dir).each do |what|
-    title, path = html.getTitleAndPath(what)
+    title, path = html.getTitleAndPaths(what)
     s = if what == adrObject.simplename.to_s
       %{<b>#{title}</b>}
     elsif what == adrObject.dirname.simplename.to_s[0..-7]

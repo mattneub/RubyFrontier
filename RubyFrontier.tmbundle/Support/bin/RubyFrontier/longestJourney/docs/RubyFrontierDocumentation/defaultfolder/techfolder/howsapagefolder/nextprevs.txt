@@ -33,4 +33,20 @@ No rules tell you how to use a nextprevs list; indeed, no law requires that you 
 
 RubyFrontier does provide one built-in method for forming navigation links. In this approach, it is assumed that navigation to the next and previous page takes place always within a single folder. The built-in method, which you can call in a macro by saying **`html.getNextPrev()`**, forms a list of all the files in the same folder as the file currently being rendered. The list is simply the folder's nextprevs list if there is one (or, the files in alphabetical order if there is not). It then returns an array of two items — the members of the list just before and after the page currently being rendered (or nil if the page currently being rendered is first or last in the list). You could then use these values as keys into the [autoglossary](autoglossary) to form links.
 
-Another helpful method, mentioned [earlier](standardmacros), is **`html.getTitleAndPaths()`**. It takes as parameter an identifier that keys into the [autoglossary](autoglossary) and returns an array providing the title and pathname of that page. For example, at the bottom right of this page is a link to the next page in the nextprevs list, which, as you can see, is `xrefs`. But the link does not say "xrefs"; it says "<%= "Next: " + html.getTitleAndPaths("xrefs")[0] %>". The text of the link was formed by calling `html.getTitleAndPaths` to obtain the title of the `xrefs.txt` page object.
+Another helpful method, mentioned [earlier](standardmacros), is **`html.getTitleAndPaths()`** (also known, for legacy reasons, as **`html.getTitleAndPath()`**, in the singular). It takes as parameter an identifier that keys into the [autoglossary](autoglossary) and returns an array providing the title and pathname of that page. For example, at the bottom right of this page is a link to the next page in the nextprevs list, which, as you can see, is `xrefs`. But the link does not say "xrefs"; it says "<%= "Next: " + html.getTitleAndPaths("xrefs")[0] %>". The text of the link was formed by calling `html.getTitleAndPaths` to obtain the title of the `xrefs.txt` page object.
+
+The New Site model site that comes with RubyFrontier demonstrates a simple approach based on these two macros. It puts a Prev link and a Next link at the bottom of each page, by calling this macro in the template:
+
+	def nextprevlinks()
+	  p, n = html.getNextPrev(adrObject)
+	  ntitle, npath = html.getTitleAndPaths(n) if n
+	  ptitle, ppath = html.getTitleAndPaths(p) if p
+	  rel_to_top = adrsiteroottable.relative_uri_from(adrobject)
+	  s = ""
+	  s << "Prev: " + html.getLink(ptitle, rel_to_top + ppath) if p
+	  s << " | " if p and n
+	  s << "Next: " + html.getLink(ntitle, rel_to_top + npath) if n
+	  "<p>#{s}</p>\n"
+	end
+
+

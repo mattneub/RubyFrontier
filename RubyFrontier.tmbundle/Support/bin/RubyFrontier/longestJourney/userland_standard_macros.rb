@@ -14,17 +14,10 @@ module UserLand::Html::StandardMacros
     sheetLoc.dirname.mkpath # ensure folder, write out stylesheet if needed
     if sheetLoc.needs_update_from(source)
       puts "Writing css (#{sheetName})!"
-      adrPageTable[:sheetLoc] = sheetLoc; # so macros in the stylesheet can get at it
-      # if adrPageTable[:less] # support for LESS
-      #   sheetLoc.open("w") {|io| io.write(Less.parse(source.read))}
-      # else
-      #   FileUtils.cp(source, sheetLoc, :preserve => true)
-      # end
-      # new feature: support for macros in stylesheet!
+      adrPageTable[:sheetLoc] = sheetLoc # so macros in the stylesheet can get at it
+      adrPageTable[:sheetName] = sheetName # so cssFilter can get at it
       s = source.read
-      s = processMacros(s, binding)
-      # s = Less.parse(s) if adrPageTable[:less] # support for LESS
-      # s = Sass::Engine.new(s, :syntax => :scss, :style => :expanded).render if adrPageTable[:scss] # support for SASS
+      s = processMacros(s, binding) # support for macros in stylesheet
       # cssFilter, handed adrPageTable, expected to access :csstext
       adrPageTable[:csstext] = s
       callFilter("cssFilter")
@@ -62,11 +55,15 @@ module UserLand::Html::StandardMacros
     # TODO: as with linkstylesheet, unlike Frontier, my logic for finding the stylesheet is very simplified
     # must be in #stylesheets folder as css file, end of story
     # NEW: attempt to locate sheet in all #stylesheets folders up the hierarchy
+    # TODO: not DRY, much of this is identical to linkstylesheet
     source, sheetLoc = getResourceAndTargetFolder("stylesheets", sheetName) # sheetLoc unused
+    adrPageTable[:sheetName] = sheetName # so cssFilter can get at it
     s = source.read
-    s = processMacros(s, binding) # new: support for macros in stylesheet
-    # s = Less.parse(s) if adrPageTable[:less]
-    s = Sass::Engine.new(s, :syntax => :scss, :style => :expanded).render if adrPageTable[:scss] # support for SASS
+    s = processMacros(s, binding) # support for macros in stylesheet
+    # cssFilter, handed adrPageTable, expected to access :csstext
+    adrPageTable[:csstext] = s
+    callFilter("cssFilter")
+    s = adrPageTable[:csstext]
     %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
   end
   def embedjavascript(sheetName, adrPageTable=@adrPageTable) # embed javascript
