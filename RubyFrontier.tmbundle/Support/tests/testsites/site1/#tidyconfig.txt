@@ -1,0 +1,7 @@
+char-encoding: utf8
+drop-empty-paras: yes
+fix-uri: yes
+merge-divs: no
+wrap: 0
+tidy-mark: no
+
