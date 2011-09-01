@@ -13,4 +13,11 @@ def finalFilter(adrPageTable)
   # for example, I like to remove any self-links that may have been accidentally generated
   # remove self-links
   adrPageTable[:renderedtext] = adrPageTable[:renderedtext].gsub(/<a href="">(.*?)<\/a>/, "\\1")
+  # add tidy
+  config = adrPageTable["tidyconfig"] # pathname for config file
+  adrPageTable[:renderedtext] = IO.popen("tidy -config '#{config.to_s}' -q --show-warnings no", "r+") do |io| 
+    io.write adrPageTable[:renderedtext]
+    io.close_write
+    io.read
+  end
 end

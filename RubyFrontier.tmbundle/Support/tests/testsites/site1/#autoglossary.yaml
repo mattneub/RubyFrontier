@@ -1,25 +1,32 @@
 --- 
+SECAboutThisPage: 
+  :page_id: thirdpage
+  :sectitle: About This Page
 firstpage: &id001 
   :path: !ruby/object:Pathname 
     path: firstpage.html
   :linetext: My First Web Page
   :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/firstpage.txt
-SECAboutThisPage: 
-  :page_id: thirdpage
-  :sectitle: About This Page
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/firstpage.txt
+fourthpage: &id003 
+  :path: !ruby/object:Pathname 
+    path: folder/fourthpage.html
+  :linetext: My Fourth Web Page
+  :adr: !ruby/object:Pathname 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/folder/fourthpage.txt
+my first web page: *id001
 thirdpage: &id002 
   :path: !ruby/object:Pathname 
     path: thirdpage.html
   :linetext: My Third and Greatest Web Page
   :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/thirdpage.txt
-my first web page: *id001
-my third and greatest web page: *id002
-secondpage: &id003 
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/thirdpage.txt
+secondpage: &id004 
   :path: !ruby/object:Pathname 
     path: secondpage.html
   :linetext: My Second Web Page
   :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/newsite/secondpage.txt
-my second web page: *id003
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/secondpage.txt
+my third and greatest web page: *id002
+my fourth web page: *id003
+my second web page: *id004

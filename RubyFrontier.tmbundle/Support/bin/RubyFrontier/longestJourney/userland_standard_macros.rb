@@ -64,7 +64,7 @@ module UserLand::Html::StandardMacros
     adrPageTable[:csstext] = s
     callFilter("cssFilter")
     s = adrPageTable[:csstext]
-    %{\n<style type="text/css">\n<!--\n#{s}\n-->\n</style>\n}
+    %{\n<style type="text/css">\n<!--/*--><![CDATA[/*><!--*/\n#{s}\n/*]]>*/-->\n</style>\n}
   end
   def embedjavascript(sheetName, adrPageTable=@adrPageTable) # embed javascript
     # you really ought to use linkjavascripts instead, it calls this for you

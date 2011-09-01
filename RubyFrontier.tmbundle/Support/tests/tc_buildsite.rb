@@ -4,8 +4,8 @@ require "test/unit"
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourney.rb'
 
 class TestBuilding < Test::Unit::TestCase
-  #require (File.dirname(__FILE__)) + '/stdoutRedirectionForTesting.rb'
-  #include RedirectIo
+  require (File.dirname(__FILE__)) + '/stdoutRedirectionForTesting.rb'
+  include RedirectIo
   
   def test_classMethods
     p = (Pathname(__FILE__).dirname + "testsites") + "site1"
@@ -55,8 +55,74 @@ class TestBuilding < Test::Unit::TestCase
     assert_equal(%{<a href="url#anc" crap="crud" bite="me">biteme</a>}, s)
     s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc", :othersite => "other")
     assert_equal(%{<a href="other^url#anc" crap="crud" bite="me">biteme</a>}, s)
-    
-    
+    # preflightSite
+    UserLand::Html.preflightSite(f2) # actually works for any file within the site
+    autog = File.open( p + '#autoglossary.yaml' ) { |yf| YAML::load( yf ) }
+    assert_kind_of(Hash, autog)
+    # autoglossary contains entries by title
+    assert_not_nil(autog['my first web page'])
+    assert_not_nil(autog['my second web page'])
+    assert_not_nil(autog['my third and greatest web page'])
+    assert_not_nil(autog['my fourth web page'])
+    # autoglossary contains entries by file simplename
+    assert_not_nil(autog['firstpage'])
+    assert_not_nil(autog['secondpage'])
+    assert_not_nil(autog['thirdpage'])
+    assert_not_nil(autog['fourthpage'])
+    # and that's all there is
+    assert_equal(8, autog.length)
+    # now let's analyze a typical entry
+    fp = autog['fourthpage']
+    assert_equal("My Fourth Web Page", fp[:linetext])
+    assert_equal(Pathname("folder/fourthpage.html"), fp[:path])
+    assert_equal(f4, fp[:adr])
+    # create a new site
+    newsite = Pathname("~/Desktop/testingXYZ").expand_path # new site will be created here
+    newsite.rmtree unless !newsite.exist?
+    UserLand::Html.newSite(true)
+    Dir.chdir(newsite)
+    # and here's what I expect it to contain
+    s = <<END
+#filters
+#ftpSite.yaml
+#glossary.yaml
+#images
+#javascripts
+#prefs.yaml
+#stylesheets
+#template.txt
+#templates
+#tools
+firstpage.txt
+secondpage.txt
+thirdpage.txt
+
+./#filters:
+cssFilter.rb
+finalFilter.rb
+firstFilter.rb
+pageFilter.rb
+postMacroFilter.rb
+
+./#images:
+rubyFrontierLogo.png
+
+./#javascripts:
+
+./#stylesheets:
+s1.css
+s2.css
+
+./#templates:
+secondtemplate.txt
+thirdtemplate.txt
+
+./#tools:
+blurb.txt
+nextprevlinks.rb
+section.rb
+END
+    assert_equal(s, `ls -R1`)
     # trying to build a non-page raises an error
     assert_raise(RuntimeError) do
       UserLand::Html.releaseRenderedPage(f1, false, false)
@@ -67,9 +133,16 @@ class TestBuilding < Test::Unit::TestCase
     rescue
       assert_match /not a site page/, $!.message
     end
-    
-    # releaseRenderedPage, publishSite, publishFolder
-    
+    # releaseRenderedPage, publishSite (should also testpublishFolder)
+    # publish entire site
+    actualoutput = Pathname("~/Desktop/testsite1").expand_path # new site will be created here
+    actualoutput.rmtree unless !actualoutput.exist?
+    UserLand::Html.publishSite(f2, true, false) # publish, rebuild autoglossary, do not open in browser
+    modeloutput = (Pathname(__FILE__).dirname + "testsites") + "site1PublishAll"
+    command = "diff -r '#{modeloutput.to_s}' '#{actualoutput.to_s}'"
+    # TODO really ought to remove any .DS_Store files first just in case
+    assert_match("", `#{command}`) # crude but effective check that whole suite is working decently
+    # TODO no test for traverseLink, really ought to do something about that
   end
   
 end

@@ -41,7 +41,7 @@ module UserLand::Html
     end
     
   end
-  def self.publishSite(adrObject, preflight=true)
+  def self.publishSite(adrObject, preflight = true, flPreview = true)
     adrObject = Pathname(adrObject).expand_path
     self.guaranteePageOfSite(adrObject) # raises if not
     puts "publishing site"
@@ -49,7 +49,7 @@ module UserLand::Html
     self.everyPageOfSite(adrObject).each do |p|
       puts ""
       puts "publishing '#{p}'"
-      self.releaseRenderedPage(p, (p == adrObject)) # the only one to open in browser is the one we started with
+      self.releaseRenderedPage(p, (p == adrObject) && flPreview) # the only one to open in browser is the one we started with
     end
     puts "finished publishing site"
   end
@@ -132,8 +132,13 @@ module UserLand::Html
     end.compact.join(" ")
     %{<a href="#{url}"#{" " + opt if !opt.empty?}>#{linetext}</a>}
   end
-  def self.newSite()
-    s = `"#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog" filesave --title "New Web Site" --text "Specify a folder to create"`
+  def self.newSite(testing = false)
+    s = ""
+    if !testing
+      s = `"#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog" filesave --title "New Web Site" --text "Specify a folder to create"`
+    else # testing, use with care
+      s = Pathname("~/Desktop/testingXYZ").expand_path.to_s
+    end
     exit if s == "" # user cancelled
     p = Pathname(s.chomp)
     p.mkpath
@@ -141,7 +146,9 @@ module UserLand::Html
     FileUtils.rm((p + "#autoglossary.yaml").to_s) # just causes errors if it's there
     # also get rid of svn leftovers if present
     `find '#{p}' -name ".svn" -print0 | xargs -0 rm -R -f`
-    `"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{p}'`
+    # and get rid of .DS_Store if present
+    `find '#{p}' -name ".DS_Store" -print0 | xargs -0 rm -R -f`
+    `"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{p}'` unless testing
   end
   def self.traverseLink(adrObject, linktext)
     autoglossary = self.getFtpSiteFile(Pathname(adrObject)).dirname + "#autoglossary.yaml"
