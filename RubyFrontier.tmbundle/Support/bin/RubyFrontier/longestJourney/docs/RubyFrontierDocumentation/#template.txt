@@ -16,5 +16,5 @@
 	by Matt Neuburg, phd = matt at tidbits dot com 
 	(<a href="http://www.apeth.net/matt/">http://www.apeth.net/matt/</a>),
 	using <b><a href="default">RubyFrontier</a></b>.<br />Download RubyFrontier from
-	<a href="http://sourceforge.net/projects/rubyfrontier/">SourceForge</a>.
+	<a href="https://github.com/mattneub/RubyFrontier">GitHub</a>.
 <%= pagefooter() %>
