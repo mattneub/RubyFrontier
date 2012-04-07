@@ -108,6 +108,6 @@ myrequire 'userland_pagemaker'
 
 f = `defaults read com.neuburg.matt.rubyFrontier userrb 2>/dev/null`
 $userrb = f.chomp
-myrequire $userrb rescue puts "No $userrb specified, did not load a user.rb file. If you have a user.rb file, specify it with Locate user.rb File command."
+myrequire $userrb rescue puts "Did not load a user.rb file. If you have a user.rb file, specify it with Locate user.rb File command. (If you've done that, your user.rb file may be generating an error on load.)"
 
 

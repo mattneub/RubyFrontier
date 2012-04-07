@@ -1,7 +1,7 @@
 VERSION
 =======
 
-This is version 1.0.
+This is version 1.0.1.
 
 HISTORY
 =======
@@ -37,4 +37,7 @@ In version 0.9.9.7, replaced LESS support with SASS support. Also, started writi
 In version 0.9.9.8, removed both LESS and SASS support, and in their place introduced the cssFilter which leaves it up to you whether and how you want to process CSS. The documentation and the New Site model site are recast to demonstrate the new technique. Also, improved the `nextprevlinks.rb` tool script that comes with the New Site model site (and PageMaker's `pagesInFolder` utility now filters out empty lines from the #nextprevs.txt file instead of throwing an error).
 
 In version 1.0, cleaned up cruft in the CSS processing processing routines, especially for embedded CSS. More unit tests. Migrated from svn to git. Changed the README file to this HISTORY file, and placed a revised README.md file at top level where GitHub will see it.
+
+In version 1.0.1, expanded the user.rb mechanism to allow inclusion of a #user.rb file at the top level of the site folder; also improved the error message when a user.rb file fails to load. Documentation updated.
+
 

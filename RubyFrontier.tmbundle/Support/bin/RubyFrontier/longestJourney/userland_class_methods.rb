@@ -20,7 +20,14 @@ module UserLand::Html
     # TODO: omitting file writer startup mechanism, adrStorage unused
     # in fact, callFileWriterStartup is now completely unused now that getFtpSiteFile has been extracted from it
     # adrStorage = callFileWriterStartup(adrObject)
-          
+    # NEW FEATURE: look for #user.rb at top level of site and require (load) it if found
+    # in a way this might replace the old callFileWriterStartup mechanism
+    userrb = self.getFtpSiteFile(adrObject).dirname + "#user.rb"
+    if userrb.exist? && !$localuserrbloaded
+      $localuserrbloaded = true
+      require userrb.to_s 
+    end
+    
     pm = PageMaker.new
     pm.buildObject(adrObject)
     puts "page built in #{Time.new.to_f - time} seconds" if doTimings

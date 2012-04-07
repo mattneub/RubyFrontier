@@ -2,9 +2,23 @@
 
 Frontier provided a way to let you make settings that would be in common for rendering *all* your Web sites (unless overridden by a setting within a site). For example, if you know that in a lot of different sites you'd like to say "apple" as a shortcut for "http://www.apple.com" in links, it seems silly to make you redefine this in a [`#glossary` hash](glossary) for *every* source folder. So you need a place where you can define "apple" to mean "http://www.apple.com" just *once*, and have this definition available in any page in any Web site you render.
 
-To handle the need for such **user settings**, RubyFrontier provides the following mechanism. You provide a file — the **user.rb** file. (It doesn't actually have to be named `user.rb`, but that's the convention and that's what I'm going to call it.) You tell RubyFrontier where it is by choosing RubyFrontier > Locate User.rb File. From then on, RubyFrontier remembers where this file is (on this computer).
+The idea of a **user.rb** file originated as a way for RubyFrontier to handle the need for such **global user settings**.
 
-Whenever you give a RubyFrontier command, such as Publish Page, as RubyFrontier is loading all the files where its code is kept, it loads `user.rb` *last*. This means that `user.rb` is your chance to add code to the RubyFrontier command's Ruby world.
+In addition, it was soon observed in practice that — Ruby being Ruby — it would be convenient to use the `user.rb` file for a second purpose, namely to let the user **inject custom code** into RubyFrontier's own classes.
+
+### The Two user.rb Files
+
+There are actually _two_ ways to supply a `user.rb` file (there was originally just one such way, but it became clear after a while that a second was needed):
+
+* Originally, RubyFrontier provided the following mechanism. You provide a file — the **user.rb** file. (It doesn't actually have to be named `user.rb`, but that's the convention and that's what I'm going to call it.) You tell RubyFrontier where it is by choosing RubyFrontier > Locate User.rb File. From then on, RubyFrontier remembers where this file is (on this computer).
+
+    Whenever you give a RubyFrontier command, such as Publish Page, as RubyFrontier is loading all the files where its own code is kept, it loads `user.rb` *last*. This means that `user.rb` is your chance to add code to the RubyFrontier command's Ruby world.
+
+* This worked fine, but it had the following major drawback: it wasn't portable. If I make a site folder and give it to you, and if my site has any dependencies on stuff in my `user.rb` file, the site won't work on your machine. We could get around this if I send you the code that was in my `user.rb` file and tell you to paste it into your `user.rb` file, but that seems clumsy.
+
+    Therefore, there is a second place to put a `user.rb` file: namely, at the top level of the site folder, with the name _#user.rb_. The rule is that this file, if found, will be loaded (required) _after_ the user's own global `user.rb` file but _before_ starting to render any page. Moreover, this happens only once per rendering session: that is, if the command is to publish a folder or the entire site, the _#user.rb_ file will be loaded just once.
+    
+    Since the _#user.rb_ file is part of the site, it is portable. The main purpose of this _#user.rb_ file is to share custom modifications of RubyFrontier's own classes — that is, to supply utility methods that for one reason or another can't be expressed as [macros](macros), but must be embedded dynamically into RubyFrontier's own code before the rendering process begins.
 
 <!--
 
@@ -23,7 +37,9 @@ At present, the only purpose of the `user` folder is to contain a folder called 
 
 -->
 
-When file `user.rb` is loaded, here are the sorts of thing it can do:
+### What a user.rb File Can Do
+
+When a `user.rb` file is loaded, here are the sorts of thing it can do:
 
 * **Supply a user glossary**. If `user.rb` defines a class method `glossary()` of a module `UserLand::User`, that method will be called. It should return a hash of key-value pairs to be used in links; the key should be the string you want to use in the `href` attribute of a link, and the value should be the URL you want substituted for that key. This hash will be melded into the [`"glossary"` hash](pagetable) formed from any [`#glossary.yaml` files](directiveobjects) encountered as RubyFrontier walks up the [hierarchy](hierarchy), and thus will be available during [glossary expansion](glossary).
 
@@ -44,7 +60,10 @@ When file `user.rb` is loaded, here are the sorts of thing it can do:
 * **Supply outline renderers**. If `user.rb` defines any subclasses of `SuperRenderer` within a module `UserLand::Renderers`, those classes will be available as [outline renderers](outlinerenderers) (that is, the name of such a class can be used as the value of the [`:renderoutlinewith` directive](scalardirectives)).
 
 * **Inject code into RubyFrontier**. A typical use would be that you find yourself needing to keep a utility method in the `#tools` folder of more than one source folder; you can save yourself the trouble and keep it in `user.rb` instead. For example, if `user.rb` defines an instance method of `UserLand::Html::PageMaker`, then that method can be conveniently called from a [macro](macros) by using the `html.` prefix (in accordance with the rules of [macro scoping](macros)).
-
-  But you can go further. Since `user.rb` is loaded after the entirety of `longestJourney.rb` and the various other files it requires, you can actually overshadow RubyFrontier's own native code if you so desire. This was always a huge problem with Frontier: it wasn't object-oriented, so it was difficult to overshadow the built-in code with your own, and if you modified the built-in code directly (as I did with many handlers, especially among the `html` verbs) you risked losing your modifications when you updated the database. With Ruby, however, it's simple; if you want to open up a RubyFrontier class and mess with it in `user.rb`, you can. And your changes won't be directly tromped on when you download an updated version of the RubyFrontier bundle (because your changes are not *in* the RubyFrontier bundle).
+    
+    Moreover, this is not a matter of mere convenience. Some code simply _cannot_ be expressed as a macro in the `#tools` folder; technical considerations of scope or timing might require that you open up `UserLand::Html::PageMaker` and inject a utility method into it.
+    
+    Indeed, since `user.rb` is loaded after the entirety of `longestJourney.rb` and the various other files it requires, you can actually *overshadow* RubyFrontier's own native code if you so desire. This was always a huge problem with Frontier: it wasn't object-oriented, so it was difficult to overshadow the built-in code with your own, and if you modified the built-in code directly (as I did with many handlers, especially among the `html` verbs) you risked losing your modifications when you updated the database. With Ruby, however, it's simple; if you want to open up a RubyFrontier class and mess with it in `user.rb`, you can. And your changes won't be directly tromped on when you download an updated version of the RubyFrontier bundle (because your changes are not *in* the RubyFrontier bundle).
 
 **Note concerning the "user templates"**: Frontier had a mechanism of "user templates"; any templates kept in the `user` table could be referred to by name in any site. RubyFrontier imitates this only to the extent of [including two "user templates"](template) that can be referred to by name. But they are actually inside the RubyFrontier bundle and so the user templates mechanism is not really open to your use, unless you want to reach right inside the RubyFrontier bundle and put additional templates in there. In future, if there is demand, I am certainly open to restoring a more convenient user templates mechanism; but up to now I have not done so because I haven't felt the need for it.
+
