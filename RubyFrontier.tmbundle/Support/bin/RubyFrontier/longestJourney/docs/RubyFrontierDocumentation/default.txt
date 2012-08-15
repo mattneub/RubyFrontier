@@ -14,7 +14,7 @@ You might like to watch this [screencast](http://www.apeth.com/rubyFrontier.mov)
 
 Here is some [further description](what) of what RubyFrontier is.
 
-Want to see a Web site of about 150 heavily interlinked pages with great navigation, made with RubyFrontier? Check out the [Script Debugger online help](http://www.latenightsw.com/sd4/help/index.html).
+Want to see a Web site of about 150 heavily interlinked pages with great navigation, made with RubyFrontier? Check out the [Script Debugger online help](http://www.apeth.com/sd5help/index.html).
 
 ## Why RubyFrontier?
 
