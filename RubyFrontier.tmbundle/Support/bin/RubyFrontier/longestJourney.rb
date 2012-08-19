@@ -2,7 +2,7 @@ $: << File.dirname(__FILE__)
 # utilities: myrequire, myraise, Memoizable, and various modifications to existing classes
 require 'longestJourneyUtilities.rb'
 
-myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "exifr", "enumerator", "kramdown", "haml", "sass"
+myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "exifr", "enumerator", "kramdown", "haml", "sass", "nokogiri"
 
 =begin make 'load' and 'require' include folder next to, and with same name as, this file 
 that is where supplementary files go

@@ -1,7 +1,7 @@
 VERSION
 =======
 
-This is version 1.0.1.
+This is version 1.0.2.
 
 HISTORY
 =======
@@ -40,4 +40,5 @@ In version 1.0, cleaned up cruft in the CSS processing processing routines, espe
 
 In version 1.0.1, expanded the user.rb mechanism to allow inclusion of a #user.rb file at the top level of the site folder; also improved the error message when a user.rb file fails to load. Documentation updated.
 
+In version 1.0.2, introduced a mechanism to allow a `.txt` file to function as an outline (like a `.opml`) file, by using indentation and setting the `:treatasopml` directive to `true`. Documentation updated.
 

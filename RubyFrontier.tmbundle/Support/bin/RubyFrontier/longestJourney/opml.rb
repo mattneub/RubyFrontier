@@ -2,6 +2,8 @@
 Simulate some Frontier op.* verbs using OPML as the outline source.
 =end
 
+# TODO: now that I trust Nokogiri, should eliminate use of libxml and rexml and rely on Nokogiri entirely
+
 # superclass's "new" factory method lets us substitute different subclass implementations at will
 # also container for methods that don't vary between implementations
 class Opml
@@ -117,14 +119,58 @@ class Opml
     @curline
   end
   
+  # class method, utility: translate line-indented text to OPML
+  # at the moment we basically assume line-indent by spaces (probably two spaces per level)
+  
+  def self.doThisLevel(lines, level, doc, curnode) # private loop/recurse helper for next method
+    # lines is the array of lines
+    # level is the level we are at:
+    # a deeper level means add a child, another at this level means add a sibling
+    # doc is a reference to the xml document
+    # curnode points to an already processed node; level is its level
+    # =======
+    # keep processing lines as long as level doesn't go shallower
+    # if it does, do nothing and let unwinding of recursion deal with it
+    while (lines.length > 0) && ((nextlevel = lines[0][:level]) >= level)
+      if nextlevel > level
+        newnode = curnode.add_child(Nokogiri::XML::Node.new("outline", doc))
+        newnode['text'] = lines[0][:text]
+        lines.shift
+        doThisLevel(lines, nextlevel, doc, newnode) # dive dive dive
+      else
+        newnode = curnode.add_next_sibling(Nokogiri::XML::Node.new("outline", doc))
+        newnode['text'] = lines[0][:text]
+        curnode = newnode
+        lines.shift
+      end
+    end
+  end
+  class << self; private :doThisLevel; end
+  def self.textToOpml(s)
+    doc = Nokogiri::XML::Document.new
+    doc.root = Nokogiri::XML::Node.new("opml", doc)
+    doc.root['version'] = '1.0'
+    body = doc.root.add_child(Nokogiri::XML::Node.new("body", doc))
+    lines = s.split("\n")
+    # separate level from content up front
+    lines = lines.map do |line|
+        line =~ /^(\s*)/
+        level = $1.length
+        rest = line[level..-1]
+        {:text => rest, :level => level}
+    end
+    doThisLevel(lines, -1, doc, body)
+    doc
+  end
+  
 end
 
 class Opmlrexml < Opml
   myrequire ['rexml/document', :REXML]
   
   # ivars: doc, top, curline
-  def initialize(f)
-    @doc = Document.new(File.read(f))
+  def initialize(f) # f can be pathname or string
+    @doc = f.kind_of?(Pathname) ? Document.new(File.read(f)) : Document.new(f)
     @top = @doc.root.elements["body"]
     self.firstSummit()
   end
@@ -251,8 +297,8 @@ class Opmllibxml < Opml
   end
     
   # ivars: doc, top, curline
-  def initialize(f) # f is a file
-    @doc = Document.file(f)
+  def initialize(f) # f can be pathname or string
+    @doc = f.kind_of?(Pathname) ? Document.file(f) : Document.string(f)
     @top = @doc.root.find_first("body")
     self.firstSummit()
   end

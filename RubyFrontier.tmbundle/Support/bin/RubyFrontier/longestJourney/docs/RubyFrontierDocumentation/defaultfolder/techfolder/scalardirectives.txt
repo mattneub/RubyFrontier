@@ -94,6 +94,8 @@ If a [page object](types) file is a renderable, RubyFrontier uses the page objec
 
 * **:renderoutlinewith**. The name of the [outline renderer](outlinerenderers) to be used if the page object is an outline (`.opml`).
 
+* **:treatasopml**. If `true`, a `.txt` file will be treated as if it were an outline (`.opml`), converting the text to XML in accordance with its indentation structure.
+
 #### Template
 
 * **:template**. The name of the [template](template) into which the page object should be poured. If not defined, the file `#template.txt` will be used. If defined, the file in question will be sought by appending ".txt" and looking in the source folder's `#templates` folder and in the [user templates](user) folder.

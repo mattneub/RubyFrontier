@@ -378,12 +378,26 @@ class UserLand::Html::PageMaker
       while line = io.gets and line[0,1] == "#"
         runDirective(line[1..-1], adrPageTable)
       end
-      line + (io.gets(nil) || "") # read all the rest
+      rest = line + (io.gets(nil) || "") # read all the rest
+      if adrPageTable[:treatasopml]
+        # new feature: keep outline-structured text in .txt file
+        # we use #treatasopml directive to alert us
+        # we already have the directives, so now just create and return the Opml object
+        opml = Opml.textToOpml(rest)
+        op = Opml.new(opml.to_s)
+        # problem! runDirectives will be called *again* on the template
+        # but we don't want *it* treated as opml
+        # the only thing I can think of right now is to turn the switch back off
+        adrPageTable[:treatasopml] = false
+        return op
+      end
+      return rest
     end
   end
   def runOutlineDirectives(adrObject, adrPageTable=@adrPageTable)
+    # start with .opml file: extract to Opml object
+    op = Opml.new(adrObject)
     # extract directives from start of outline, return rest of outline
-    op = Opml.new(adrObject.to_s)
     while aline = op.getLineText and aline[0,1] == "#"
       runDirective(aline[1..-1], adrPageTable)
       op.deleteLine
