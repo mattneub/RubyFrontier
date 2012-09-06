@@ -36,7 +36,7 @@ When your renderer runs, its code is subject to [macro scoping](macros). This wi
 
 ###Outline Manipulation Methods
 
-To help you manipulate the outline, RubyFrontier defines a subset of the [Frontier `op` verbs](http://pages.sbcglobal.net/mattneub/frontierDef/ch18.html). (Consult the file `opml.rb`.) The outline, when you receive it in the `render()` method, is already expressed as an object of class `Opml`. (This object is the parameter called `op` in the above schema.) You are expected to use the `Opml` instance methods, which imitate the Frontier `op` verbs, to navigate the outline and extract the desired information.
+To help you manipulate the outline, RubyFrontier defines a subset of the [Frontier `op` verbs](http://sbc.apeth.com/frontierDef/ch18.html). (Consult the file `opml.rb`.) The outline, when you receive it in the `render()` method, is already expressed as an object of class `Opml`. (This object is the parameter called `op` in the above schema.) You are expected to use the `Opml` instance methods, which imitate the Frontier `op` verbs, to navigate the outline and extract the desired information.
 
 When using the `Opml` instance methods, there is always a "current line" of the outline to which we are pointing (because that's how Frontier did things). A brief description of the `Opml` instance methods follows.
 

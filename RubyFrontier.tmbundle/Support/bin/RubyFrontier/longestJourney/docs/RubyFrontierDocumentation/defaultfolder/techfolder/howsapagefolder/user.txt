@@ -51,7 +51,7 @@ When a `user.rb` file is loaded, here are the sorts of thing it can do:
         Frontier
         http://frontier.userland.com
         thebookontheweb
-        http://pages.sbcglobal.net/mattneub/frontierDef/ch00.html
+        http://sbc.apeth.com/frontierDef/ch00.html
         END
             Hash[*s.split("\n")]
           end
