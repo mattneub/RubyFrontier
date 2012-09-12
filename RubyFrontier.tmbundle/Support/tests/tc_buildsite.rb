@@ -87,7 +87,6 @@ class TestBuilding < Test::Unit::TestCase
 #ftpSite.yaml
 #glossary.yaml
 #images
-#javascripts
 #prefs.yaml
 #stylesheets
 #template.txt
@@ -106,8 +105,6 @@ postMacroFilter.rb
 
 ./#images:
 rubyFrontierLogo.png
-
-./#javascripts:
 
 ./#stylesheets:
 s1.css
