@@ -290,14 +290,14 @@ class UserLand::Html::PageMaker
       found_ftpsite = false
       adrObjectDir.ascend do |dir|
         dir.each_entry do |f|
-          if /^#/ =~ f
+          if f.to_s.start_with?("#")
             dirf = dir + f
             case (directive = f.simplename.to_s.downcase) # special casing of certain directives
             when "#tools"
               # gather tools into tools hash, hashing pathnames under simple filenames
               # new feature (non-Frontier), .txt files go into snippets hash
               dirf.each_entry do |ff|
-                unless /^\./ =~ (tool_simplename = ff.simplename.to_s.downcase)
+                unless (tool_simplename = ff.simplename.to_s.downcase).start_with?(".")
                   case ff.extname
                   when ".rb"
                     adrPageTable["tools"][tool_simplename] ||= dirf + ff
@@ -309,7 +309,7 @@ class UserLand::Html::PageMaker
             when "#images", "#stylesheets", "#javascripts" 
               # gather contents into single hash, hashing pathnames under simple filenames
               dirf.each_entry do |ff|
-                unless /^\./ =~ (ref_simplename = ff.simplename.to_s.downcase)
+                unless (ref_simplename = ff.simplename.to_s.downcase).start_with?(".")
                   adrPageTable[directive[1..-1]][ref_simplename] ||= dirf + ff
                 end
               end
@@ -427,15 +427,15 @@ class UserLand::Html::PageMaker
     if s =~ /^stylesheet./i
       adrPageTable[:linkstylesheets] << s[10..-1]
     elsif s.downcase == "linkstylesheets"
-      adrPageTable[:linkstylesheets] += v.to_a
+      adrPageTable[:linkstylesheets] += Array(v)
     elsif s.downcase == "linkstylesheetsnot"
-      adrPageTable[:linkstylesheets] -= v.to_a
+      adrPageTable[:linkstylesheets] -= Array(v)
     elsif s =~ /^javascript./i
       adrPageTable[:linkjavascripts] << s[10..-1]
     elsif s.downcase == "linkjavascripts"
-      adrPageTable[:linkjavascripts] += v.to_a
+      adrPageTable[:linkjavascripts] += Array(v)
     elsif s.downcase == "linkjavascriptsnot"
-      adrPageTable[:linkjavascripts] -= v.to_a
+      adrPageTable[:linkjavascripts] -= Array(v)
     else
       if yieldToExisting
         adrPageTable[k] ||= v
@@ -610,7 +610,7 @@ class UserLand::Html::PageMaker
     else
       # if not, just use alphabetical order
       folder.children.each do |p|
-        next if p.basename.to_s =~ /^[#.]/
+        next if p.basename.to_s.start_with?("#", ".")
         arr << p.simplename.to_s if renderable?(p)
       end
     end

@@ -2,7 +2,7 @@ require 'test/unit'
 
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourney.rb'
 
-class TestFakeStdout < Test::Unit::TestCase
+class TestLoading < Test::Unit::TestCase
   def test_usertemplates_newsite
     assert_not_equal(nil, $usertemplates)
     assert(($usertemplates + "bbedit.txt").exist?)

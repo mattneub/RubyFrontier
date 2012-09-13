@@ -118,6 +118,7 @@ class Array # convenience methods
   end
 end
 
+=begin
 class JPEG # used by Pathname#image_size, stolen from the Internet :) http://snippets.dzone.com/posts/show/805
   attr_reader :width, :height, :bits
   def initialize(file)
@@ -145,19 +146,26 @@ private
         when 0xC0..0xC3, 0xC5..0xC7, 0xC9..0xCB, 0xCD..0xCF # SOF markers
           length, @bits, @height, @width, components = io.readsof
           raise 'malformed JPEG' unless length == 8 + components * 3
-        when 0xD9, 0xDA:  break # EOI, SOS
-        when 0xFE:        @comment = io.readframe # COM
-        when 0xE1:        io.readframe # APP1, contains EXIF tag
-        else              io.readframe # ignore frame
+        # colons not allowed in 1.9, change to "then"
+        when 0xD9, 0xDA then  break # EOI, SOS
+        when 0xFE then        @comment = io.readframe # COM
+        when 0xE1 then        io.readframe # APP1, contains EXIF tag
+        else                  io.readframe # ignore frame
       end
     end
   end
 end
+=end
 
 require 'pathname'
 require 'uri'
 
 class Pathname # convenience methods
+  def to_str
+    to_s # work around 1.9 withdrawal of to_str, which does implicit conversion
+    # the problem is not so much my own code...
+    # ...as that sites rely on the implicit behavior
+  end
   def contains?(p)
     p.ascend {|dir| break true if self == dir } # nil otherwise
   end
@@ -170,13 +178,23 @@ class Pathname # convenience methods
   def relative_uri_from(p2) # derive relative (partial) URI
     # unfortunately a relative path is not the same as a relative uri, so can't use relative_path_from
     # so we construct a pair of pseudo http URLs and have URI do the work
-    raise "expecting absolute path" unless self.absolute? && p2.absolute?
+    p1 = Pathname(self)
+    
+    raise "expecting absolute path" unless p1.absolute? && p2.absolute?
+    
+    # attempt to work around change in URI behavior in Ruby 1.9
+    # if a real directory, guarantee trailing slash
+    p1 = File.join(p1,"") if p1.directory?
+    p2 = File.join(p2,"") if p2.directory?
+    
     #uri1 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => self.to_s
     #uri2 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => p2.to_s
-    uri1 = URI(URI.escape("file://" + self.to_s))
+    
+    uri1 = URI(URI.escape("file://" + p1.to_s))
     uri2 = URI(URI.escape("file://" + p2.to_s))
     return uri1.route_from(uri2).path
   end
+=begin
   def image_size # read image file height and width
     # stolen from the Internet :) http://snippets.dzone.com/posts/show/805
     case self.extname.downcase
@@ -190,6 +208,16 @@ class Pathname # convenience methods
     when ".tif", ".tiff"
       t = EXIFR::TIFF.new(self.to_s)
       return [t.width, t.height]
+    else
+      return [nil, nil]
+    end
+  end
+=end
+  def image_size # read image file height and width
+    # we now use Dimensions gem
+    case self.extname.downcase
+    when ".png", ".gif", ".jpg", ".jpeg", ".tif", ".tiff"
+      return Dimensions::dimensions(self)
     else
       return [nil, nil]
     end

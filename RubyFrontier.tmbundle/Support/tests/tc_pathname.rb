@@ -2,7 +2,7 @@ require "test/unit"
 
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
 
-myrequire 'rubygems', 'exifr'
+myrequire 'rubygems', 'dimensions'
 
 class TestPathname < Test::Unit::TestCase
   def test_contains
@@ -50,13 +50,19 @@ class TestPathname < Test::Unit::TestCase
     assert_equal("test2.txt", Pathname("/top/down/test2.txt").relative_uri_from(Pathname("/top/down/test1.txt")))
     assert_equal("down/test2.txt", Pathname("/top/down/test2.txt").relative_uri_from(Pathname("/top/test1.txt")))
     assert_equal("down%20down/test2.txt", Pathname("/top/down down/test2.txt").relative_uri_from(Pathname("/top/test1.txt")))
+    # issue exposed by change in URI behavior
+    assert_equal("./", Pathname("/folder/").relative_uri_from(Pathname("/folder/firstpage.txt")))
+    # the problem is that Pathname often gives us names like "/folder" without the final slash...
+    # ... and then that fails on Ruby 1.9
+    # however, I've got a workaround in cases where the path is real and can thus be tested with directory?
+    assert_equal("./", Pathname("~").expand_path.relative_uri_from(Pathname("~/test1.txt").expand_path))
   end
   def test_image
     p = Pathname(__FILE__).dirname + "images"
     assert_equal([372,37], (p + "im.gif").image_size)
     assert_equal([372,37], (p + "im.jpg").image_size)
     assert_equal([372,37], (p + "im.png").image_size)
-    assert_equal([372,37], (p + "im.tif").image_size) # requires exifr
+    assert_equal([372,37], (p + "im.tif").image_size)
     assert_equal([nil, nil], (p + "im.pct").image_size) # we don't do PICT
   end
   def test_memo

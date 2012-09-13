@@ -1,7 +1,7 @@
 VERSION
 =======
 
-This is version 1.0.2.
+This is version 1.1. The version increment marks the beginning of usability under Ruby 1.9.3. WARNING: This took a lot of tweaking, and despite my best efforts, new bugs may have been introduced.
 
 HISTORY
 =======
@@ -41,4 +41,6 @@ In version 1.0, cleaned up cruft in the CSS processing processing routines, espe
 In version 1.0.1, expanded the user.rb mechanism to allow inclusion of a #user.rb file at the top level of the site folder; also improved the error message when a user.rb file fails to load. Documentation updated.
 
 In version 1.0.2, introduced a mechanism to allow a `.txt` file to function as an outline (like a `.opml`) file, by using indentation and setting the `:treatasopml` directive to `true`. Documentation updated.
+
+In version 1.1, support for Ruby 1.9.3 was added, along with some general code cleanup. Dependency on exifr removed, replaced by dependency on dimensions. Improved message/exception formatting.
 

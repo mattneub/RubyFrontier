@@ -1,32 +1,32 @@
---- 
-SECAboutThisPage: 
-  :page_id: thirdpage
-  :sectitle: About This Page
-firstpage: &id001 
-  :path: !ruby/object:Pathname 
+---
+firstpage: &2153477740
+  :path: !ruby/object:Pathname
     path: firstpage.html
-  :linetext: My First Web Page
-  :adr: !ruby/object:Pathname 
+  :adr: !ruby/object:Pathname
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/firstpage.txt
-fourthpage: &id003 
-  :path: !ruby/object:Pathname 
+  :linetext: My First Web Page
+my first web page: *2153477740
+fourthpage: &2153486220
+  :path: !ruby/object:Pathname
     path: folder/fourthpage.html
-  :linetext: My Fourth Web Page
-  :adr: !ruby/object:Pathname 
+  :adr: !ruby/object:Pathname
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/folder/fourthpage.txt
-my first web page: *id001
-thirdpage: &id002 
-  :path: !ruby/object:Pathname 
-    path: thirdpage.html
-  :linetext: My Third and Greatest Web Page
-  :adr: !ruby/object:Pathname 
-    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/thirdpage.txt
-secondpage: &id004 
-  :path: !ruby/object:Pathname 
+  :linetext: My Fourth Web Page
+my fourth web page: *2153486220
+secondpage: &2153503680
+  :path: !ruby/object:Pathname
     path: secondpage.html
-  :linetext: My Second Web Page
-  :adr: !ruby/object:Pathname 
+  :adr: !ruby/object:Pathname
     path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/secondpage.txt
-my third and greatest web page: *id002
-my fourth web page: *id003
-my second web page: *id004
+  :linetext: My Second Web Page
+my second web page: *2153503680
+thirdpage: &2153712000
+  :path: !ruby/object:Pathname
+    path: thirdpage.html
+  :adr: !ruby/object:Pathname
+    path: /Users/mattleopard/desire/ruby/rubyFrontier related/rubyFrontier/RubyFrontier.tmbundle/Support/tests/testsites/site1/thirdpage.txt
+  :linetext: My Third and Greatest Web Page
+my third and greatest web page: *2153712000
+SECAboutThisPage:
+  :sectitle: About This Page
+  :page_id: thirdpage

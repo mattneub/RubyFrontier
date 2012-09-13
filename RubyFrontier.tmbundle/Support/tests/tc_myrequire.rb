@@ -29,10 +29,20 @@ class TestMyRequire < Test::Unit::TestCase
       YAML
     end
     # require of library plus include
-    assert_nothing_raised do
-      myrequire ['yaml', :YAML]
-      YAML
-      ERROR_MANY_IMPLICIT
+    # structure of yaml library changed 1.8 -> 1.9
+    # this turns out to be rather a fragile example! oh well
+    if RUBY_VERSION < "1.9"
+      assert_nothing_raised do
+        myrequire ['yaml', :YAML]
+        YAML
+        ERROR_MANY_IMPLICIT
+      end
+    else
+        assert_nothing_raised do
+        myrequire ['yaml', :YAML]
+        YAML
+        ENGINE
+      end
     end
   end
 end

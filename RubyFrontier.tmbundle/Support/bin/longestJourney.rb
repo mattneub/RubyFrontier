@@ -17,9 +17,8 @@ module RubyFrontier
       fs = self.new
       yield
     rescue Exception => e
-      fs.close
-      print e.message, "<br>"
-      p e.backtrace.join("<br>")
+      puts e.message
+      e.backtrace.each {|line| puts line}
     ensure
       fs.close
     end
@@ -38,6 +37,9 @@ module RubyFrontier
     def close
       $stdout = @old_stdout
     end
+    def flush
+      @old_stdout.flush
+    end
   end
   
   def self.perform(command_name, *args)
@@ -47,17 +49,15 @@ module RubyFrontier
       html_header("RubyFrontier")
       puts "<pre>"
       FakeStdout.open do
-        require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
         UserLand::Html.send(command_name, *args)
       end
       puts "</pre>"
       html_footer()
     else
-      require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
       UserLand::Html.send(command_name, *args)
     end
   end
 end
 
-# repeat the require without penalty
-#require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
+require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
+

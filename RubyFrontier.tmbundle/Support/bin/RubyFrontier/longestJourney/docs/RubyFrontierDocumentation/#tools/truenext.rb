@@ -16,7 +16,7 @@ def truenext()
     nomad = obj
     while true
       nomad = nomad.dirname
-      if nomad.to_s =~ /folder$/i
+      if nomad.to_s.downcase.end_with? "folder"
         daddy = nomad.basename.to_s[0..-7]
         if @adrPageTable[:autoglossary][daddy]
           daddyObj = @adrPageTable[:autoglossary][daddy][:adr]

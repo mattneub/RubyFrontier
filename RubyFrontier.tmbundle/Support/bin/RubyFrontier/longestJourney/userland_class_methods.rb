@@ -38,7 +38,7 @@ module UserLand::Html
     
     pm.saveOutAutoglossary # save out autoglossary if any
         
-    if flPreview && (File.extname(pm.adrPageTable[:fname]) =~ /\.htm/i) # supposed to be a test for browser displayability
+    if flPreview && (File.extname(pm.adrPageTable[:fname]).downcase.start_with?(".htm")) # supposed to be a test for browser displayability
       if (apacheURL = pm.adrPageTable[:ftpsite][:apacheURL])
         f = pm.adrPageTable[:f].relative_path_from(Pathname(pm.adrPageTable[:ftpsite][:apacheSite]).expand_path)
         `open #{URI.escape(apacheURL + f)}`
@@ -86,7 +86,7 @@ module UserLand::Html
     # distinguish from pagesInFolder which is shallow, only during rendering, only renderables, and uses #nextprevs order
     result = Array.new
     Pathname(f).find do |p|
-      Find.prune if p.basename.to_s =~ /^[#.]/
+      Find.prune if p.basename.to_s.start_with?("#", ".")
       result << p if (!p.directory? && p.simplename != "") # ignore invisibles
     end
     result

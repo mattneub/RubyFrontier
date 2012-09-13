@@ -173,7 +173,7 @@ module UserLand::Html::StandardMacros
       if s = adrPageTable.fetch2(oneatt.to_sym)
         if %w{alink bgcolor text link vlink}.include?(oneatt)
           # colors should be hex and start with #
-          unless s =~ /^#/
+          unless s.start_with?("#")
             if s.length == 6
               unless s =~ /[^0-9a-f]/i
                 s = "#" + s
