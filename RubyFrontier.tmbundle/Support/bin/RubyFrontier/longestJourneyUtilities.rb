@@ -118,8 +118,10 @@ class Array # convenience methods
   end
 end
 
-=begin
-class JPEG # used by Pathname#image_size, stolen from the Internet :) http://snippets.dzone.com/posts/show/805
+=begin code to get dimensions of JPEG image, no longer used but left here as useful historical info
+# Ruby 1.9 broken the original code from http://snippets.dzone.com/posts/show/805
+# I have fixed it here so that it works under Ruby 1.8.7 and under Ruby 1.9
+class JPEG # used by Pathname#image_size
   attr_reader :width, :height, :bits
   def initialize(file)
     if file.kind_of? IO
@@ -130,7 +132,12 @@ class JPEG # used by Pathname#image_size, stolen from the Internet :) http://sni
   end
 private
   def examine(io)
-    raise 'malformed JPEG' unless io.getc == 0xFF && io.getc == 0xD8 # SOI
+    if RUBY_VERSION >= "1.9"
+      class << io
+        def getc; super.bytes.first; end
+        def readchar; super.bytes.first; end
+      end
+    end
     class << io
       def readint; (readchar << 8) + readchar; end
       def readframe; read(readint - 2); end
@@ -141,6 +148,7 @@ private
         c
       end
     end
+    raise 'malformed JPEG' unless io.getc == 0xFF && io.getc == 0xD8 # SOI
     while marker = io.next
       case marker
         when 0xC0..0xC3, 0xC5..0xC7, 0xC9..0xCB, 0xCD..0xCF # SOF markers
@@ -194,7 +202,8 @@ class Pathname # convenience methods
     uri2 = URI(URI.escape("file://" + p2.to_s))
     return uri1.route_from(uri2).path
   end
-=begin
+=begin code to get size of various sorts of image
+# no longer used; we now use the Dimensions gem, which provides a unified locus for all image types
   def image_size # read image file height and width
     # stolen from the Internet :) http://snippets.dzone.com/posts/show/805
     case self.extname.downcase
