@@ -97,6 +97,7 @@ module UserLand::Html
     self.everyPageOfFolder(self.getFtpSiteFile(adrObject).dirname)
   end
   def self.preflightSite(adrObject)
+    time = Time.new.to_f
     puts "preflighting site..."
     # prebuild autoglossary using every page of table containing adrObject path
     glossary = LCHash.new
@@ -118,7 +119,7 @@ module UserLand::Html
     end
     pm.saveOutAutoglossary(Hash[glossary]) # save out resulting autoglossary
     puts " "
-    puts "site preflighted, autoglossary rebuilt and saved"
+    puts "site preflighted, autoglossary rebuilt and saved in #{Time.new.to_f - time} seconds"
   end  
 =begin  
   def self.callFileWriterStartup(adrObject, adrStorage=Hash.new) # UNUSED
@@ -155,7 +156,10 @@ module UserLand::Html
     p = Pathname(s.chomp)
     p.mkpath
     FileUtils.cp_r($newsite.to_s + '/.', p)
-    FileUtils.rm((p + "#autoglossary.yaml").to_s) # just causes errors if it's there
+    begin
+      FileUtils.rm((p + "#autoglossary.yaml").to_s) # just causes errors if it's there
+    rescue
+    end
     # also get rid of svn leftovers if present
     `find '#{p}' -name ".svn" -print0 | xargs -0 rm -R -f`
     # and get rid of .DS_Store if present

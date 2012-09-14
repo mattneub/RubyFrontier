@@ -70,8 +70,8 @@ class UserLand::Html::PageMaker
     begin
       vv = nil # trick so that "v" is promoted to be global to the block as "vv", in case "rescue" is called
       adrPageTable["tools"].each_value { |v| theBindingMaker.instance_eval(File.read(vv = v)) }
-    rescue SyntaxError
-      raise "Trouble parsing #{vv}"
+    rescue SyntaxError => e
+      myraise "Trouble parsing #{vv}: \n#{e.message}"
     end
   
     # if the page is an outline or script, now render it (unlike Frontier which did it earlier, unnecessarily)

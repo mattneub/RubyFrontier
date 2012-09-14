@@ -48,7 +48,7 @@ class TestFakeStdout < Test::Unit::TestCase
     RubyFrontier.perform(:test_output, true) # artificial method I created just so we could test fully formatted output
     # perform with true gives us full html header and footer with <pre> sandwich around munged puts output
     # a complication: if we get the "no user.rb" message, "this is test" won't be first within the <pre> 
-    assert_match(%r{(<pre>\n|<br>)this is a test<br>and this is a test<br></pre>}, @stdout.string, @stdout.string)
+    assert_match(%r{(<pre>\s*|<br>)this is a test<br>and this is a test<br></pre>}, @stdout.string, @stdout.string)
   end
   def test_perform2
     RubyFrontier.perform(:test_output, false) # when false, no munging of "puts", no header and footer, no nothing
