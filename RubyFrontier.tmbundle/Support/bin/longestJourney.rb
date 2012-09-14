@@ -33,6 +33,7 @@ module RubyFrontier
         %{<a href="txmt://open?url=file://#{e_url($1)}">#{$1}</a>#{$2}}
       end
       @old_stdout.print s
+      @old_stdout.flush # experimental
     end
     def close
       $stdout = @old_stdout
@@ -48,6 +49,7 @@ module RubyFrontier
       STDOUT.sync = true
       html_header("RubyFrontier")
       puts "<pre>"
+      puts " " # trying to get the console to clear as soon as possible
       FakeStdout.open do
         UserLand::Html.send(command_name, *args)
       end

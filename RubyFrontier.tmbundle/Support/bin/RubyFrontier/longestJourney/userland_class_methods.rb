@@ -54,10 +54,11 @@ module UserLand::Html
     puts "publishing site"
     self.preflightSite(adrObject) if preflight
     self.everyPageOfSite(adrObject).each do |p|
-      puts ""
+      puts " "
       puts "publishing '#{p}'"
       self.releaseRenderedPage(p, (p == adrObject) && flPreview) # the only one to open in browser is the one we started with
     end
+    puts " "
     puts "finished publishing site"
   end
   def self.publishFolder(adrObject, preflight=true)
@@ -101,18 +102,22 @@ module UserLand::Html
     glossary = LCHash.new
     pm = nil # so that we have a PageMaker object left over at the end
     self.everyPageOfSite(Pathname(adrObject)).each do |p|
+      # can be slow, so provide feedback while we work
+      print "."
       pm = PageMaker.new
       pm.memoize = false # so if we then publishSite, existing values won't bite us
       pm.buildPageTableFully(p)
       tempGlossary = LCHash.new
       pm.addPageToGlossary(p, tempGlossary) # downcases for us
       glossary.merge!(tempGlossary) do |k, vold, vnew| # notify user of non-uniques
+        puts " "
         puts "----", "Non-unique autoglossary entry detected for #{k}",
           vold.inspect, "vs.", vnew.inspect, "while processing '#{p}'" if vold != vnew
         vnew
       end
     end
     pm.saveOutAutoglossary(Hash[glossary]) # save out resulting autoglossary
+    puts " "
     puts "site preflighted, autoglossary rebuilt and saved"
   end  
 =begin  

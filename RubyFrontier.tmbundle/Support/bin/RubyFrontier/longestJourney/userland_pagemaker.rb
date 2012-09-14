@@ -68,10 +68,10 @@ class UserLand::Html::PageMaker
     # all outline renderers in tools spring into life as classes
     theBindingMaker = BindingMaker.new(self)
     begin
-      v = nil # trick so that "v" is global to the block, in case "rescue" is called
-      adrPageTable["tools"].each_value { |v| theBindingMaker.instance_eval(File.read(v)) }
+      vv = nil # trick so that "v" is promoted to be global to the block as "vv", in case "rescue" is called
+      adrPageTable["tools"].each_value { |v| theBindingMaker.instance_eval(File.read(vv = v)) }
     rescue SyntaxError
-      raise "Trouble parsing #{v}"
+      raise "Trouble parsing #{vv}"
     end
   
     # if the page is an outline or script, now render it (unlike Frontier which did it earlier, unnecessarily)
