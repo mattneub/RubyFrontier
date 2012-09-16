@@ -21,7 +21,7 @@ HISTORY
 
 In preparation for the move to GitHub in October 2011 I wrote some unit tests, thus providing some basis for believing that RubyFrontier mostly does what it's supposed to do. Because of these unit tests, along with the relative maturity and proven track record of RubyFrontier (in my own life at least), I declared the version number 1.0 at the time of the move to GitHub, marking a milestone in the life of the code.
 
-In September 2012 another milestone was reached: RubyFrontier started working under Ruby 1.9.3. See the next section for more about that.
+In September 2012 another milestone was reached: RubyFrontier started working under Ruby 1.9.3.
 
 For past history and version number, see the file "HISTORY" (inside the bundle).
 
@@ -31,13 +31,13 @@ DEPENDENCIES
 
 You need a Mac and TextMate (presumably TextMate 1.5.x; I have not tested with TextMate 2). Windows / Linux users and TextMate detractors, this is not the droid you're looking for. I might eventually relax the dependency on TextMate, but for now, despite its flaws, TextMate does so much for me and for RubyFrontier that I have not bothered to consider any other milieu.
 
-RubyFrontier was originally written under Ruby 1.8.6. I now use it under Ruby 1.8.7. In September 2012 I installed Ruby 1.9.3 and spent a couple of days testing and tweaking, and I am happy to say that RubyFrontier now appears to be working equally under Ruby 1.8.7 and 1.9.3. By "working equally" I mean that:
+RubyFrontier was originally written under Ruby 1.8.6, and I then used it for a long time under Ruby 1.8.7. In September 2012 I installed Ruby 1.9.3 and spent some time tweaking, and I am happy to say that RubyFrontier now appears to be working equally under Ruby 1.8.7 and 1.9.3. By "working equally" I mean that:
 
 1. All tests pass. You could argue that the tests are a little weak and don't hit certain edge cases or go very deep into the page/site-building mechanism, and that's true enough. But it's something. And...
 
-2. The documentation site (included in RubyFrontier) builds _identically_ under Ruby 1.8.7 and Ruby 1.9.3. I regard that as a highly encouraging sign.
+2. All my own sites build correctly.
 
-Therefore I now permit use of RubyFrontier under Ruby 1.9.3. Please bear in mind for now that getting RubyFrontier to work under Ruby 1.9.3 required a lot of tweaking, and I took the opportunity to do some code clean-up. Therefore it is _possible_ (though not expected) that some new bugs may have been introduced. I urge you to try it and to [report][] any issues. If the current state of RubyFrontier worries you, stick with Ruby 1.8.7 and use commit 611d787958, the last commit before the plunge into Ruby 1.9.3.
+Therefore I now permit use of RubyFrontier under Ruby 1.9.3. As of this point (version 1.1.1) I am quite confident about this feature. If you do encounter an issue, please [report][] it. If the Ruby 1.9.3 tweaks worry you, stick with Ruby 1.8.7 and use commit 611d787958, but in my opinion the current version is better, under both Ruby 1.8.7 and Ruby 1.9.3.
 
 Various parts of RubyFrontier, and the demonstration sites, use various libraries and gems, some of which you may not have installed. Many of these are initially "weak-linked", meaning that it is not a fatal error to lack them, but you'll probably want to install them anyway, as doing so can do no harm. For example, the part of RubyFrontier that deals with images uses the `dimensions` gem to get the dimensions of images, but you do not need to install the `dimensions` gem immediately - RubyFrontier will complain of its absence to you, but it will work just fine nevertheless as long as your Web sites have no images.
 

@@ -1,7 +1,7 @@
 VERSION
 =======
 
-This is version 1.1. The version increment marks the beginning of usability under Ruby 1.9.3. WARNING: This took a lot of tweaking, and despite my best efforts, new bugs may have been introduced.
+This is version 1.1.1.
 
 HISTORY
 =======
@@ -43,4 +43,6 @@ In version 1.0.1, expanded the user.rb mechanism to allow inclusion of a #user.r
 In version 1.0.2, introduced a mechanism to allow a `.txt` file to function as an outline (like a `.opml`) file, by using indentation and setting the `:treatasopml` directive to `true`. Documentation updated.
 
 In version 1.1, support for Ruby 1.9.3 was added, along with some general code cleanup. Dependency on exifr removed, replaced by dependency on dimensions. Improved message/exception formatting.
+
+In version 1.1.1, some tweaks were made to improve message/exception formatting even more (and fixed a test that was broken by this change). Improved reporting of syntax errors in tools. Fixed the JPEG dimensions calculation to work with Ruby 1.9.3, even though we aren't using it any more (it's fixed but commented out). Corrected a bug caused by removal of the autoglossary from the repository. The most important change is a huge speedup in rebuilding the autoglossary (Preflight Site, Publish Site).
 

@@ -3,10 +3,7 @@ $: << File.dirname(__FILE__)
 require 'longestJourneyUtilities.rb'
 
 myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "dimensions", "enumerator", "kramdown", "haml", "sass", "nokogiri"
-begin
-  YAML::ENGINE.yamler = 'syck' # otherwise our speed is cut in *half* on Ruby 1.9.3
-rescue
-end
+
 =begin make 'load' and 'require' include folder next to, and with same name as, this file 
 that is where supplementary files go
 uses our Pathname convenience method so we couldn't do this until now

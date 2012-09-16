@@ -247,3 +247,5 @@ class Pathname # convenience methods
   extend Memoizable
   memoize :chop_basename
 end
+
+

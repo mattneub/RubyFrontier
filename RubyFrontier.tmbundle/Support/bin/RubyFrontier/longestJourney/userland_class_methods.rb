@@ -99,6 +99,11 @@ module UserLand::Html
   def self.preflightSite(adrObject)
     time = Time.new.to_f
     puts "preflighting site..."
+    # a lot faster if we don't try to read in existing autoglossary every time
+    autoglossary = self.getFtpSiteFile(Pathname(adrObject)).dirname + "#autoglossary.yaml"
+    if autoglossary.exist?
+      File.delete(autoglossary)
+    end
     # prebuild autoglossary using every page of table containing adrObject path
     glossary = LCHash.new
     pm = nil # so that we have a PageMaker object left over at the end
