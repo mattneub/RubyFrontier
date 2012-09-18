@@ -91,8 +91,10 @@ class LCHash < Hash # implement pseudo-case-insensitive fetching
 end
 
 class Symbol # convenience methods
-  def downcase
-    self.to_s.downcase.to_sym
+  unless self.respond_to? :downcase # in Ruby 1.9 it is already defined for us
+    define_method :downcase do
+      self.to_s.downcase.to_sym
+    end
   end
 end
 
