@@ -1,99 +1,97 @@
 
-require "test/unit"
 
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
+$: << File.dirname(File.expand_path(__FILE__)) + '/thingsToRequire'
 
-class TestMyRequire < Test::Unit::TestCase
-  def test_myrequire
-    # simple require of one library
-    assert_nothing_raised do
-      myrequire 'pathname'
-      Pathname
-    end
-    # require of multiple libraries in implicit array
-    assert_nothing_raised do
-      myrequire 'pathname', 'yaml'
-      Pathname
-      YAML
-    end
-    # require of multiple libraries in implicit array of explicit one-element arrays
-    assert_nothing_raised do
-      myrequire ['pathname'], ['yaml']
-      Pathname
-      YAML
-    end
-    # require of multiple libraries in explicit array splatted
-    assert_nothing_raised do
-      myrequire *['pathname', 'yaml']
-      Pathname
-      YAML
-    end
-    # require of library plus include
-    # structure of yaml library changed 1.8 -> 1.9
-    # this turns out to be rather a fragile example! oh well
-    if RUBY_VERSION < "1.9"
-      assert_nothing_raised do
-        myrequire ['yaml', :YAML]
-        YAML
-        ERROR_MANY_IMPLICIT
-      end
-    else
-        assert_nothing_raised do
-        myrequire ['yaml', :YAML]
-        YAML
-        ENGINE
-      end
-    end
-  end
+begin
+  require "minitest/autorun"
+rescue LoadError
+  require 'rubygems'
+  require 'minitest/autorun'
 end
 
-class TestMyRequireOutput < Test::Unit::TestCase
-  # ability to nab stdout and inspect it as @stdout
-  require (File.dirname(__FILE__)) + '/stdoutRedirectionForTesting.rb'
-  include RedirectIo
-  # separate defs because we want setup and teardown separately for each, to end up with a different @stdout
-  # mere require of single unavailable library: no exception, warning comes back
-  def test_myrequire
-    assert_nothing_raised do
-      myrequire 'zampabalooie'
-    end
-    assert_match /^Warning: Require failed/, @stdout.string, @stdout.string
+class TestMyRequire < MiniTest::Spec
+  # assert_nothing_raised is accused of being not a test at all 
+  # (http://blog.zenspider.com/blog/2012/01/assert_nothing_tested.html)
+  # so it has been removed in the conversion from Test::Unit to MiniTest
+  # it is argued that if something raises, it will raise right there in the test
+  # (https://github.com/seattlerb/minitest/issues/159)
+  # nevertheless it's nice to have an actual assertion
+  # hence this utility whose output can be tested
+  def testForError # pass me a block and I'll tell you if it raised
+    yield
+    "ok"
+  rescue
+    $!
   end
-  # require of multiple libraries in explicit array
-  # but this syntax is wrong; it is an array of one element, so 'yaml' is taken as an include, which fails
-  def test_myrequire2
-    assert_nothing_raised do
-      myrequire ['pathname', 'yaml']
-    end
-    assert_match /failed to include yaml/, @stdout.string, @stdout.string
+  before do
+    # make sure we are actually requiring/loading something new each time
+    # note that "before" can include an assertion!
+    proc{Req1}.must_raise NameError
+    proc{Req2}.must_raise NameError
   end
-  # require of multiple libraries in explicit array splatted, one bad
-  def test_myrequire3
-    assert_nothing_raised do
-      myrequire *['pathname', 'yamlcaml']
+  after do
+    # "unload" what we required/loaded, by removing the name and the require path
+    begin
+      Object.send :remove_const, :Req1
+      Object.send :remove_const, :Req2
+    rescue
     end
-    assert_match /^Warning: Require failed/, @stdout.string, @stdout.string
+    $".delete_if {|elem| elem =~ %r%thingsToRequire% }
   end
-  # require of library plus include, with failure
-  def test_myrequire4
-    assert_nothing_raised do
-      myrequire ['yaml', :YAMLL]
+  it "requires one library" do
+    testForError do
+      myrequire 'req1'
+      Req1
+    end.must_equal "ok"
+  end
+  it "requires multiple libraries in implicit array" do
+    testForError do
+      myrequire 'req1', 'req2'
+      Req1
+      Req2
+    end.must_equal "ok"
+  end
+  it "requires multiple libraries in implicit array of explicit one-element arrays" do
+    testForError do
+      myrequire ['req1'], ['req2']
+      Req1
+      Req2
+    end.must_equal "ok"
+  end
+  it "requires multiple libraries in explicit array splatted" do
+    testForError do
+      myrequire *['req1', 'req2']
+      Req1
+      Req2
+    end.must_equal "ok"
+  end
+  it "treats two-element array as signifying library and namespace" do
+    out, err = capture_io do 
+      myrequire ['req1', 'req2']
     end
-    assert_match /failed to include/, @stdout.string, @stdout.string
+    out.must_match %r/failed to include req2/
+  end
+  it "successfully includes namespaces in series" do
+    proc {Three}.must_raise NameError # because there is no such term
+    # but...
+    testForError do
+      myrequire(['req1', [:Req1, :Two]])
+    end.must_equal "ok"
+    (Three).to_s.must_equal "Req1::Two::Three"
+  end
+  it "complains if the require fails" do
+    out, err = capture_io do
+      myrequire 'req3'
+    end
+    out.must_match(/^Warning: Require failed.*req3/m)
+  end
+  it "complains if any require fails in a series" do
+    out, err = capture_io do
+      myrequire 'req1', 'req3', 'req2'
+    end
+    out.must_match(/^Warning: Require failed.*req3/m)
   end
 end
-
-=begin
-require 'test/unit/ui/console/testrunner'
-class TestMyRequireSuite
-  def self.suite
-    suite = Test::Unit::TestSuite.new "TestMyRequire"
-    suite << TestMyRequire.suite
-    suite << TestMyRequireOutput.suite
-    return suite
-  end
-end
-Test::Unit::UI::Console::TestRunner.run(TestMyRequireSuite)
-=end
 
 

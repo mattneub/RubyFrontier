@@ -1,24 +1,28 @@
-require "test/unit"
 
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
 
-class TestMyRaise < Test::Unit::TestCase
-  # simple require of one library
-  def deeper
-    myraise "test"
+begin
+  require "minitest/autorun"
+rescue LoadError
+  require 'rubygems'
+  require 'minitest/autorun'
+end
+
+#top-level "myraise"
+
+describe "myraise" do
+  before do
+    @raise = proc {myraise "test"}
   end
-  def test_myrequire1
-    assert_raise(RuntimeError) do
-      deeper
-    end
+  it "raises a RuntimeError" do
+    @raise.must_raise RuntimeError
   end
-  def test_myrequire2
-    begin
-      deeper
-    rescue
-      assert_equal "test", $!.message
-      assert_equal 1, $!.backtrace.length
-    end
+  it "emits the attached message" do
+    @raise.call rescue $!.message.must_equal "test"
+  end
+  it "has a single-level backtrace" do
+    @raise.call rescue $!.backtrace.length.must_equal 1
   end
 end
+
 

@@ -177,7 +177,8 @@ class Pathname # convenience methods
     # ...as that sites rely on the implicit behavior
   end
   def contains?(p)
-    p.ascend {|dir| break true if self == dir } # nil otherwise
+    cleanself = self.cleanpath
+    p.cleanpath.ascend {|dir| break true if cleanself == dir } # nil otherwise
   end
   def simplename # name without extension
     self.basename(self.extname)
@@ -192,10 +193,25 @@ class Pathname # convenience methods
     
     raise "expecting absolute path" unless p1.absolute? && p2.absolute?
     
-    # attempt to work around change in URI behavior in Ruby 1.9
-    # if a real directory, guarantee trailing slash
-    p1 = File.join(p1,"") if p1.directory?
-    p2 = File.join(p2,"") if p2.directory?
+    # remove trailing slashes, be canonical
+    p1 = p1.cleanpath
+    p2 = p2.cleanpath
+        
+    # however, there's a problem
+    # we're trying to form a *relative* URL even though we are starting with absolute paths
+    # e.g. relative positions in source folder will be relative positions in output folder
+    # so it is crucial that the top-level folder NOT BE NAMED
+    # because it won't have the same name in the output folder
+    # to ensure this, we put the trailing slash back if the pathname is just the top-level folder
+    # this gives the correct outcome from URI even in Ruby 1.9, where the behavior changed
+    
+    p1 = File.join(p1,"") if p1.split[0].root?
+    p2 = File.join(p2,"") if p2.split[0].root?
+    
+    # # attempt to work around change in URI behavior in Ruby 1.9
+    # # if a real directory, guarantee trailing slash
+    # p1 = File.join(p1,"") if p1.directory?
+    # p2 = File.join(p2,"") if p2.directory?
     
     #uri1 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => self.to_s
     #uri2 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => p2.to_s

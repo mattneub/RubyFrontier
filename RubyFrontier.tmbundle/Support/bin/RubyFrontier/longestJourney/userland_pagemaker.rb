@@ -459,6 +459,7 @@ class UserLand::Html::PageMaker
     return adrPageTable[:siteRootFolder] if adrPageTable[:siteRootFolder]
     folder = Pathname(adrPageTable[:ftpsite][:folder]).expand_path
     # ensure whole containing path exists; if not, use temp folder
+    # TODO: why are we not using tmpdir here????
     folder = Pathname(`mktemp -d /tmp/website.XXXXXX`) unless folder.dirname.exist?
     return (adrPageTable[:siterootfolder] = folder) # set in adrPageTable and also return it
   end
