@@ -41,6 +41,11 @@ module RubyFrontier
     def flush
       @old_stdout.flush
     end
+    def <<(what) # needed by pp
+      @old_stdout.<<(what.gsub("<","&lt;")) 
+      # TODO: this is incomplete, probably needs to act more like write
+      # in fact I suspect that I probably could just *call* write
+    end
   end
   
   def self.perform(command_name, *args)

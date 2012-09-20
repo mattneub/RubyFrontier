@@ -37,16 +37,16 @@ Another helpful method, mentioned [earlier](standardmacros), is **`html.getTitle
 
 The New Site model site that comes with RubyFrontier demonstrates a simple approach based on these two macros. It puts a Prev link and a Next link at the bottom of each page, by calling this macro in the template:
 
-	def nextprevlinks()
-	  p, n = html.getNextPrev(adrObject)
-	  ntitle, npath = html.getTitleAndPaths(n) if n
-	  ptitle, ppath = html.getTitleAndPaths(p) if p
-	  rel_to_top = adrsiteroottable.relative_uri_from(adrobject)
-	  s = ""
-	  s << "Prev: " + html.getLink(ptitle, rel_to_top + ppath) if p
-	  s << " | " if p and n
-	  s << "Next: " + html.getLink(ntitle, rel_to_top + npath) if n
-	  "<p>#{s}</p>\n"
-	end
+    def nextprevlinks()
+      p, n = html.getNextPrev(adrObject)
+      ntitle, npath = html.getTitleAndPaths(n) if n
+      ptitle, ppath = html.getTitleAndPaths(p) if p
+      s = ""
+      s << "Prev: " + html.getLink(ptitle, ptitle) if p
+      s << " | " if p and n
+      s << "Next: " + html.getLink(ntitle, ntitle) if n
+      "<p>#{s}</p>\n"
+    end
 
+Observe that we can use the title of the target page not only as the visible text of the link but also as the `href` of the link, because it will be turned into a relative URL for us by the [autoglossary mechanism](autoglossary). We could equally have used `p` and `n` themselves as identifiers to form the `href` for these links.
 

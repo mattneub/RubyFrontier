@@ -86,24 +86,87 @@ describe Pathname do
     end
   end
   
+  describe "pieces" do
+    it "breaks pathname into pieces" do
+      s = "/hey/ho/nonny/no"
+      p = Pathname(s)
+      p.pieces.length.must_equal 4
+      ("/" + p.pieces.join("/")).must_equal s
+    
+      s = "/hey/"
+      p = Pathname(s)
+      p.pieces.length.must_equal 1
+      ("/" + p.pieces.join("/")).must_equal "/hey" # cleaned path
+    
+      s = "/hey"
+      p = Pathname(s)
+      p.pieces.length.must_equal 1
+      ("/" + p.pieces.join("/")).must_equal "/hey" # cleaned path
+    end
+  end
+  
+  
   describe "relative_uri_from" do
-    it "raises if one or both pathnames not absolute" do
+    it "rejects nonabsolutes" do
       proc {Pathname("test1").relative_uri_from(Pathname("test2"))}.must_raise RuntimeError
       proc {Pathname("/test1").relative_uri_from(Pathname("test2"))}.must_raise RuntimeError
       proc {Pathname("test1").relative_uri_from(Pathname("/test2"))}.must_raise RuntimeError
     end
+    it "rejects different top levels" do
+      proc {Pathname("/hey/ho").relative_uri_from(Pathname("/nonny/no"))}.must_raise RuntimeError
+    end
+    
+    # a serious edge case
+    it "handles identical paths" do
+      p1 = p2 = Pathname("/a/b/c/d")
+      p1.relative_uri_from(p2).must_equal("") # crucial to our sites that this be the way of expressing it
+    end
+  
+    # examples derived from the URI spec, http://tools.ietf.org/html/rfc3986
+    it "same except for last" do
+      p2 = Pathname("/a/b/c/d")
+      Pathname("/a/b/c/g").relative_uri_from(p2).must_equal("g")
+    end
+    it "raises on pure down" do
+      # there is no such thing as a uri from a folder, so there's no "right" answer
+      p2 = Pathname("/a/b/c/d")
+      proc {Pathname("/a/b/c/d/e/f/g").relative_uri_from(p2)}.must_raise RuntimeError
+    end
+    it "sidewards and down" do
+      p2 = Pathname("/a/b/c/d")
+      Pathname("/a/b/c/g/h/i/j").relative_uri_from(p2).must_equal("g/h/i/j")
+    end
+    it "one shorter" do
+      p2 = Pathname("/a/b/c/d")
+      Pathname("/a/b/c").relative_uri_from(p2).must_equal "."
+    end
+    it "two shorter" do
+      p2 = Pathname("/a/b/c/d")
+      Pathname("/a/b").relative_uri_from(p2).must_equal ".."
+    end
+    it "many shorter" do
+      p2 = Pathname("/a/b/c/d")
+      Pathname("/a").relative_uri_from(p2).must_equal "../.."
+    end
+    it "goes up many and comes down" do
+      p2 = Pathname("/a/b/c/d")
+      Pathname("/a/g").relative_uri_from(p2).must_equal "../../g"
+      Pathname("/a/g/h").relative_uri_from(p2).must_equal "../../g/h"
+    end
+  
+    # examples I made up
     it "goes sideways" do
       Pathname("/top/test2.txt").relative_uri_from(Pathname("/top/test1.txt")).must_equal "test2.txt"
       Pathname("/top/next/test2.txt").relative_uri_from(Pathname("/top/next/test1.txt")).must_equal "test2.txt"
     end
-    it "goes up with double dots" do
-      Pathname("/top/down").relative_uri_from(Pathname("/top/down/test1.txt")).must_equal "../down"
+    it "goes up one level with a single dot" do
+      Pathname("/top/down").relative_uri_from(Pathname("/top/down/test1.txt")).must_equal "."
       # trailing slash on first doesn't matter
-      Pathname("/top/down/").relative_uri_from(Pathname("/top/down/test1.txt")).must_equal "../down"
+      Pathname("/top/down/").relative_uri_from(Pathname("/top/down/test1.txt")).must_equal "."
       # trailing slash on second doesn't matter
-      Pathname("/top/down").relative_uri_from(Pathname("/top/down/test1/")).must_equal "../down"
+      Pathname("/top/down").relative_uri_from(Pathname("/top/down/test1/")).must_equal "."
       # trailing slash on both doesn't matter
-      Pathname("/top/down/").relative_uri_from(Pathname("/top/down/test1/")).must_equal "../down"
+      Pathname("/top/down/").relative_uri_from(Pathname("/top/down/test1/")).must_equal "."
     end
     it "goes up with double dots and then sideways" do
       Pathname("/top/side").relative_uri_from(Pathname("/top/down/down/test1.txt")).must_equal "../../side"
@@ -115,14 +178,15 @@ describe Pathname do
       Pathname("/top/side/").relative_uri_from(Pathname("/top/down/down/test1/")).must_equal "../../side"
     end
     it "goes down" do
+      skip # THIS TEST IS BOGUS! there is no such thing as a url from a folder
       Pathname("/top/down/test2.txt").relative_uri_from(Pathname("/top")).must_equal "down/test2.txt"
-      Pathname("/top/down/test2.txt").relative_uri_from(Pathname("/top/down")).must_equal "down/test2.txt"
-      Pathname("/top/down/down/test2.txt").relative_uri_from(Pathname("/top/down")).must_equal "down/down/test2.txt"
+      Pathname("/top/down/test2.txt").relative_uri_from(Pathname("/top/down")).must_equal "test2.txt"
+      Pathname("/top/down/down/test2.txt").relative_uri_from(Pathname("/top/down")).must_equal "down/test2.txt"
       # slashes don't matter
-      Pathname("/top/down/test2.txt").relative_uri_from(Pathname("/top/down/")).must_equal "down/test2.txt"
-      Pathname("/top/down/down/test2.txt").relative_uri_from(Pathname("/top/down/")).must_equal "down/down/test2.txt"
-      Pathname("/top/down/test2/").relative_uri_from(Pathname("/top/down/")).must_equal "down/test2"
-      Pathname("/top/down/down/test2/").relative_uri_from(Pathname("/top/down/")).must_equal "down/down/test2"
+      Pathname("/top/down/test2.txt").relative_uri_from(Pathname("/top/down/")).must_equal "test2.txt"
+      Pathname("/top/down/down/test2.txt").relative_uri_from(Pathname("/top/down/")).must_equal "down/test2.txt"
+      Pathname("/top/down/test2/").relative_uri_from(Pathname("/top/down/")).must_equal "test2"
+      Pathname("/top/down/down/test2/").relative_uri_from(Pathname("/top/down/")).must_equal "down/test2"
     end
     it "goes sideways and down" do
       Pathname("/top/down/test2.txt").relative_uri_from(Pathname("/top/test1.txt")).must_equal "down/test2.txt"
@@ -137,14 +201,14 @@ describe Pathname do
       Pathname("/top/down down/test2.txt").relative_uri_from(Pathname("/top/test1.txt")).must_equal "down%20down/test2.txt"
     end
     it "never mentions the top-level folder's name" do
-      Pathname("/top/").relative_uri_from(Pathname("/top/text1.txt")).must_equal "./"
-      Pathname("/top").relative_uri_from(Pathname("/top/down/test1.txt")).must_equal "../"
-      Pathname("/top/").relative_uri_from(Pathname("/top/down/test1.txt")).must_equal "../"
-      Pathname("/top").relative_uri_from(Pathname("/top/down/test1/")).must_equal "../"
-      Pathname("/top/").relative_uri_from(Pathname("/top/down/test1/")).must_equal "../"
-      Pathname("/top/").relative_uri_from(Pathname("/top/down/down/test1/")).must_equal "../../"
-      Pathname("/top").relative_uri_from(Pathname("/top/down/down/test1.txt")).must_equal "../../"
-      Pathname("/top").relative_uri_from(Pathname("/top/down/down/test1")).must_equal "../../"
+      Pathname("/top/").relative_uri_from(Pathname("/top/text1.txt")).must_equal "."
+      Pathname("/top").relative_uri_from(Pathname("/top/down/test1.txt")).must_equal ".."
+      Pathname("/top/").relative_uri_from(Pathname("/top/down/test1.txt")).must_equal ".."
+      Pathname("/top").relative_uri_from(Pathname("/top/down/test1/")).must_equal ".."
+      Pathname("/top/").relative_uri_from(Pathname("/top/down/test1/")).must_equal ".."
+      Pathname("/top/").relative_uri_from(Pathname("/top/down/down/test1/")).must_equal "../.."
+      Pathname("/top").relative_uri_from(Pathname("/top/down/down/test1.txt")).must_equal "../.."
+      Pathname("/top").relative_uri_from(Pathname("/top/down/down/test1")).must_equal "../.."
     end
   end
   

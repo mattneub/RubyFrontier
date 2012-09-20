@@ -186,39 +186,69 @@ class Pathname # convenience methods
   def needs_update_from(p) # compare mod dates
     !self.exist? || self.mtime < p.mtime
   end
-  def relative_uri_from(p2) # derive relative (partial) URI
-    # unfortunately a relative path is not the same as a relative uri, so can't use relative_path_from
-    # so we construct a pair of pseudo http URLs and have URI do the work
-    p1 = Pathname(self)
+  def pieces
+    p1 = self.cleanpath
+    result = Array.new
+    first = second = Pathname("dummy")
+    current = p1
+    until first.root?
+      first, second = current.split
+      current = first
+      result.unshift second
+    end
+    result.map {|piece| piece.to_s}
+  end
+  def relative_uri_from(p2)    
+    # in order to avoid the quirks of depending on URI, whose style of presenting a relative URI can change,
+    # I've decided to write my own URI-construction routine, allowing me to take charge of the URI's format
     
+    p1 = self.cleanpath
+    p2 = p2.cleanpath
     raise "expecting absolute path" unless p1.absolute? && p2.absolute?
     
-    # remove trailing slashes, be canonical
-    p1 = p1.cleanpath
-    p2 = p2.cleanpath
-        
-    # however, there's a problem
-    # we're trying to form a *relative* URL even though we are starting with absolute paths
-    # e.g. relative positions in source folder will be relative positions in output folder
-    # so it is crucial that the top-level folder NOT BE NAMED
-    # because it won't have the same name in the output folder
-    # to ensure this, we put the trailing slash back if the pathname is just the top-level folder
-    # this gives the correct outcome from URI even in Ruby 1.9, where the behavior changed
+    p1p = p1.pieces
+    p2p = p2.pieces
+    raise "paths must have same top level" unless p1p[0] == p2p[0]
     
-    p1 = File.join(p1,"") if p1.split[0].root?
-    p2 = File.join(p2,"") if p2.split[0].root?
+    if p1p == p2p # super-degenerate edge case, self-reference
+      return "" # empty href indicates self-reference, useful in finalFilter
+    end
     
-    # # attempt to work around change in URI behavior in Ruby 1.9
-    # # if a real directory, guarantee trailing slash
-    # p1 = File.join(p1,"") if p1.directory?
-    # p2 = File.join(p2,"") if p2.directory?
+    # we know that they share a common start, so remove it
+    while p1p[0] == p2p[0] do
+      p1p.shift
+      p2p.shift
+    end
     
-    #uri1 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => self.to_s
-    #uri2 = URI::HTTP.build2 :scheme => "http", :host => "crap", :path => p2.to_s
+    # the next question is how many steps long p2's remaining path is:
+    # that is, the path from our starting point to the (now absent) common folder
     
-    uri1 = URI(URI.escape("file://" + p1.to_s))
-    uri2 = URI(URI.escape("file://" + p2.to_s))
-    return uri1.route_from(uri2).path
+    outcome = 
+    case p2p.length
+    when 0
+      # first degenerate case: no steps
+      # p2 is simply the start of p1
+      # this case is illegal! we're trying to make a relative URL from a folder
+      # took me all this time to understand what I was previously doing wrong and why it was fragile
+      # it is meaningless to speak of a relative uri from a FOLDER (and you can't click on a link in a folder anyway)
+      # hence my test cases and usages were bogus
+      raise "illegal to make a URI relative to a folder"
+    
+    when 1
+      # second degenerate case: one step
+      # we need to go just one up, and then down p1
+      outcome = (["."] + p1p).join("/")
+      
+    else
+      # standard case
+      outcome = (([".."] * (p2p.length - 1)) + p1p).join("/")
+    end
+    
+    # stylistic choice: strip off initial "./" (legal but otiose) for up-one-and-down
+    # single step up is "." and will remain untouched
+    outcome = outcome[2..-1] if outcome.start_with?("./")
+    
+    URI.escape(outcome)
   end
 =begin code to get size of various sorts of image
 # no longer used; we now use the Dimensions gem, which provides a unified locus for all image types
