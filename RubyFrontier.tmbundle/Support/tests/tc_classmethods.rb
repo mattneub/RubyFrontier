@@ -10,6 +10,7 @@ require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFront
 
 require 'tmpdir' # we're going to make and remove a folder full of stuff
 
+
 class TestUserLandHtml < MiniTest::Spec
   @@preflighted = false
   before do
@@ -131,7 +132,6 @@ class TestUserLandHtml2 < MiniTest::Spec
     it "creates a new site with the expected contents" do
       Dir.mktmpdir("testingnewsite") do |dir|
         UserLand::Html.newSite(dir)
-        Dir.chdir(dir)
         # and here's what I expect it to contain
         s = <<END
 #filters
@@ -170,7 +170,9 @@ blurb.txt
 nextprevlinks.rb
 section.rb
 END
-        `ls -R1`.must_equal s
+        Dir.chdir(dir) do
+          `ls -R1`.must_equal s
+        end
       end
     end
   end
@@ -185,7 +187,6 @@ END
       err.message.must_match %r%not a site page%
     end
     it "builds site1 correctly" do
-      Dir.chdir # I have no idea why this is needed, but somebody is very unhappy otherwise
       actualoutput = Pathname("~/Desktop/testsite1").expand_path # new site will be created here
       actualoutput.rmtree unless !actualoutput.exist?
       capture_io do # suppress output
