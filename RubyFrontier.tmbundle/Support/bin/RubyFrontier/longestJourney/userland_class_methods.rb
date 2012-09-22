@@ -150,12 +150,12 @@ module UserLand::Html
     end.compact.join(" ")
     %{<a href="#{url}"#{" " + opt if !opt.empty?}>#{linetext}</a>}
   end
-  def self.newSite(testing = false)
+  def self.newSite(testing = nil)
     s = ""
     if !testing
       s = `"#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog" filesave --title "New Web Site" --text "Specify a folder to create"`
-    else # testing, use with care
-      s = Pathname("~/Desktop/testingXYZ").expand_path.to_s
+    else # testing, use with care: this is the folder that will be used
+      s = testing
     end
     exit if s == "" # user cancelled
     p = Pathname(s.chomp)

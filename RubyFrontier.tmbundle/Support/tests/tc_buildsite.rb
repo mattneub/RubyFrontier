@@ -1,88 +1,139 @@
-require "test/unit"
+begin
+  require "minitest/autorun"
+rescue LoadError
+  require 'rubygems'
+  require 'minitest/autorun'
+end
 
 # load the whole RubyFrontier world
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourney.rb'
 
-class TestBuilding < Test::Unit::TestCase
-  require (File.dirname(__FILE__)) + '/stdoutRedirectionForTesting.rb'
-  include RedirectIo
+require 'tmpdir' # we're going to make and remove a folder full of stuff
+
+class TestUserLandHtml < MiniTest::Spec
+  @@preflighted = false
+  before do
+    @folder = (Pathname(__FILE__).dirname + "testsites") + "site1"
+    @template = @folder + "#template.txt"
+    @firstpage = @folder + "firstpage.txt"
+    @nonexistentpage = @folder + "biteme.txt"
+    @deeperpage = (@folder + "folder") + "fourthpage.txt"
+  end
   
-  def test_classMethods
-    p = (Pathname(__FILE__).dirname + "testsites") + "site1"
-    f1 = p + "#template.txt"
-    f2 = p + "firstpage.txt"
-    f3 = p + "biteme.txt"
-    f4 = p + (p + "folder") + "fourthpage.txt"
-    # guaranteePageOfSite
-    assert_raise(RuntimeError) do
-      UserLand::Html.guaranteePageOfSite(f3) # non-existent raises
+  describe "class methods" do
+    describe "guaranteePageOfSite" do
+      it "raises for non-existent page" do
+        proc{ UserLand::Html.guaranteePageOfSite @nonexistentpage }.must_raise RuntimeError
+      end
+      it "raises for non-page object" do
+        proc{ UserLand::Html.guaranteePageOfSite @template }.must_raise RuntimeError
+      end
+      it "does nothing for page object" do
+        proc{ UserLand::Html.guaranteePageOfSite @firstpage }.call
+        "ok".must_equal "ok"
+      end
     end
-    assert_raise(RuntimeError) do
-      UserLand::Html.guaranteePageOfSite(f1) # non-page raises
+    describe "getFtpSiteFile" do
+      it "raises for file with no ftpsite file above it" do
+        proc{ UserLand::Html.getFtpSiteFile __FILE__ }.must_raise RuntimeError
+      end
+      it "returns the ftpsite file's pathname" do
+        ftpsite = @folder + "#ftpSite.yaml"
+        UserLand::Html.getFtpSiteFile(@template).must_equal ftpsite # non-page object
+        UserLand::Html.getFtpSiteFile(@firstpage).must_equal ftpsite # page object
+        UserLand::Html.getFtpSiteFile(@deeperpage).must_equal ftpsite # deeper page object
+        UserLand::Html.getFtpSiteFile(@nonexistentpage).must_equal ftpsite # non-existent object but folder exists
+      end
     end
-    assert_nothing_raised do
-      UserLand::Html.guaranteePageOfSite(f2) # real page, nothing happens
+    describe "everyPageOf" do
+      def simpleOrdered(meth, p)
+        (UserLand::Html.send meth, p).map{|f| f.simplename.to_s}.sort
+      end
+      describe "everyPageOfFolder" do
+        it "lists every page object at all depths down only" do
+          simpleOrdered(:everyPageOfFolder, @folder).must_equal %w{firstpage fourthpage secondpage thirdpage}
+          simpleOrdered(:everyPageOfFolder, @deeperpage.dirname).must_equal %w{ fourthpage }
+        end
+      end
+      describe "everyPageOfSite" do
+        it "lists every page object at all depths up and down" do
+          simpleOrdered(:everyPageOfSite, @firstpage).must_equal %w{firstpage fourthpage secondpage thirdpage}
+          # folder ok
+          simpleOrdered(:everyPageOfSite, @deeperpage.dirname).must_equal %w{firstpage fourthpage secondpage thirdpage}
+          # nonpage object ok
+          simpleOrdered(:everyPageOfSite, @template).must_equal %w{firstpage fourthpage secondpage thirdpage}
+          simpleOrdered(:everyPageOfSite, @deeperpage).must_equal %w{firstpage fourthpage secondpage thirdpage}
+        end
+      end
     end
-    # getFtpSiteFile
-    assert_raise(RuntimeError) do
-      UserLand::Html.getFtpSiteFile(__FILE__) # not in a site, raises
+    describe "getLink" do
+      # html.getLink - linetext, url, options hash
+      it "uses linetext and url" do
+        UserLand::Html.getLink("biteme", "url").must_equal %{<a href="url">biteme</a>}
+      end
+      it "uses linetext, url, arbitrary options hash" do
+        UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me").
+          must_equal %{<a href="url" crap="crud" bite="me">biteme</a>}
+      end
+      it "interprets anchor option correctly" do
+        UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "anc").
+          must_equal %{<a href="url#anc" crap="crud" bite="me">biteme</a>}
+      end
+      it "interprets anchor option correctly and forgives initial hash" do
+        UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc").
+          must_equal %{<a href="url#anc" crap="crud" bite="me">biteme</a>}
+      end
+      it "does our pseudo syntax for foreign site folder" do
+        UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc", :othersite => "other").
+          must_equal %{<a href="other^url#anc" crap="crud" bite="me">biteme</a>}
+      end
     end
-    assert_equal(p + "#ftpSite.yaml", UserLand::Html.getFtpSiteFile(f1)) # works with non-page
-    assert_equal(p + "#ftpSite.yaml", UserLand::Html.getFtpSiteFile(f2)) # works with page
-    assert_equal(p + "#ftpSite.yaml", UserLand::Html.getFtpSiteFile(f3)) # works with non-existent page, provided folder exists
-    assert_equal(p + "#ftpSite.yaml", UserLand::Html.getFtpSiteFile(f4)) # works with deeper page
-    # everyPageOfFolder
-    arr = UserLand::Html.everyPageOfFolder(p).map {|aPage| aPage.simplename.to_s}.sort
-    assert_equal(%w{firstpage fourthpage secondpage thirdpage}, arr) # includes page objects at all depths down
-    arr = UserLand::Html.everyPageOfFolder(f4.dirname).map {|aPage| aPage.simplename.to_s}.sort
-    assert_equal(%w{ fourthpage }, arr) # but does not go up, of course
-    # everyPageOfSite 
-    # lists all page objects even if we start with a non-page
-    arr = UserLand::Html.everyPageOfSite(f1).map {|aPage| aPage.simplename.to_s}.sort
-    assert_equal(%w{firstpage fourthpage secondpage thirdpage}, arr)
-    arr = UserLand::Html.everyPageOfSite(f2).map {|aPage| aPage.simplename.to_s}.sort
-    assert_equal(%w{firstpage fourthpage secondpage thirdpage}, arr)
-    arr = UserLand::Html.everyPageOfSite(f4).map {|aPage| aPage.simplename.to_s}.sort
-    assert_equal(%w{firstpage fourthpage secondpage thirdpage}, arr)
-    # html.getLink - linetext, url, options hash
-    s = UserLand::Html.getLink("biteme", "url")
-    assert_equal(%{<a href="url">biteme</a>}, s)
-    s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me")
-    assert_equal(%{<a href="url" crap="crud" bite="me">biteme</a>}, s)
-    s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "anc")
-    assert_equal(%{<a href="url#anc" crap="crud" bite="me">biteme</a>}, s)
-    s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc")
-    assert_equal(%{<a href="url#anc" crap="crud" bite="me">biteme</a>}, s)
-    s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc", :othersite => "other")
-    assert_equal(%{<a href="other^url#anc" crap="crud" bite="me">biteme</a>}, s)
-    # preflightSite
-    UserLand::Html.preflightSite(f2) # actually works for any file within the site
-    autog = File.open( p + '#autoglossary.yaml' ) { |yf| YAML::load( yf ) }
-    assert_kind_of(Hash, autog)
-    # autoglossary contains entries by title
-    assert_not_nil(autog['my first web page'])
-    assert_not_nil(autog['my second web page'])
-    assert_not_nil(autog['my third and greatest web page'])
-    assert_not_nil(autog['my fourth web page'])
-    # autoglossary contains entries by file simplename
-    assert_not_nil(autog['firstpage'])
-    assert_not_nil(autog['secondpage'])
-    assert_not_nil(autog['thirdpage'])
-    assert_not_nil(autog['fourthpage'])
-    # and that's all there is
-    assert_equal(8, autog.length)
-    # now let's analyze a typical entry
-    fp = autog['fourthpage']
-    assert_equal("My Fourth Web Page", fp[:linetext])
-    assert_equal(Pathname("folder/fourthpage.html"), fp[:path])
-    assert_equal(f4, fp[:adr])
-    # create a new site
-    newsite = Pathname("~/Desktop/testingXYZ").expand_path # new site will be created here
-    newsite.rmtree unless !newsite.exist?
-    UserLand::Html.newSite(true)
-    Dir.chdir(newsite)
-    # and here's what I expect it to contain
-    s = <<END
+    describe "preflightsite and autoglossary structure" do
+      before do
+        unless @@preflighted # do once
+          capture_io do # suppress output
+            UserLand::Html.preflightSite(@firstpage) # actually works for any file within the site
+          end
+          @@autog = File.open( @folder + '#autoglossary.yaml' ) { |yf| YAML::load( yf ) }
+          @@preflighted = true
+        end
+      end
+      it "autoglossary represents a hash containing exactly these 8 entries" do
+        @@autog.must_be_kind_of Hash
+        # keys are by lowercase title and lowercase simplename
+        titles = ['my first web page', 'my second web page', 'my third and greatest web page', 'my fourth web page']
+        titles += ['firstpage', 'secondpage', 'thirdpage', 'fourthpage']
+        titles.each {|title| @@autog[title].wont_be_nil}
+        # and that's all there is
+        @@autog.length.must_equal 8
+      end
+      it "autoglossary values have the correct structure" do
+        fp = @@autog['fourthpage']
+        fp[:linetext].must_equal "My Fourth Web Page"
+        fp[:path].must_equal Pathname("folder/fourthpage.html")
+        fp[:adr].must_equal @deeperpage
+      end
+    end
+  end
+  # TODO: test traverseLink somehow?
+end
+
+class TestUserLandHtml2 < MiniTest::Spec
+  before do
+    @folder = (Pathname(__FILE__).dirname + "testsites") + "site1"
+    @template = @folder + "#template.txt"
+    @firstpage = @folder + "firstpage.txt"
+    @nonexistentpage = @folder + "biteme.txt"
+    @deeperpage = (@folder + "folder") + "fourthpage.txt"
+  end
+  
+  describe "class methods for creating and publishing" do
+    it "creates a new site with the expected contents" do
+      Dir.mktmpdir("testingnewsite") do |dir|
+        UserLand::Html.newSite(dir)
+        Dir.chdir(dir)
+        # and here's what I expect it to contain
+        s = <<END
 #filters
 #ftpSite.yaml
 #glossary.yaml
@@ -119,27 +170,34 @@ blurb.txt
 nextprevlinks.rb
 section.rb
 END
-    assert_equal(s, `ls -R1`)
-    # trying to build a non-page raises an error
-    assert_raise(RuntimeError) do
-      UserLand::Html.releaseRenderedPage(f1, false, false)
+        `ls -R1`.must_equal s
+      end
     end
-    # in particular, trying to build a non-page raises an error that says *this*
-    begin
-      UserLand::Html.releaseRenderedPage(f1, false, false)
-    rescue
-      assert_match /not a site page/, $!.message
-    end
-    # releaseRenderedPage, publishSite (should also testpublishFolder)
-    # publish entire site
-    actualoutput = Pathname("~/Desktop/testsite1").expand_path # new site will be created here
-    actualoutput.rmtree unless !actualoutput.exist?
-    UserLand::Html.publishSite(f2, true, false) # publish, rebuild autoglossary, do not open in browser
-    modeloutput = (Pathname(__FILE__).dirname + "testsites") + "site1PublishAll"
-    command = "diff -r '#{modeloutput.to_s}' '#{actualoutput.to_s}'"
-    # TODO really ought to remove any .DS_Store files first just in case
-    assert_match("", `#{command}`) # crude but effective check that whole suite is working decently
-    # TODO no test for traverseLink, really ought to do something about that
   end
   
+  describe "releaseRenderedPage" do
+    # false false means don't rebuild autoglossary, don't open in browser
+    it "raises for a nonpage object" do
+      proc {UserLand::Html.releaseRenderedPage(@template, false, false)}.must_raise RuntimeError
+    end
+    it "raises and says not a site page" do
+      err = proc {UserLand::Html.releaseRenderedPage(@template, false, false) rescue $!}.call
+      err.message.must_match %r%not a site page%
+    end
+    it "builds site1 correctly" do
+      Dir.chdir # I have no idea why this is needed, but somebody is very unhappy otherwise
+      actualoutput = Pathname("~/Desktop/testsite1").expand_path # new site will be created here
+      actualoutput.rmtree unless !actualoutput.exist?
+      capture_io do # suppress output
+        UserLand::Html.publishSite(@firstpage, true, false)
+        UserLand::Html.publishSite(@firstpage, false, false) # must publish twice to get the xref to work
+      end
+      #out.must_match %r%finished publishing%i # fails sometimes and I'm not sure why
+      # we have a prebuilt model, let's see if they match
+      modeloutput = @folder.dirname + "site1PublishAll"
+      command = "diff -r '#{modeloutput.to_s}' '#{actualoutput.to_s}'"
+      `#{command}`.must_equal ""
+    end
+  end
+
 end

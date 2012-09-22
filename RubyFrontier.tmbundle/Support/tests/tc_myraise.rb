@@ -8,8 +8,6 @@ rescue LoadError
   require 'minitest/autorun'
 end
 
-#top-level "myraise"
-
 describe "myraise" do
   before do
     @raise = proc {myraise "test"}

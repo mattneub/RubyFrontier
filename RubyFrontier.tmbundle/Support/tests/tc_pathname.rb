@@ -63,7 +63,6 @@ describe Pathname do
   
   describe "needs_update_from both files exist" do
     before do
-      skip
       # fixture: need two files, one newer
       tmp = Dir.tmpdir
       @f1 = tmp + "a.txt"
@@ -73,12 +72,10 @@ describe Pathname do
       File.open(@f2, "w") {|io| io.puts "howdy"}
     end
     after do
-      skip
       File.delete(@f1)
       File.delete(@f2)
     end
     it "returns true iff source file is newer" do
-      skip
       Pathname(@f1).exist?.must_equal true
       Pathname(@f2).exist?.must_equal true
       Pathname(@f1).needs_update_from(Pathname(@f2)).must_equal true

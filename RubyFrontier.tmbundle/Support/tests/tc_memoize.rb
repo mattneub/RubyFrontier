@@ -1,4 +1,3 @@
-#require "test/unit"
 
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
 
@@ -21,7 +20,7 @@ end
 # so there are separate instances with separate instance variables for each "it"
 # however, that is very low overhead here
 
-class MemoizeClassMethod < MiniTest::Spec
+class MemoizeClassMethod < MiniTest::Unit
   # let's memoize a class method
   class Memoizer
     class << self
@@ -49,7 +48,7 @@ class MemoizeClassMethod < MiniTest::Spec
   end
 end
 
-class MemoizeModuleMethod < MiniTest::Spec
+class MemoizeModuleMethod < MiniTest::Unit
   module Memoizer
     class << self
       def randy3(s)
@@ -74,7 +73,7 @@ class MemoizeModuleMethod < MiniTest::Spec
   end
 end
 
-class MemoizeInstanceMethod < MiniTest::Spec
+class MemoizeInstanceMethod < MiniTest::Unit
   # let's memoize an instance method
   class Memoizer
     def randy(s)

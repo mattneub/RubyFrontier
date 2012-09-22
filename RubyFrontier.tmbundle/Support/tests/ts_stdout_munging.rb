@@ -1,63 +1,89 @@
-require 'test/unit'
+begin
+  require "minitest/autorun"
+rescue LoadError
+  require 'rubygems'
+  require 'minitest/autorun'
+end
 
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/longestJourney.rb'
 
-class TestFakeStdout < Test::Unit::TestCase
-  require (File.dirname(__FILE__)) + '/stdoutRedirectionForTesting.rb'
-  include RedirectIo
-  
-  def test_br
-    RubyFrontier::FakeStdout.open do # while FakeStdout rules, "puts" gets <br> wherever "\n" occurs
-      puts "howdy\nthere\nI'm Oedipus Tex"
-      puts "You may have heard of my brother Rex"
+#TODO: fake stdout now does more work, need more tests
+
+describe RubyFrontier::FakeStdout do
+  it "replaces newline with br" do
+    out, err = capture_io do
+      RubyFrontier::FakeStdout.open do
+        puts "howdy\nthere\nI'm Oedipus Tex"
+        puts "You may have heard of my brother Rex"
+      end
     end
-    assert_equal('howdy<br>there<br>I\'m Oedipus Tex<br>You may have heard of my brother Rex<br>', @stdout.string)
+    out.must_equal 'howdy<br>there<br>I\'m Oedipus Tex<br>You may have heard of my brother Rex<br>'
   end
-  def test_link
-    RubyFrontier::FakeStdout.open do # while FakeStdout rules, line-end single-quoted filename (starts with slash) becomes a link
-      puts "this is a '/cool/test'"
+  it "turns line-end single-quoted string starting with slash to txmt link" do
+    out, err = capture_io do
+      RubyFrontier::FakeStdout.open do
+        puts "this is a '/cool/test'"
+      end
     end
-    assert_equal('this is a <a href="txmt://open?url=file:///cool/test">/cool/test</a><br>', @stdout.string)
-  end
-  def test_link_not
-    RubyFrontier::FakeStdout.open do # not line-final so no link
-      puts "this is a '/cool/test' "
+    out.must_equal 'this is a <a href="txmt://open?url=file:///cool/test">/cool/test</a><br>'
+    out.must_match %r%txmt%
+    out, err = capture_io do
+      RubyFrontier::FakeStdout.open do
+        puts "this is a '/cool/test' "
+      end
     end
-    assert_equal('this is a \'/cool/test\' <br>', @stdout.string)
-  end
-  def test_link_not2
-    RubyFrontier::FakeStdout.open do # no single-quotes so no link
-      puts "this is a \"/cool/test\""
+    out.wont_match %r%txmt% # because it wasn't line-final
+    out, err = capture_io do
+      RubyFrontier::FakeStdout.open do
+        puts "this is a \"/cool/test\""
+      end
     end
-    assert_equal('this is a "/cool/test"<br>', @stdout.string)
-  end
-  def test_link_not3
-    RubyFrontier::FakeStdout.open do # no initial slash so no link
-      puts "this is a 'cool/test'"
+    out.wont_match %r%txmt% # because it wasn't single-quoted
+    out, err = capture_io do
+      RubyFrontier::FakeStdout.open do
+        puts "this is a 'cool/test'"
+      end
     end
-    assert_equal('this is a \'cool/test\'<br>', @stdout.string)
+    out.wont_match %r%txmt% # because there's no initial slash
   end
-  def test_raise
-    RubyFrontier::FakeStdout.open do # while FakeStdout rules, nice reformatted output of exception reports
+  it "nicely formats exception reports" do
+    def test_raise # just to inject "test_raise" into the error's backtrace
       raise "oops"
     end
-    assert_match(/^oops<br>/, @stdout.string, @stdout.string)
-    assert_match(%r{RubyFrontier.tmbundle/Support/tests/ts_stdout_munging.rb:\d*:in `test_raise'<br>}, @stdout.string, @stdout.string)
-  end
-  def test_perform
-    RubyFrontier.perform(:test_output, true) # artificial method I created just so we could test fully formatted output
-    # perform with true gives us full html header and footer with <pre> sandwich around munged puts output
-    # a complication: if we get the "no user.rb" message, "this is test" won't be first within the <pre> 
-    assert_match(%r{(<pre>\s*|<br>)this is a test<br>and this is a test<br></pre>}, @stdout.string, @stdout.string)
-  end
-  def test_perform2
-    RubyFrontier.perform(:test_output, false) # when false, no munging of "puts", no header and footer, no nothing
-    assert_equal("this is a test\nand this is a test\n", @stdout.string)
-  end
-  def test_perform_raise
-    RubyFrontier.perform(:test_raise, true) # artificial method I created just so we could test fully formatted output when there's an exception
-    assert_match(/^oops<br>/, @stdout.string, @stdout.string)
-    assert_match(%r{RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/userland_class_methods.rb:\d*:in `test_raise'<br>}, @stdout.string, @stdout.string)
+    out, err = capture_io do
+      RubyFrontier::FakeStdout.open do
+        test_raise
+      end
+    end
+    out.must_match %r%^oops<br>%
+    out.must_match %r{RubyFrontier.tmbundle/Support/tests/ts_stdout_munging.rb:\d*:in `test_raise'<br>}
   end
 end
+
+describe "perform" do
+  it "with true, wraps pre with FakeStdout around any output" do
+    out, err = capture_io do
+      RubyFrontier.perform(:test_output, true)
+      # artificial method I created just so we could test fully formatted output
+      # perform with true gives us full html header and footer with <pre> sandwich around munged puts output
+    end
+    # a complication: if we get the "no user.rb" message, "this is a test" won't be first within the <pre>
+    out.must_match %r{(<pre>\s*|<br>)this is a test<br>and this is a test<br></pre>}
+    # same thing if we raise, passes thru nice formatting
+    out, err = capture_io do
+      RubyFrontier.perform(:test_raise, true)
+      # artificial method I created just so we could test fully formatted output when there's an exception
+      # perform with true gives us full html header and footer with <pre> sandwich around munged puts output
+    end
+    out.must_match %r%^oops<br>%
+    out.must_match %r{RubyFrontier.tmbundle/Support/bin/RubyFrontier/longestJourney/userland_class_methods.rb:\d*:in `test_raise'<br>}
+  end
+  it "with false, outputs directly unmunged" do
+    out, err = capture_io do
+      RubyFrontier.perform(:test_output, false)
+    end
+    out.must_equal "this is a test\nand this is a test\n"
+  end
+end
+
 
