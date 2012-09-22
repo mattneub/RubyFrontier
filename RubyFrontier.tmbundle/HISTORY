@@ -1,7 +1,7 @@
 VERSION
 =======
 
-This is version 1.1.1.
+This is version 1.1.2.
 
 HISTORY
 =======
@@ -45,4 +45,7 @@ In version 1.0.2, introduced a mechanism to allow a `.txt` file to function as a
 In version 1.1, support for Ruby 1.9.3 was added, along with some general code cleanup. Dependency on exifr removed, replaced by dependency on dimensions. Improved message/exception formatting.
 
 In version 1.1.1, some tweaks were made to improve message/exception formatting even more (and fixed a test that was broken by this change). Improved reporting of syntax errors in tools. Fixed the JPEG dimensions calculation to work with Ruby 1.9.3, even though we aren't using it any more (it's fixed but commented out). Corrected a bug caused by removal of the autoglossary from the repository. The most important change is a huge speedup in rebuilding the autoglossary (Preflight Site, Publish Site).
+
+In version 1.1.2, tests were revised to use MiniTest (and were rewritten and rationalized in the process); all tests pass on both Ruby 1.8.7 and Ruby 1.9.3. Pathname#relative_uri_from was completely rewritten from the ground up, so that we are no longer dependent on the formatting quirks of URI::Generic. The implementation of nextprevlinks in the model site was corrected (it was never right!) and the documentation was adjusted to match. The newSite method can now be invoked programmatically with a parameter saying where to create the site folder. Added a tentative implementation of #<< for FakeStdout (needed by pp, apparently).
+
 

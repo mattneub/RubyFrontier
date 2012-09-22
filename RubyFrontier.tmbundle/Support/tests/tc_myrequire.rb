@@ -37,7 +37,7 @@ class TestMyRequire < MiniTest::Spec
       Object.send :remove_const, :Req2
     rescue
     end
-    $".delete_if {|elem| elem =~ %r%thingsToRequire% }
+    $".delete_if {|elem| elem =~ %r%req\d% }
   end
   it "requires one library" do
     testForError do

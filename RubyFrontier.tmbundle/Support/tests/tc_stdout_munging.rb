@@ -56,7 +56,7 @@ describe RubyFrontier::FakeStdout do
       end
     end
     out.must_match %r%^oops<br>%
-    out.must_match %r{RubyFrontier.tmbundle/Support/tests/ts_stdout_munging.rb:\d*:in `test_raise'<br>}
+    out.must_match %r{RubyFrontier.tmbundle/Support/tests/tc_stdout_munging.rb:\d*:in `test_raise'<br>}
   end
 end
 
