@@ -5,13 +5,15 @@ task :test do
   tm = `mdfind "kMDItemCFBundleIdentifier == 'com.macromates.textmate'"`
   tm.chomp!
   tm += "/Contents/SharedSupport/Support"
-  dir = File.dirname(File.expand_path(__FILE__))
   ENV['TM_SUPPORT_PATH'] = tm
+  
+  dir = File.dirname(File.expand_path(__FILE__))
   tests = nil # make available from block
   Dir.chdir dir do
     tests = Dir.glob 'RubyFrontier.tmbundle/Support/tests/tc_*.rb'
+    tests = tests.map { |test| File.expand_path test }
   end
-  tests = tests.map { |test| File.expand_path test }
+  
   $stdout.sync
   
   RUBY = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
