@@ -3,12 +3,9 @@
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourneyUtilities.rb'
 $: << File.dirname(File.expand_path(__FILE__)) + '/thingsToRequire'
 
-begin
-  require "minitest/autorun"
-rescue LoadError
-  require 'rubygems'
-  require 'minitest/autorun'
-end
+require 'rubygems'
+gem 'minitest', '>= 3.5'
+require 'minitest/autorun'
 
 class TestMyRequire < MiniTest::Spec
   # assert_nothing_raised is accused of being not a test at all 

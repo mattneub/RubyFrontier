@@ -1,9 +1,6 @@
-begin
-  require "minitest/autorun"
-rescue LoadError
-  require 'rubygems'
-  require 'minitest/autorun'
-end
+require 'rubygems'
+gem 'minitest', '>= 3.5'
+require 'minitest/autorun'
 
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/longestJourney.rb'
 

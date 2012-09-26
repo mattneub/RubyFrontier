@@ -155,7 +155,7 @@ module UserLand::Html
     if !testing
       s = `"#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog" filesave --title "New Web Site" --text "Specify a folder to create"`
     else # testing, use with care: this is the folder that will be used
-      s = testing
+      s = testing.to_s
     end
     exit if s == "" # user cancelled
     p = Pathname(s.chomp)

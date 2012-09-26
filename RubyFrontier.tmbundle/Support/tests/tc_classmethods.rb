@@ -1,9 +1,6 @@
-begin
-  require "minitest/autorun"
-rescue LoadError
-  require 'rubygems'
-  require 'minitest/autorun'
-end
+require 'rubygems'
+gem 'minitest', '>= 3.5'
+require 'minitest/autorun'
 
 # load the whole RubyFrontier world
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourney.rb'
@@ -186,6 +183,12 @@ END
       err = proc {UserLand::Html.releaseRenderedPage(@template, false, false) rescue $!}.call
       err.message.must_match %r%not a site page%
     end
+    it "raises for a page outside the site" do
+      err = proc {UserLand::Html.releaseRenderedPage(__FILE__, false, false) rescue $!}.call
+      err.message.must_match %r%not in a site source folder%
+    end
+  end
+  describe "publishSite" do
     it "builds site1 correctly" do
       actualoutput = Pathname("~/Desktop/testsite1").expand_path # new site will be created here
       actualoutput.rmtree unless !actualoutput.exist?
