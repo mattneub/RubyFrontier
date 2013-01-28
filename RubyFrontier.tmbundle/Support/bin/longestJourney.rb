@@ -53,6 +53,7 @@ module RubyFrontier
     if as_html
       STDOUT.sync = true
       html_header("RubyFrontier")
+      require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
       puts "<pre>"
       puts " " # trying to get the console to clear as soon as possible
       FakeStdout.open do
@@ -61,10 +62,12 @@ module RubyFrontier
       puts "</pre>"
       html_footer()
     else
+      require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
       UserLand::Html.send(command_name, *args)
     end
   end
 end
 
-require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
+# moved this to *inside* self.perform in order to get formatting of warnings on load
+# require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
 

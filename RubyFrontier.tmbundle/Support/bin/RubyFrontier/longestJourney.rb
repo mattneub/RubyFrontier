@@ -1,7 +1,11 @@
 $: << File.dirname(__FILE__)
 # utilities: myrequire, myraise, Memoizable, and various modifications to existing classes
 require 'longestJourneyUtilities.rb'
-
+begin
+  gem 'psych'
+rescue LoadError # no penalty for not having it
+rescue # no penalty for no gem command
+end
 myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "dimensions", "enumerator", "kramdown", "haml", "sass", "nokogiri"
 
 =begin make 'load' and 'require' include folder next to, and with same name as, this file 

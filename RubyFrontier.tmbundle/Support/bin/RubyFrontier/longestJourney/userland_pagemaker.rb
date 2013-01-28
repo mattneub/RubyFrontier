@@ -56,6 +56,7 @@ class UserLand::Html::PageMaker
     end
   end
   def buildObject(adrObject, adrPageTable=@adrPageTable)
+    raise "can't build nonexistent object" unless adrObject.exist?
     # construct entire page table
     buildPageTableFully(adrObject)
     # if this is not a renderable, that's all

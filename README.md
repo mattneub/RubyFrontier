@@ -39,8 +39,6 @@ RubyFrontier was originally written under Ruby 1.8.6, and I then used it for a l
 
 Therefore I now permit use of RubyFrontier under Ruby 1.9.3. As of this point (version 1.1.1 and later) I am quite confident about this feature. If you do encounter an issue, please [report][] it. If the Ruby 1.9.3 tweaks worry you, stick with Ruby 1.8.7 and use commit 611d787958, but in my opinion the current version is better, under both Ruby 1.8.7 and Ruby 1.9.3.
 
-Various parts of RubyFrontier, and the demonstration sites, use various libraries and gems, some of which you may not have installed. Many of these are initially "weak-linked", meaning that it is not a fatal error to lack them, but you'll probably want to install them anyway, as doing so can do no harm. For example, the part of RubyFrontier that deals with images uses the `dimensions` gem to get the dimensions of images, but you do not need to install the `dimensions` gem immediately - RubyFrontier will complain of its absence to you, but it will work just fine nevertheless as long as your Web sites have no images.
-
 
 INSTALLATION
 -----
@@ -53,10 +51,19 @@ What I personally do is put a symlink in _~/Library/Application Support/TextMate
 PREPARATION
 -----
 
+Various parts of RubyFrontier, and the demonstration sites, use various libraries and gems, some of which you may not have installed. Many of these are initially "weak-linked", meaning that it is not a fatal error to lack them, but you'll probably want to install them anyway, as doing so can do no harm. For example, the part of RubyFrontier that deals with images uses the `dimensions` gem to get the dimensions of images, but you do not need to install the `dimensions` gem immediately - RubyFrontier will complain of its absence to you, but it will work just fine nevertheless as long as your Web sites have no images.
+
+You should see a good set of warnings if you choose RubyFrontier > Build RubyFrontier Docs. The idea is that you should install a missing gem and then try again until the docs build successfully. Rinse, lather, repeat. Once you build the docs successfully you can relax; you can live happily with warnings about things that don't affect you.
+
 You are permitted (though not required) to have a _user.rb_ file outside the bundle. Whenever a RubyFrontier command runs, the _user.rb_ file is loaded after all of RubyFrontier's own code has loaded. Thus, _user.rb_ is your opportunity to add to or customize RubyFrontier's behavior globally (as opposed to the many customizations you can have in a particular Web site folder, plus there is also a mechanism for keeping a _user.rb_ in an individual site folder). For example, this is where you implement glossary entries and outline renderers that you wish to have available in all your sites. If you wanted, you could even open the PageMaker class and add or even rewrite methods, without touching the code in the bundle.
 
 To set the location of this _user.rb_ file, use the RubyFrontier > Locate User.rb File command. Your _user.rb_ does not actually have to be called "user.rb", but it should be a Ruby file.
 
+
+TESTS
+-----
+
+`cd` to the folder containing the _Rakefile_ and `rake test`. Warnings (the same warnings mentioned in the previous section) are unimportant. One `tc_pathname.rb` test skips; this is deliberate. You should see 0 failures and 0 errors.
 
 DOCUMENTATION
 -----

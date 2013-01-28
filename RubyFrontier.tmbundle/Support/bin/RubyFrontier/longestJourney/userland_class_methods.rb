@@ -102,7 +102,7 @@ module UserLand::Html
     # a lot faster if we don't try to read in existing autoglossary every time
     autoglossary = self.getFtpSiteFile(Pathname(adrObject)).dirname + "#autoglossary.yaml"
     if autoglossary.exist?
-      File.delete(autoglossary)
+      File.delete(autoglossary) # comment out to experiment with speed difference 
     end
     # prebuild autoglossary using every page of table containing adrObject path
     glossary = LCHash.new
