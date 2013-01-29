@@ -19,6 +19,7 @@ def myrequire(*what)
     rescue LoadError
       puts "Warning: Require failed", "This could cause trouble later... or not. Here's the error message we got:"
       puts $!
+      puts
     end
   end
 end

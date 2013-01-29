@@ -1,7 +1,7 @@
 VERSION
 =======
 
-This is version 1.1.3.
+This is version 1.1.4.
 
 HISTORY
 =======
@@ -49,4 +49,7 @@ In version 1.1.1, some tweaks were made to improve message/exception formatting 
 In version 1.1.2, tests were revised to use MiniTest (and were rewritten and rationalized in the process); all tests pass on both Ruby 1.8.7 and Ruby 1.9.3. Pathname#relative_uri_from was completely rewritten from the ground up, so that we are no longer dependent on the formatting quirks of URI::Generic. The implementation of nextprevlinks in the model site was corrected (it was never right!) and the documentation was adjusted to match. The newSite method can now be invoked programmatically with a parameter saying where to create the site folder. Added a tentative implementation of #<< for FakeStdout (needed by pp, apparently).
 
 In version 1.1.3, an output bug was fixed (thanks, hdmw): warnings were being overwritten by subsequent output, perhaps due to changes in version 1.1. Also improved the README to describe the warnings and what you're supposed to do (or not do) about them, and to explain how to run the tests.
+
+In version 1.1.4, the output bug from 1.1.3 was fixed even better, and a bug with the user.rb specification mechanism under Ruby 1.9.x was fixed.
+
 

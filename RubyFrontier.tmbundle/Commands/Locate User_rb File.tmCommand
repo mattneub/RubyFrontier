@@ -9,8 +9,14 @@
 
 require "#{ENV['TM_SUPPORT_PATH']}/lib/ui.rb"
 
+# cover ui.rb inability to work with Ruby 1.9.x
+class String
+  def to_a
+    return [self]
+  end
+end
 (f = TextMate::UI::request_file( :title =&gt; "Locate User.rb")) || exit
-`defaults write com.neuburg.matt.rubyFrontier userrb "#{f}"`</string>
+`defaults write com.neuburg.matt.rubyFrontier userrb '#{f[0]}'`</string>
 	<key>input</key>
 	<string>none</string>
 	<key>name</key>

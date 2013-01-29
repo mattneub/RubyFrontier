@@ -53,7 +53,9 @@ module RubyFrontier
     if as_html
       STDOUT.sync = true
       html_header("RubyFrontier")
+      puts "<pre>"
       require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
+      puts "</pre>"
       puts "<pre>"
       puts " " # trying to get the console to clear as soon as possible
       FakeStdout.open do

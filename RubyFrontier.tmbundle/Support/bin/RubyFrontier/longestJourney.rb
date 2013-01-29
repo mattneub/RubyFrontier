@@ -112,6 +112,11 @@ myrequire 'userland_pagemaker'
 
 f = `defaults read com.neuburg.matt.rubyFrontier userrb 2>/dev/null`
 $userrb = f.chomp
-myrequire $userrb rescue puts "Did not load a user.rb file. If you have a user.rb file, specify it with Locate user.rb File command. (If you've done that, your user.rb file may be generating an error on load.)"
+begin
+  require $userrb # not myrequire, we want this error message, not the other one
+  rescue LoadError
+    puts "Did not load a user.rb file. If you have a user.rb file, specify it with Locate user.rb File command. (If you've done that, your user.rb file may be generating an error on load.)"
+    puts
+end
 
 
