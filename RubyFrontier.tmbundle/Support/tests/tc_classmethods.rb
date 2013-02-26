@@ -1,6 +1,7 @@
 require 'rubygems'
 gem 'minitest', '>= 3.5'
 require 'minitest/autorun'
+require 'nokogiri'
 
 # load the whole RubyFrontier world
 require File.dirname(File.dirname(File.expand_path(__FILE__))) + '/bin/RubyFrontier/longestJourney.rb'
@@ -70,20 +71,48 @@ class TestUserLandHtml < MiniTest::Spec
         UserLand::Html.getLink("biteme", "url").must_equal %{<a href="url">biteme</a>}
       end
       it "uses linetext, url, arbitrary options hash" do
-        UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me").
-          must_equal %{<a href="url" crap="crud" bite="me">biteme</a>}
+        s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me")
+        set = Nokogiri::HTML.fragment(s)
+        atag = set.children[0]
+        atag.name.must_equal 'a'
+        atag['href'].must_equal 'url'
+        atag['crap'].must_equal 'crud'
+        atag['bite'].must_equal 'me'
+        atag.attributes.count.must_equal 3
+        atag.children[0].text.must_equal 'biteme'
       end
       it "interprets anchor option correctly" do
-        UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "anc").
-          must_equal %{<a href="url#anc" crap="crud" bite="me">biteme</a>}
+        s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "anc")
+        set = Nokogiri::HTML.fragment(s)
+        atag = set.children[0]
+        atag.name.must_equal 'a'
+        atag['href'].must_equal 'url#anc'
+        atag['crap'].must_equal 'crud'
+        atag['bite'].must_equal 'me'
+        atag.attributes.count.must_equal 3
+        atag.children[0].text.must_equal 'biteme'
       end
       it "interprets anchor option correctly and forgives initial hash" do
-        UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc").
-          must_equal %{<a href="url#anc" crap="crud" bite="me">biteme</a>}
+        s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc")
+        set = Nokogiri::HTML.fragment(s)
+        atag = set.children[0]
+        atag.name.must_equal 'a'
+        atag['href'].must_equal 'url#anc'
+        atag['crap'].must_equal 'crud'
+        atag['bite'].must_equal 'me'
+        atag.attributes.count.must_equal 3
+        atag.children[0].text.must_equal 'biteme'
       end
       it "does our pseudo syntax for foreign site folder" do
-        UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc", :othersite => "other").
-          must_equal %{<a href="other^url#anc" crap="crud" bite="me">biteme</a>}
+        s = UserLand::Html.getLink("biteme", "url", :crap => "crud", :bite => "me", :anchor => "#anc", :othersite => "other")
+        set = Nokogiri::HTML.fragment(s)
+        atag = set.children[0]
+        atag.name.must_equal 'a'
+        atag['href'].must_equal 'other^url#anc'
+        atag['crap'].must_equal 'crud'
+        atag['bite'].must_equal 'me'
+        atag.attributes.count.must_equal 3
+        atag.children[0].text.must_equal 'biteme'
       end
     end
     describe "preflightsite and autoglossary structure" do
