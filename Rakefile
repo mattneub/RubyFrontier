@@ -2,8 +2,9 @@ require 'rake'
 require 'rbconfig'
 
 task :test do
-  tm = `mdfind "kMDItemCFBundleIdentifier == 'com.macromates.textmate'"`
-  tm.chomp!
+  # tm = `mdfind "kMDItemCFBundleIdentifier == 'com.macromates.textmate'"`
+  # tm.chomp!
+  tm = ENV['TMPATH']
   tm += "/Contents/SharedSupport/Support"
   ENV['TM_SUPPORT_PATH'] = tm
   

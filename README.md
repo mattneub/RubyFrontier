@@ -39,6 +39,8 @@ RubyFrontier was originally written under Ruby 1.8.6, and I then used it for a l
 
 Therefore I now permit use of RubyFrontier under Ruby 1.9.3. As of this point (version 1.1.1 and later) I am quite confident about this feature. If you do encounter an issue, please [report][] it. If the Ruby 1.9.3 tweaks worry you, stick with Ruby 1.8.7 and use commit 611d787958, but in my opinion the current version is better, under both Ruby 1.8.7 and Ruby 1.9.3.
 
+In February 2013 Ruby 2.0.0 was released. RubyFrontier appears to work well under Ruby 2.0.0. Again, if there's a problem, please [report][] it.
+
 
 INSTALLATION
 -----
@@ -63,7 +65,15 @@ To set the location of this _user.rb_ file, use the RubyFrontier > Locate User.r
 TESTS
 -----
 
-`cd` to the folder containing the _Rakefile_ and `rake test`. Warnings (the same warnings mentioned in the previous section) are unimportant. One `tc_pathname.rb` test skips; this is deliberate. You should see 0 failures and 0 errors.
+The tests require a knowledge of where TextMate is. So there are two ways to run the tests:
+
+* In TextMate, open RubyFrontier, find the tests, and run each one individually.
+
+* Use the Rakefile. The Rakefile expects an environment variable TMPATH to tell it where TextMate is. So work out the path to TextMate in advance. In the Terminal, `cd` to the folder containing the _Rakefile_ and then say the equivalent of this, substituting your path to TextMate:
+
+    rake TMPATH=/Users/mattleopard/extra/OSX/TextMate\ stuff/TextMate.app test
+
+Warnings (the same warnings mentioned in the previous section) are unimportant. One `tc_pathname.rb` test skips; this is deliberate. You should see 0 failures and 0 errors.
 
 DOCUMENTATION
 -----
@@ -79,7 +89,7 @@ Alternatively, choose RubyFrontier > Show RubyFrontier Docs Source. This command
 FUTURE DIRECTIONS
 -----
 
-Now that RubyFrontier is apparently usable with Ruby 1.9.3, my chief goal is more and better unit tests, in order to keep making sure that RubyFrontier works equally in Ruby 1.8.7 and Ruby 1.9.3.
+Now that RubyFrontier is usable with Ruby 1.9.3 (and Ruby 2.0.0), my chief goal is more and better unit tests, in order to keep making sure that RubyFrontier works equally in Ruby 1.8.7 and Ruby 1.9.3. _Eventually I would like to withdraw support for Ruby 1.8.7 and anything earlier than Ruby 1.9.3._
 
 LICENSE
 -----
