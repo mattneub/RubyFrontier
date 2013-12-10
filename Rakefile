@@ -4,9 +4,9 @@ require 'rbconfig'
 task :test do
   # tm = `mdfind "kMDItemCFBundleIdentifier == 'com.macromates.textmate'"`
   # tm.chomp!
-  tm = ENV['TMPATH']
-  tm += "/Contents/SharedSupport/Support"
-  ENV['TM_SUPPORT_PATH'] = tm
+  # tm = ENV['TMPATH']
+  # tm += "/Contents/SharedSupport/Support"
+  ENV['TM_SUPPORT_PATH'] = "bogus" unless ENV['TM_SUPPORT_PATH']
   
   dir = File.dirname(File.expand_path(__FILE__))
   tests = nil # make available from block

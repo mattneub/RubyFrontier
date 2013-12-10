@@ -5,6 +5,18 @@ require "#{ENV["TM_SUPPORT_PATH"]}/lib/web_preview.rb"
 require "#{ENV["TM_SUPPORT_PATH"]}/lib/escape.rb"
 #require "#{ENV["TM_SUPPORT_PATH"]}/lib/exit_codes.rb"
 
+=begin
+if RUBY_VERSION =~ /1.9/
+  Encoding.default_external = Encoding::UTF_8
+  Encoding.default_internal = Encoding::UTF_8
+end
+if RUBY_VERSION =~ /2.0/
+  Encoding.default_external = Encoding::UTF_8
+  Encoding.default_internal = Encoding::UTF_8
+end
+=end
+
+
 # trampoline for html-output commands
 # they call RubyFrontier::perform (syntax is :method_name, trueOrFalse, argsForMethodCall...)
 # we interpose our fake stdout and then do the require and call UserLand.Html
@@ -54,6 +66,7 @@ module RubyFrontier
       STDOUT.sync = true
       html_header("RubyFrontier")
       puts "<pre>"
+      puts "Performing command #{command_name}" # informative and in case no error
       require File.dirname(__FILE__) + "/RubyFrontier/longestJourney.rb"
       puts "</pre>"
       puts "<pre>"

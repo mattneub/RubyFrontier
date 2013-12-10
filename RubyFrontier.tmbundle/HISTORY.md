@@ -1,7 +1,7 @@
 VERSION
 =======
 
-This is version 1.1.4.
+This is version 1.1.4.1.
 
 HISTORY
 =======
@@ -52,4 +52,5 @@ In version 1.1.3, an output bug was fixed (thanks, hdmw): warnings were being ov
 
 In version 1.1.4, the output bug from 1.1.3 was fixed even better, and a bug with the user.rb specification mechanism under Ruby 1.9.x was fixed.
 
+In version 1.1.4.1, incorporated a new way of running the tests through a Rakefile, and tweaked the output to reveal what command is being performed. I am now running RubyFrontier with TextMate 2 under Mavericks (OS X 10.9).
 
