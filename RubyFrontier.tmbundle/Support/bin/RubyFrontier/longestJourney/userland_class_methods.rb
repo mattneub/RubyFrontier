@@ -37,8 +37,17 @@ module UserLand::Html
     # callFileWriterShutdown(adrObject, adrStorage)
     
     pm.saveOutAutoglossary # save out autoglossary if any
-        
-    if flPreview && (File.extname(pm.adrPageTable[:fname]).downcase.start_with?(".htm")) # supposed to be a test for browser displayability
+    
+    # new option to let user specify what file types to preview in the browser
+    preview = false
+    if flPreview
+      extension = File.extname(pm.adrPageTable[:fname]).downcase
+      suffixlist = pm.adrPageTable[:ftpsite][:preview]
+      if (suffixlist && suffixlist.include?(extension)) || extension.start_with?(".htm")
+        preview = true
+      end
+    end
+    if preview
       if (apacheURL = pm.adrPageTable[:ftpsite][:apacheURL])
         f = pm.adrPageTable[:f].relative_path_from(Pathname(pm.adrPageTable[:ftpsite][:apacheSite]).expand_path)
         `open #{URI.escape(apacheURL + f)}`
