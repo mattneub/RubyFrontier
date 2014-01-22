@@ -50,9 +50,9 @@ module UserLand::Html
     if preview
       if (apacheURL = pm.adrPageTable[:ftpsite][:apacheURL])
         f = pm.adrPageTable[:f].relative_path_from(Pathname(pm.adrPageTable[:ftpsite][:apacheSite]).expand_path)
-        `open #{URI.escape(apacheURL + f)}`
+        `open "#{URI.escape(apacheURL + f)}"`
       else
-        `open file://#{URI.escape(pm.adrPageTable[:f].to_s)}`
+        `open "file://#{URI.escape(pm.adrPageTable[:f].to_s)}"`
       end
     end
     
@@ -119,6 +119,12 @@ module UserLand::Html
     self.everyPageOfSite(Pathname(adrObject)).each do |p|
       # can be slow, so provide feedback while we work
       print "."
+      # even preflighting can require loading of the local user.rb file
+      userrb = self.getFtpSiteFile(adrObject).dirname + "#user.rb"
+      if userrb.exist? && !$localuserrbloaded
+        $localuserrbloaded = true
+        require userrb.to_s 
+      end
       pm = PageMaker.new
       pm.memoize = false # so if we then publishSite, existing values won't bite us
       pm.buildPageTableFully(p)
