@@ -1,11 +1,21 @@
 RUBYFRONTIER
 =======
 
-RubyFrontier is a TextMate bundle, implementing a template-based system of building Web pages and (especially) Web sites in a highly automated manner. It generates static Web pages; it isn't a Web application framework. Its purpose is to make Web sites by way of a convenient writing tool, separating form from content (you concentrate on content, and RubyFrontier wraps up that content into Web page form when you build the site). RubyFrontier is excellent for heavily hyperlinked pages and for automatic generation of navigation structures such as breadcrumbs, next-prev links, etc. The system is modeled in the first instance after UserLand Frontier's `html` suite, which I documented in my [Frontier book](http://sbc.apeth.com/frontierDef/ch41.html). RubyFrontier is written in Ruby and you are expected to know Ruby and to be willing to read and to program in Ruby in order to customize and specify its behavior. It also makes some rudimentary use of [YAML][]. You can optionally employ any other cool tools you like; for example, most of my RubyFrontier sites use things like [kramdown][] and [SASS][].
+RubyFrontier is a TextMate bundle, implementing a template-based system of building Web pages and (especially) Web sites in a highly automated manner. It generates static Web pages; it isn't a Web application framework. Its purpose is to let the user make Web sites by way of a convenient writing tool, separating form from content (you concentrate on content, and RubyFrontier wraps up that content into Web page form when you build the site). RubyFrontier is particularly superb for heavily hyperlinked pages and for automatic generation of navigation structures such as breadcrumbs, next-prev links, etc.
 
-For more information and full documentation, read <http://www.apeth.com/RubyFrontierDocs/>. The documentation is itself a RubyFrontier-built site, and the source for the documentation is included with RubyFrontier so you can see how it's done.
+The system is modeled in the first instance after UserLand Frontier's `html` suite, which I documented in my [Frontier book](http://sbc.apeth.com/frontierDef/ch41.html). RubyFrontier is written in Ruby and you are expected to know Ruby and to be willing to read and to program in Ruby in order to customize and specify its behavior. It also makes some rudimentary use of [YAML][]. You can optionally employ any other cool tools you like; for example, most of my RubyFrontier sites use things like [kramdown][] and [SASS][].
 
-For another example site, see my [documentation for Script Debugger 5](http://www.apeth.com/sd5help/index.html).
+For more information and full documentation, read <http://www.apeth.com/RubyFrontierDocs/>. The documentation *is itself a RubyFrontier-built site*, and the source for the documentation is included with RubyFrontier so you can see how it's done.
+
+Other example sites:
+
+* My [home page](http://www.apeth.net/matt/default.html) is a RubyFrontier site.
+
+* Online help [documentation for Script Debugger 5](http://www.apeth.com/sd5help/index.html) written with RubyFrontier.
+
+* A kind of [rudimentary blog](http://www.apeth.com/nonblog/) maintained with RubyFrontier.
+
+* A [photo album](http://photos.apeth.net) built with RubyFrontier.
 
 
 GROUND OF BEING
