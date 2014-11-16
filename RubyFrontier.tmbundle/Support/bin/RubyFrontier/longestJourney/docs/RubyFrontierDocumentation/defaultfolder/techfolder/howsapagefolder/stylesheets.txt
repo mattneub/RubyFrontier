@@ -42,7 +42,7 @@ Another alternative is that you might want to embed a stylesheet in the page its
 
 ### Support for LESS and SASS
 
-At some point, I discovered [LESS](http://lesscss.org/docs.html), a more convenient way of writing and structuring CSS. I instantly added LESS support to RubyFrontier. This had to be done at the core RubyFrontier level because it affected two of the [standard macros](standardmacros), **`linkstylesheet()`** and **`embedstylesheet()`**.
+At some point, I discovered [LESS](http://lesscss.org), a more convenient way of writing and structuring CSS. I instantly added LESS support to RubyFrontier. This had to be done at the core RubyFrontier level because it affected two of the [standard macros](standardmacros), **`linkstylesheet()`** and **`embedstylesheet()`**.
 
 However, the developer of LESS stopped supporting it as a Ruby gem and turned it into a JavaScript thing. So I had to change the nature of RubyFrontier's support. Initially, as a replacement for LESS, RubyFrontier started supported [SASS](sass) instead. This meant modifying **`linkstylesheet()`** and **`embedstylesheet()`** again. Clearly, this was not going to be a maintainable approach going forward.
 

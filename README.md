@@ -120,7 +120,7 @@ AUTHOR
 
 Matt Neuburg (<matt@tidbits.com>, <http://www.apeth.net/matt/>)
 
-[kramdown]: http://kramdown.rubyforge.org/
+[kramdown]: http://kramdown.gettalong.org/
 [Haml]: http://haml-lang.com/
 [SASS]: http://sass-lang.com/
 [YAML]: http://yaml.org/
