@@ -169,7 +169,13 @@ module UserLand::Html
   def self.newSite(testing = nil)
     s = ""
     if !testing
-      s = `"#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog" filesave --title "New Web Site" --text "Specify a folder to create"`
+      scpt = <<END
+try
+choose folder
+POSIX path of result
+end try
+END
+      s = `osascript -e "#{scpt}"`
     else # testing, use with care: this is the folder that will be used
       s = testing.to_s
     end
@@ -185,7 +191,8 @@ module UserLand::Html
     `find '#{p}' -name ".svn" -print0 | xargs -0 rm -R -f`
     # and get rid of .DS_Store if present
     `find '#{p}' -name ".DS_Store" -print0 | xargs -0 rm -R -f`
-    `"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{p}'` unless testing
+    `"#{ENV['TM_MATE']}" '#{p}'` unless testing
+    # `open -a TextMate.app '#{p}'` unless testing
   end
   def self.traverseLink(adrObject, linktext)
     autoglossary = self.getFtpSiteFile(Pathname(adrObject)).dirname + "#autoglossary.yaml"

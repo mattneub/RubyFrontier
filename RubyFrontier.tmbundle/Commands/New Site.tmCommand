@@ -14,11 +14,19 @@ require "#{b}/bin/longestJourney.rb"
 RubyFrontier::perform(:newSite, false)</string>
 	<key>input</key>
 	<string>none</string>
+	<key>inputFormat</key>
+	<string>text</string>
 	<key>name</key>
 	<string>New Site</string>
-	<key>output</key>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>text</string>
+	<key>outputLocation</key>
 	<string>discard</string>
 	<key>uuid</key>
 	<string>7010B257-8006-41DB-A4A1-96AF9EFA87FA</string>
+	<key>version</key>
+	<integer>2</integer>
 </dict>
 </plist>
