@@ -23,13 +23,13 @@ def get_pages(dir)
   html.pagesInFolder(dir).each do |what|
     title, path = html.getTitleAndPaths(what)
     s = if what == adrObject.simplename.to_s
-      %{<b>#{title}</b>}
+      %{<span style="white-space:nowrap" markdown="1"><b>#{title}</b></span>}
     elsif what == adrObject.dirname.simplename.to_s[0..-7]
-      %{<span class="parent">#{html.getLink(title, what)}</span>}
+      %{<span style="white-space:nowrap" class="parent" markdown="1">#{html.getLink(title, what)}</span>}
     else
-      html.getLink(title, what)
+      %{<span style="white-space:nowrap" markdown="1">#{html.getLink(title, what)}</span>}
     end
-    arr << %{<span style="white-space:nowrap" markdown="1">#{s}</span>}
+    arr << s
   end
   arr
 end
