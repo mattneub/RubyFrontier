@@ -17,12 +17,12 @@ def pageFilter(adrPageTable)
   # our crude but brilliantly effective strategy: delimit in <%%% ... %%%> and switch on "embeddedhaml"
   if adrPageTable[:embeddedhaml]
     adrPageTable[:bodytext] = adrPageTable[:bodytext].gsub(/^<%%%(.*?)%%%>/m) do |s|
-      Haml::Engine.new($1, :attr_wrapper => '"', :ugly => true).render
+      Haml::Engine.new($1, :attr_wrapper => '"').render
     end
   end
   # still another example:
   # support for template being written as Haml
   if adrPageTable[:hamltemplate] and (t = adrPageTable.fetch2(:template))
-    adrPageTable[:directTemplate] = Haml::Engine.new(File.read(t), :attr_wrapper => '"', :ugly => true).render
+    adrPageTable[:directTemplate] = Haml::Engine.new(File.read(t), :attr_wrapper => '"').render
   end
 end
