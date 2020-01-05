@@ -3,6 +3,7 @@ Simulate some Frontier op.* verbs using OPML as the outline source.
 =end
 
 # TODO: now that I trust Nokogiri, should eliminate use of libxml and rexml and rely on Nokogiri entirely
+# Have now eliminated libxml leaving only rexml; Nokogiri version remains to be written
 
 # superclass's "new" factory method lets us substitute different subclass implementations at will
 # also container for methods that don't vary between implementations
@@ -10,13 +11,13 @@ class Opml
 
   MAXINT = 1 << 64
   
-  @USELIBXML = false # class instance variable used as pseudo-constant, change in user.rb if desired
+  # @USELIBXML = false # class instance variable used as pseudo-constant, change in user.rb if desired
   def self.new(*args)
-    object = if @USELIBXML
-      Opmllibxml.allocate
-    else
-      Opmlrexml.allocate
-    end
+    # object = if @USELIBXML
+    object = Opmllibxml.allocate
+    # else
+    # Opmlrexml.allocate
+    # end
     object.send :initialize, *args
     object
   end
@@ -273,6 +274,8 @@ class Opmlrexml < Opml
   end
 end
 
+# withdraw use of libxml entirely, as it is too difficult for most people to install these days
+=begin
 class Opmllibxml < Opml
   myrequire ['xml/libxml', :XML]
   if defined?(XML)
@@ -402,4 +405,5 @@ class Opmllibxml < Opml
   end
   
 end
+=end
 
