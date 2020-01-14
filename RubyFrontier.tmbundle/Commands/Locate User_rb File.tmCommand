@@ -7,23 +7,33 @@
 	<key>command</key>
 	<string>#!/usr/bin/env ruby
 
-require "#{ENV['TM_SUPPORT_PATH']}/lib/ui.rb"
-
-# cover ui.rb inability to work with Ruby 1.9.x
-class String
-  def to_a
-    return [self]
-  end
+scpt = &lt;&lt;END
+try
+choose file with prompt "Locate user.rb:"
+POSIX path of result
+end try
+END
+s = `osascript -e '#{scpt}'`
+if s.length &gt; 0
+  puts "trying"
+  `defaults write com.neuburg.matt.rubyFrontier userrb '#{s.chomp}'`
 end
-(f = TextMate::UI::request_file( :title =&gt; "Locate User.rb")) || exit
-`defaults write com.neuburg.matt.rubyFrontier userrb '#{f[0]}'`</string>
+</string>
 	<key>input</key>
 	<string>none</string>
+	<key>inputFormat</key>
+	<string>text</string>
 	<key>name</key>
 	<string>Locate User.rb File</string>
-	<key>output</key>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>text</string>
+	<key>outputLocation</key>
 	<string>discard</string>
 	<key>uuid</key>
 	<string>7A5AC03D-F3D6-4376-B54B-E9D7D3434F37</string>
+	<key>version</key>
+	<integer>2</integer>
 </dict>
 </plist>

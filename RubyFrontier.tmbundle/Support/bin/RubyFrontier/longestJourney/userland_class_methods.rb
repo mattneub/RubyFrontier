@@ -175,7 +175,7 @@ choose folder
 POSIX path of result
 end try
 END
-      s = `osascript -e "#{scpt}"`
+      s = `osascript -e '#{scpt}'`
     else # testing, use with care: this is the folder that will be used
       s = testing.to_s
     end
