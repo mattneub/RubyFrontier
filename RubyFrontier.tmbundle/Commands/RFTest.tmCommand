@@ -12,19 +12,26 @@ b = ENV['TM_BUNDLE_SUPPORT']
 require "#{b}/bin/longestJourney.rb"
 RubyFrontier::perform(:releaseRenderedPage, true, f)
 
-
 </string>
 	<key>input</key>
 	<string>none</string>
+	<key>inputFormat</key>
+	<string>text</string>
 	<key>keyEquivalent</key>
 	<string>@'</string>
 	<key>name</key>
 	<string>Publish Page</string>
-	<key>output</key>
-	<string>showAsHTML</string>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>html</string>
+	<key>outputLocation</key>
+	<string>newWindow</string>
 	<key>scope</key>
 	<string>text, source.ruby</string>
 	<key>uuid</key>
 	<string>512E481D-298D-407D-9CBC-A1C1E91C1492</string>
+	<key>version</key>
+	<integer>2</integer>
 </dict>
 </plist>

@@ -13,14 +13,23 @@ b = ENV['TM_BUNDLE_SUPPORT']
 f = b + "/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation/default.txt"
 require "#{b}/bin/longestJourney.rb"
 RubyFrontier::perform(:publishSite, true, f)
+
 </string>
 	<key>input</key>
 	<string>none</string>
+	<key>inputFormat</key>
+	<string>text</string>
 	<key>name</key>
 	<string>Build RubyFrontier Docs</string>
-	<key>output</key>
-	<string>showAsHTML</string>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>html</string>
+	<key>outputLocation</key>
+	<string>newWindow</string>
 	<key>uuid</key>
 	<string>3AC4AFE3-507D-4E85-BB74-C3E37CE00729</string>
+	<key>version</key>
+	<integer>2</integer>
 </dict>
 </plist>

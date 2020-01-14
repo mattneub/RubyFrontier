@@ -199,7 +199,7 @@ END
     if autoglossary.exist?
       entry = LCHash[(YAML.load_file(autoglossary.to_s))][linktext.downcase]
       if entry && entry[:adr] && entry[:adr].exist?
-        return `"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{entry[:adr]}'`
+        return `"#{ENV['TM_MATE']}" '#{entry[:adr]}'`
       end
     end
     puts "Not found." # appears in tooltip in TM

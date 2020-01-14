@@ -10,20 +10,29 @@
 f = ENV['TM_FILEPATH']
 b = ENV['TM_BUNDLE_SUPPORT']
 require "#{b}/bin/longestJourney.rb"
-RubyFrontier::perform(:traverseLink, false, f, STDIN.read)</string>
+RubyFrontier::perform(:traverseLink, false, f, STDIN.read)
+</string>
 	<key>fallbackInput</key>
 	<string>none</string>
 	<key>input</key>
 	<string>selection</string>
+	<key>inputFormat</key>
+	<string>text</string>
 	<key>keyEquivalent</key>
 	<string>^~B</string>
 	<key>name</key>
 	<string>Traverse Selected Link</string>
-	<key>output</key>
-	<string>showAsTooltip</string>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>text</string>
+	<key>outputLocation</key>
+	<string>toolTip</string>
 	<key>scope</key>
 	<string>text, source.ruby</string>
 	<key>uuid</key>
 	<string>E17FB077-FABB-4B17-8DFB-7C74544D3B63</string>
+	<key>version</key>
+	<integer>2</integer>
 </dict>
 </plist>

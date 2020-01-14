@@ -14,15 +14,24 @@ p = b + "/bin/RubyFrontier/longestJourney/docs/RubyFrontierDocumentation"
 f = ENV['HOME'] + "/Desktop/f" + `uuidgen`.chomp
 FileUtils.mkdir(f)
 FileUtils.cp_r(p, f)
-`"#{ENV['TM_SUPPORT_PATH']}/bin/mate" '#{f + "/RubyFrontierDocumentation"}'`
+`"#{ENV['TM_MATE']}" '#{f + "/RubyFrontierDocumentation"}'`
+
 </string>
 	<key>input</key>
 	<string>none</string>
+	<key>inputFormat</key>
+	<string>text</string>
 	<key>name</key>
 	<string>Show RubyFrontier Docs Source</string>
-	<key>output</key>
-	<string>showAsTooltip</string>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>text</string>
+	<key>outputLocation</key>
+	<string>toolTip</string>
 	<key>uuid</key>
 	<string>F3E4C87A-1B1E-4CA7-8A47-60CA3F3FF79B</string>
+	<key>version</key>
+	<integer>2</integer>
 </dict>
 </plist>

@@ -13,14 +13,23 @@ f = ENV['TM_FILEPATH']
 b = ENV['TM_BUNDLE_SUPPORT']
 require "#{b}/bin/longestJourney.rb"
 RubyFrontier::perform(:publishFolder, true, f)
+
 </string>
 	<key>input</key>
 	<string>none</string>
+	<key>inputFormat</key>
+	<string>text</string>
 	<key>name</key>
 	<string>Publish Folder</string>
-	<key>output</key>
-	<string>showAsHTML</string>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>html</string>
+	<key>outputLocation</key>
+	<string>newWindow</string>
 	<key>uuid</key>
 	<string>600E403E-AB25-4AA0-91ED-67EA5A0A04E2</string>
+	<key>version</key>
+	<integer>2</integer>
 </dict>
 </plist>
