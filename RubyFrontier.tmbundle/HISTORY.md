@@ -1,7 +1,7 @@
 VERSION
 =======
 
-This is version 1.1.4.1.
+This is version 1.1.5.
 
 HISTORY
 =======
@@ -53,4 +53,6 @@ In version 1.1.3, an output bug was fixed (thanks, hdmw): warnings were being ov
 In version 1.1.4, the output bug from 1.1.3 was fixed even better, and a bug with the user.rb specification mechanism under Ruby 1.9.x was fixed.
 
 In version 1.1.4.1, incorporated a new way of running the tests through a Rakefile, and tweaked the output to reveal what command is being performed. I am now running RubyFrontier with TextMate 2 under Mavericks (OS X 10.9).
+
+In verstion 1.1.5, minor bug fixes and documentation improvements, along with workarounds for things that broke because of updates in dependencies such as kramdown, haml, and TextMate / Mac OS X. For example, a bug in kramdown (at least I think it's a bug) was causing the documentation to build incorrectly, and TextMate's CocoaDialog is not working (which broke my New Site and Locate user.rb commands), so I switched to using `osascript`. Also stopped using TextMate's buggy `e_url`. Support for libxml (in the outline renderer commands) is dropped, mostly because it has become too difficult for most users to install. The `#ftpSite.yaml` file can now include a `preview` entry listing the extensions for files that should be previewed in the browser (not documented). Support for TextMate 1 is hereby officially dropped. Mild README and documentation improvements.
 
