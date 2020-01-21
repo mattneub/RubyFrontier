@@ -14,9 +14,9 @@ class Opml
   # @USELIBXML = false # class instance variable used as pseudo-constant, change in user.rb if desired
   def self.new(*args)
     # object = if @USELIBXML
-    object = Opmllibxml.allocate
+    # object = Opmllibxml.allocate
     # else
-    # Opmlrexml.allocate
+    object = Opmlrexml.allocate
     # end
     object.send :initialize, *args
     object
@@ -197,7 +197,7 @@ class Opmlrexml < Opml
     # However, fixed this by updating REXML to current (presently 3.1.7.3)
   end
   def countSubs
-    @curline.elements.length
+    @curline.elements.size
   end
   def hasSubs
     @curline.has_elements?
