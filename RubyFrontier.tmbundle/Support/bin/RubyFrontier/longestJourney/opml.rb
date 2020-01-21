@@ -2,22 +2,16 @@
 Simulate some Frontier op.* verbs using OPML as the outline source.
 =end
 
-# TODO: now that I trust Nokogiri, should eliminate use of libxml and rexml and rely on Nokogiri entirely
-# Have now eliminated libxml leaving only rexml; Nokogiri version remains to be written
-
 # superclass's "new" factory method lets us substitute different subclass implementations at will
 # also container for methods that don't vary between implementations
+# this is unnecessary as there is now only implementation, namely Nokogiri, but whatever
+
 class Opml
 
   MAXINT = 1 << 64
   
-  # @USELIBXML = false # class instance variable used as pseudo-constant, change in user.rb if desired
   def self.new(*args)
-    # object = if @USELIBXML
-    # object = Opmllibxml.allocate
-    # else
-    object = Opmlrexml.allocate
-    # end
+    object = Opmlnokogiri.allocate
     object.send :initialize, *args
     object
   end
@@ -166,6 +160,93 @@ class Opml
   
 end
 
+class Opmlnokogiri < Opml
+  myrequire 'nokogiri'
+  # ivars: doc, top, curline
+  def initialize(f) # f can be pathname or string
+    @doc = Nokogiri::XML::Document.parse(f, &:noblanks) # Nokogiri handles both
+    @top = @doc.search("body").first
+    self.firstSummit()
+  end
+  def firstSummit
+    @curline = @top.first_element_child
+  end
+  def getLineText
+    @curline["text"] || ""
+  end
+  def setLineText(s)
+    @curline["text"] = s
+  end
+  def countSubs
+    @curline.elements.length
+  end
+  def hasSubs
+    @curline.element.length > 0
+  end
+  def gorightone()
+    righty = @curline.first_element_child
+    if righty
+      @curline = righty
+      return true
+    else
+      return false
+    end
+  end
+  def godownone()
+    sib = @curline.next_element
+    if sib
+      @curline = sib
+      return true
+    else
+      return false
+    end
+  end
+  def goupone()
+    sib = @curline.previous_element
+    if sib
+      @curline = sib
+      return true
+    else
+      return false
+    end
+  end
+  def goleftone()
+    parent = @curline.parent
+    if parent == @top
+      return false
+    else
+      @curline = parent
+      return true
+    end
+  end
+  
+  def insert(s, dir)
+    el = Nokogiri::XML::Node.new('outline', @doc)
+    case dir
+    when :down
+      @curline.next = el
+    when :right
+      @curline.prepend_child(el)
+    end
+    @curline = el # select inserted line
+    setLineText(s) # pass thru setLineText as bottleneck so entityization is uniform
+  end
+  def deleteLine()
+    # if we have previous sibling, select it
+    # if not, but we have following sibling, select it
+    # if not, but we have parent (we are not at top), select it
+    # if not, we must be the only line; replace it by an empty-text line
+    line_to_delete = @curline
+    return line_to_delete.remove if (go(:up,1) || go(:down,1) || go(:left,1))
+    el = Nokogiri::XML::Element.new('outline', @doc)
+    el['text'] = ""
+    @curline.parent.children = el
+    @curline = el
+  end
+end
+
+# withdraw use of REXML, Nokogiri is cleaner
+=begin
 class Opmlrexml < Opml
   myrequire ['rexml/document', :REXML]
   
@@ -273,6 +354,7 @@ class Opmlrexml < Opml
     @curline = el
   end
 end
+=end
 
 # withdraw use of libxml entirely, as it is too difficult for most people to install these days
 =begin
