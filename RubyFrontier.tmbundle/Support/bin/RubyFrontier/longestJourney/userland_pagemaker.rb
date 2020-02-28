@@ -608,7 +608,7 @@ class UserLand::Html::PageMaker
     arr = Array.new
     nextprevs = folder + "#nextprevs.txt"
     if (nextprevs.exist?)
-      arr = File.readlines(nextprevs).map {|line| line.chomp}.reject {|line| line == ""}
+      arr = File.readlines(nextprevs).map {|line| line.strip.chomp}.reject {|line| line == ""}
     else
       # if not, just use alphabetical order
       folder.children.each do |p|
