@@ -519,6 +519,8 @@ class UserLand::Html::PageMaker
       # if contains dot or colon-slash-slash, or starts with #, assume this is a real URL, don't touch
       # TODO: I'm thinking of changing this test to dot or colon, to catch obscurantized mailto:
       # but user can override the first two checks by escaping (double-backslash), thus saying, yes, do process me
+      # TODO: I think the idea of testing for a dot is too restrictive; what's its real purpose?
+      # if what we mean is that it contains ".html" or similar, should say so
       unless href =~ /[^\\]\./ || href =~ %r{[^\\]\://} || href =~ /^#/
         if href =~ /([^\\])\^/ # remote-site semantics, site^id (escape to prevent this interpretation)
           # site is relative filepath in glossary, id is to be looked up in autoglossary of that site
