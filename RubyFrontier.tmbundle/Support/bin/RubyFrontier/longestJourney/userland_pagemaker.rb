@@ -535,7 +535,7 @@ class UserLand::Html::PageMaker
           end
         else # non-remote-site (normal) semantics
           url = refGlossary(href.gsub('\\',''))
-          puts "RefGlossary failed on #{href}", "apparently while processing '#{adrPageTable[:adrObject]}'" unless url
+          puts "RefGlossary failed on '#{href}'", "apparently while processing '#{adrPageTable[:adrObject]}'" unless url
         end
         retval = url || "errorRefGlossaryFailedHere"
         retval = %{<a href="#{retval}"#{rest}>} # form link, restoring stuff after href tag if any
