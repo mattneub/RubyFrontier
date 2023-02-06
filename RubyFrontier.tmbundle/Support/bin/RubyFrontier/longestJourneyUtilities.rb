@@ -249,7 +249,7 @@ class Pathname # convenience methods
     # single step up is "." and will remain untouched
     outcome = outcome[2..-1] if outcome.start_with?("./")
     
-    URI.escape(outcome)
+    URI::Parser.new.escape(outcome)
   end
 =begin code to get size of various sorts of image
 # no longer used; we now use the Dimensions gem, which provides a unified locus for all image types

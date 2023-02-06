@@ -42,7 +42,7 @@ module RubyFrontier
     def write(s)
       s = htmlize(s, :no_newline_after_br => true) #s.gsub("\n", "<br>")
       s = s.gsub(%r['(/.*)'(<br>|$)]) do |ss| 
-         %{<a href="txmt://open?url=file://#{URI::escape($1)}">#{$1}</a>#{$2}}
+         %{<a href="txmt://open?url=file://#{URI::Parser.new.escape($1)}">#{$1}</a>#{$2}}
       end
       @old_stdout.print s
       @old_stdout.flush # experimental

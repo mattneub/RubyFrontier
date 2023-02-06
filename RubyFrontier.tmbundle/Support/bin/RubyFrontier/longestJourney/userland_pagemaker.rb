@@ -226,7 +226,7 @@ class UserLand::Html::PageMaker
     # (and is in fact written out after the rendering of every page)
     adrGlossTable = adrPageTable["autoglossary"]
     adrPageTable[:autoglossary] = if adrGlossTable && adrGlossTable.exist?
-      LCHash[YAML.load_file(adrGlossTable)]
+      LCHash[YAML.load_file(adrGlossTable, aliases: true, permitted_classes: [Pathname, Symbol])]
     else
       LCHash.new
     end
@@ -317,14 +317,17 @@ class UserLand::Html::PageMaker
             when "#prefs" # flatten prefs out to become top-level entries of adrPageTable
               # we do NOT downcase this key; arbitrary directives can have meaningful case (as in #metaAppleTitle)
               begin
-                YAML.load_file(dirf).each {|k,v| incorporateDirective(k, v, true, adrPageTable)}
-              rescue
+                YAML.load_file(dirf, permitted_classes: [Pathname, Symbol]).each {|k,v| incorporateDirective(k, v, true, adrPageTable)}
+              rescue => error
+                puts "HERE"
+                puts error
+                puts error.backtrace
                 myraise "Unable to deal with #prefs.yaml file #{dirf.to_s}. Are you sure it's a valid expression of a hash?"
               end
             when "#glossary" # gather user glossary entries into glossary hash
               g = adrPageTable["glossary"]
               begin
-                YAML.load_file(dirf).each do |k,v|
+                YAML.load_file(dirf, permitted_classes: [Pathname, Symbol]).each do |k,v|
                   g[k.downcase] = v unless g[k]
                 end
               rescue
@@ -332,7 +335,7 @@ class UserLand::Html::PageMaker
               end
             when "#ftpsite"
               found_ftpsite = true
-              adrPageTable[:ftpsite] ||= YAML.load_file(dirf)
+              adrPageTable[:ftpsite] ||= YAML.load_file(dirf, permitted_classes: [Pathname, Symbol])
               adrPageTable[:adrsiteroottable] ||= dir
             else
               adrPageTable[f.simplename.to_s.downcase[1..-1]] ||= dirf # pathname hashed under simple filename
@@ -484,7 +487,7 @@ class UserLand::Html::PageMaker
     # url in ftpsite might not exist
     begin
       url = adrPageTable[:ftpsite][:url].chomp("/") + "/" # ensure ends with slash
-      h[:url] = URI::join(url, URI::escape(h[:path].to_s)).to_s
+      h[:url] = URI::join(url, URI::Parser.new.escape(h[:path].to_s)).to_s
     rescue
     end
     # put into autoglossary hash, possibly twice
@@ -528,7 +531,7 @@ class UserLand::Html::PageMaker
             id = $'
             path = refGlossary($` + $1)
             path = (adrPageTable[:adrSiteRootTable] + Pathname.new(path)).cleanpath + "#autoglossary.yaml"
-            url = LCHash[YAML.load_file(path)][id.gsub('\\','')][:url]
+            url = LCHash[YAML.load_file(path, permitted_classes: [Pathname, Symbol])][id.gsub('\\','')][:url]
             #TODO: failing to notice/barf if there is no url entry in the hash?
           rescue
             puts "Remote glossary lookup failed on #{href}", "apparently while processing '#{adrPageTable[:adrObject]}'"

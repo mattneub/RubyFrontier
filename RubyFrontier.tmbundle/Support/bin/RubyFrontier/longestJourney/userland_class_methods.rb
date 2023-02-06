@@ -50,9 +50,9 @@ module UserLand::Html
     if preview
       if (apacheURL = pm.adrPageTable[:ftpsite][:apacheURL])
         f = pm.adrPageTable[:f].relative_path_from(Pathname(pm.adrPageTable[:ftpsite][:apacheSite]).expand_path)
-        `open "#{URI.escape(apacheURL + f)}"`
+        `open "#{URI::Parser.new.escape(apacheURL + f)}"`
       else
-        `open "file://#{URI.escape(pm.adrPageTable[:f].to_s)}"`
+        `open "file://#{URI::Parser.new.escape(pm.adrPageTable[:f].to_s)}"`
       end
     end
     
@@ -197,7 +197,7 @@ END
   def self.traverseLink(adrObject, linktext)
     autoglossary = self.getFtpSiteFile(Pathname(adrObject)).dirname + "#autoglossary.yaml"
     if autoglossary.exist?
-      entry = LCHash[(YAML.load_file(autoglossary.to_s))][linktext.downcase]
+      entry = LCHash[(YAML.load_file(autoglossary.to_s, permitted_classes: [Pathname, Symbol]))][linktext.downcase]
       if entry && entry[:adr] && entry[:adr].exist?
         return `"#{ENV['TM_MATE']}" '#{entry[:adr]}'`
       end

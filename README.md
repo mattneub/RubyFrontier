@@ -9,6 +9,8 @@ For more information and full documentation, read <http://www.apeth.com/RubyFron
 
 Other example sites:
 
+* My [Combine tutorial](https://www.apeth.com/UnderstandingCombine/) is an online free book written with RubyFrontier. (The [RubyFrontier source](https://github.com/mattneub/understandingCombine) is also available.)
+
 * My [home page](http://www.apeth.net/matt/default.html) is a RubyFrontier site.
 
 * Online help [documentation for Script Debugger 5](http://www.apeth.com/sd5help/index.html) written with RubyFrontier.
@@ -35,7 +37,9 @@ In September 2012 another milestone was reached: RubyFrontier started working un
 
 In December 2013 I started using RubyFrontier with TextMate 2 under Mavericks (OS X 10.9, Ruby 2.0.0).
 
-In January 2020, TextMate 2 having proved its worth (and being considered out of beta), support for TextMate 1 was silently withdrawn. I currently use RubyFrontier on Mac OS X Catalina with TextMate 2 and ruby 2.6.3 without any meaningful problems. (I do not know whether the looming ruby 3 will cause breakage, but we'll cross that bridge as we come to it.)
+In January 2020, TextMate 2 having proved its worth (and being considered out of beta), support for TextMate 1 was silently withdrawn.
+
+In February 2023, I discovered that RubyFrontier wasn't working on my current system (Monterey), so I tweaked it to work under Ruby 3.1.2.
 
 For past history and version number, see the file "HISTORY" (inside the bundle).
 
@@ -45,21 +49,21 @@ DEPENDENCIES
 
 You need a Mac and TextMate. Windows / Linux users and TextMate detractors, this is not the droid you're looking for. I might eventually relax the dependency on TextMate, but for now, despite its flaws, TextMate does so much for me and for RubyFrontier that I have not bothered to consider any other milieu.
 
-RubyFrontier was originally written under Ruby 1.8.6, and I then used it for a long time under Ruby 1.8.7. In September 2012 I installed Ruby 1.9.3 and spent some time tweaking, and as of version 1.1.1 and later I have permitted use of RubyFrontier under Ruby 1.9.3. If the Ruby 1.9.3 tweaks worry you, stick with Ruby 1.8.7 and use commit 611d787958.
+RubyFrontier was originally written under Ruby 1.8.6, and I then used it for a long time under Ruby 1.8.7. In September 2012 I installed Ruby 1.9.3 and spent some time tweaking, and as of version 1.1.1 and later I permitted use of RubyFrontier under Ruby 1.9.3. If the Ruby 1.9.3 tweaks worry you, stick with Ruby 1.8.7 and use commit `611d787958`.
 
-In February 2013 Ruby 2.0.0 was released. RubyFrontier appears to work well under Ruby 2.0.0.
+In February 2013 Ruby 2.0.0 was released. RubyFrontier appeared to work well under Ruby 2.0.0.
 
 In December 2013 I installed Mavericks (OS X 10.9), which force-updates you to Ruby 2.0.0. At that point, it seemed easiest to give TextMate 2 a try. RubyFrontier was now running fine under Mavericks and TextMate 2.
 
-In January 2020 I was able to run on various systems up through Catalina with TextMate 2 and Ruby 2.6.3. I no longer support TextMate 1. Some TextMate features, such as CocoaDialog, no longer work, and I have replaced them in RubyFrontier's code with `osascript` dialogs (sorry about that, but it seems the simplest reliable alternative).
+In January 2020 I was able to run on various systems up through Catalina with TextMate 2 and Ruby 2.6.3. I ceased to support TextMate 1. Some TextMate features, such as CocoaDialog, no longer work, and I have replaced them in RubyFrontier's code with `osascript` dialogs (sorry about that, but it seems the simplest reliable alternative).
 
-When I say that RubyFrontier is working, I mean that:
+In February 2023, wanting to use RubyFrontier on macOS Monterey, I bit the bullet and made some adjustments to allow RubyFrontier to work under Ruby 3.1.2. These changes are not backwards-compatible to earlier versions of Ruby, so if you're still using Ruby 2.x and you haven't hit issues, don't beyond commit `d49ddf7d`. I have not yet revised the tests.
 
-1. All tests pass. You could argue that the tests are a little weak and don't hit certain edge cases or go very deep into the page/site-building mechanism, and that's true enough. But it's something. And...
+The goal for proving that RubyFrontier is working:
 
-2. All my own sites build correctly.
+1. The tests should pass. You could argue that the tests are a little weak and don't hit certain edge cases or go very deep into the page/site-building mechanism, and that's true enough. But it's something. And...
 
-
+2. My own sites should build correctly.
 
 INSTALLATION
 -----
