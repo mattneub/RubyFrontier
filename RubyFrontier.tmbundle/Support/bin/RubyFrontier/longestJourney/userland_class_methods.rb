@@ -1,10 +1,10 @@
 # public interface for rendering a page (class methods)
 # also general utilities without reference to any specific page being rendered
 
-
 module UserLand::Html
   class << self; extend Memoizable; end # have to talk like this in order to memoize class/module methods
   def self.guaranteePageOfSite(adrObject)
+    myraise "Not on any page" if adrObject.nil?
     adrObject = Pathname(adrObject).expand_path
     myraise "No such file #{adrObject}" unless adrObject.exist?
     myraise "File #{adrObject} not a site page" unless self.everyPageOfSite(adrObject).include?(adrObject)
@@ -107,6 +107,7 @@ module UserLand::Html
     self.everyPageOfFolder(self.getFtpSiteFile(adrObject).dirname)
   end
   def self.preflightSite(adrObject)
+    self.guaranteePageOfSite(adrObject) # raises if not
     time = Time.new.to_f
     puts "preflighting site..."
     # a lot faster if we don't try to read in existing autoglossary every time

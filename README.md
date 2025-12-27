@@ -41,6 +41,8 @@ In January 2020, TextMate 2 having proved its worth (and being considered out of
 
 In February 2023, I discovered that RubyFrontier wasn't working on my current system (Monterey), so I tweaked it to work under Ruby 3.1.2.
 
+In December 2025, Ruby 4.0.0 was released, and I updated RubyFrontier to work with it. This mostly involved changing some of my scripts to accommodate changes in Haml 6.0 and later; also I had to monkey-patch some code in TextMate's own bundles, correcting the syntax for when we call it and it runs under Ruby 4.0.0.
+
 For past history and version number, see the file "HISTORY" (inside the bundle).
 
 
@@ -57,13 +59,17 @@ In December 2013 I installed Mavericks (OS X 10.9), which force-updates you to R
 
 In January 2020 I was able to run on various systems up through Catalina with TextMate 2 and Ruby 2.6.3. I ceased to support TextMate 1. Some TextMate features, such as CocoaDialog, no longer work, and I have replaced them in RubyFrontier's code with `osascript` dialogs (sorry about that, but it seems the simplest reliable alternative).
 
-In February 2023, wanting to use RubyFrontier on macOS Monterey, I bit the bullet and made some adjustments to allow RubyFrontier to work under Ruby 3.1.2. These changes are not backwards-compatible to earlier versions of Ruby, so if you're still using Ruby 2.x and you haven't hit issues, don't beyond commit `d49ddf7d`. I have not yet revised the tests.
+In February 2023, wanting to use RubyFrontier on macOS Monterey, I bit the bullet and made some adjustments to allow RubyFrontier to work under Ruby 3.1.2. These changes are not backwards-compatible to earlier versions of Ruby, so if you're still using Ruby 2.x and you haven't hit issues, don't go beyond commit `d49ddf7d`. I have not yet revised the tests.
+
+In December 2025 I updated gems and found that the HAML gem (6.4.0) had drastically changed; I adjusted the RubyFrontier code to deal with these changes. I then updated to Ruby 4.0.0 and found that RubyFrontier was still working, although I had to monkey-patch some of TextMate's own bundle code.
+
+Thus, the current situation is that we expect Ruby 4.0.0 and the latest versions of all gem dependencies.
 
 The goal for proving that RubyFrontier is working:
 
 1. The tests should pass. You could argue that the tests are a little weak and don't hit certain edge cases or go very deep into the page/site-building mechanism, and that's true enough. But it's something. And...
 
-2. My own sites should build correctly.
+2. My own sites should build correctly. These include the sites built into the RubyFrontier bundle, namely the sample site (RubyFrontier > New Site) and the RubyFrontier Documentation (RubyFrontier > Build RubyFrontier Docs).
 
 INSTALLATION
 -----

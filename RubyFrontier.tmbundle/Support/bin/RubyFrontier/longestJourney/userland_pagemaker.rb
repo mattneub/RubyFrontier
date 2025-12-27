@@ -170,8 +170,9 @@ class UserLand::Html::PageMaker
     # embed page into template at <bodytext>
     # I've cut Frontier's <title> substitution feature, it saves nothing and leads to error
     # important to write it as follows or we get possibly unwanted \\, \1 substitution
-    # NEW: if <bodytext> not found, try <p></p> with id "bodytext", to allow html generators to make template
-    s2 = s.sub(%r{<bodytext>|<p +id *= *"bodytext".*?(</p>|/>)}im) {|x| adrPageTable[:bodytext]}
+    # NEW: if <bodytext> not found, try <p></p> with id "bodytext" or 'bodytext', 
+    # to allow html generators to make template
+    s2 = s.sub(%r{<bodytext>|<p +id *= *(["'])bodytext\1.*?(</p>|/>)}im) {|x| adrPageTable[:bodytext]}
     
     # NEW: check that substitution was performed
     raise "Template did not contain any place to embed bodytext" if s2 == s

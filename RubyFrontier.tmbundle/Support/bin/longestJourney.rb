@@ -16,6 +16,38 @@ if RUBY_VERSION =~ /2.0/
 end
 =end
 
+require 'fileutils'
+
+# replace TextMate incorrect call
+class << File
+  alias_method :exists?, :exist?
+end
+
+# replace code from TextMate BundleSupport with correctly structured ERB call
+module TextMate
+  module HTMLOutput
+    class << self
+      def header(options)
+        window_title = options[:window_title] || options[:title]    || 'Window Title'
+        page_title   = options[:page_title]   || options[:title]    || 'Page Title'
+        sub_title    = options[:sub_title]    || ENV['TM_FILENAME'] || 'untitled'
+        html_head    = options[:html_head]    || ''
+
+        if options[:fix_href] && File.exist?(ENV['TM_FILEPATH'].to_s)
+          html_head << "<base href='file://#{e_url ENV['TM_FILEPATH']}'>\n"
+        end
+
+        themes = collect_themes
+        
+        active_theme = find_theme(themes, saved_theme) || find_theme(themes, 'bright')
+        abort "No web preview theme found.\nMake sure that the Themes bundle is enabled in Preferences → Bundles." if active_theme.nil?
+
+        support_path = ENV['TM_SUPPORT_PATH']
+        ERB.new(HTMLOUTPUT_TEMPLATE, trim_mode: '%-').result(binding)
+      end
+    end
+  end
+end
 
 # trampoline for html-output commands
 # they call RubyFrontier::perform (syntax is :method_name, trueOrFalse, argsForMethodCall...)

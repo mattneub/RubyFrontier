@@ -11,18 +11,19 @@ def pageFilter(adrPageTable)
     # but markdown substitutes &lt;% for <%, so if we have macros they've just been stripped
     adrPageTable[:bodytext] = adrPageTable[:bodytext].gsub("&lt;%", "<%")
   end
-  # however, I now advise using kramdown instead of Markdown
+  # however, I now advise using kramdown instead of Markdown; see 'postMacroFilter.rb'
   # another example:
   # support for writing all or part of a page in Haml
-  # our crude but brilliantly effective strategy: delimit in <%%% ... %%%> and switch on "embeddedhaml"
+  # our crude but brilliantly effective strategy: delimit in <%%% ... %%%> 
+  # and switch on "embeddedhaml"
   if adrPageTable[:embeddedhaml]
     adrPageTable[:bodytext] = adrPageTable[:bodytext].gsub(/^<%%%(.*?)%%%>/m) do |s|
-      Haml::Engine.new($1, :attr_wrapper => '"').render
+      Haml::Template.new{$1}.render # block returning string
     end
   end
   # still another example:
   # support for template being written as Haml
   if adrPageTable[:hamltemplate] and (t = adrPageTable.fetch2(:template))
-    adrPageTable[:directTemplate] = Haml::Engine.new(File.read(t), :attr_wrapper => '"').render
+    adrPageTable[:directTemplate] = Haml::Template.new(t).render # file
   end
 end

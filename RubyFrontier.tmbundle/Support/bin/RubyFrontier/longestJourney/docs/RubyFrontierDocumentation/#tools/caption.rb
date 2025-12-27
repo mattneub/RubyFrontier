@@ -16,6 +16,6 @@ def caption(img, txt, xref=nil)
     %tr
       %td(class="caption" markdown="span") #{fignum + ": " + txt}
 END
-  Haml::Engine.new(s).render(Object.new, :xref => xref).gsub("\n", "")
+  Haml::Template.new{s}.render(Object.new, :xref => xref).gsub("\n", "")
 end
 
