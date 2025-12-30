@@ -6,7 +6,7 @@ begin
 rescue LoadError # no penalty for not having it
 rescue # no penalty for no gem command
 end
-myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "dimensions", "enumerator", "kramdown", "haml", "sass", "nokogiri"
+myrequire "pathname", "yaml", "erb", "pp", "uri", "rubygems", "dimensions", "enumerator", "kramdown", "haml", "sass-embedded", "nokogiri"
 
 =begin make 'load' and 'require' include folder next to, and with same name as, this file 
 that is where supplementary files go

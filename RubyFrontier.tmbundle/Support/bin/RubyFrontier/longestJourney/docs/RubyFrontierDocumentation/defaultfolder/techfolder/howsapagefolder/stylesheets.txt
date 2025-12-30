@@ -40,24 +40,23 @@ The page header can call **`linkstylesheet()`** and supply a parameter value dir
 
 Another alternative is that you might want to embed a stylesheet in the page itself. To do so, the page header can call **`embedstylesheet()`**. But this isn't very flexible, so a more common approach is to set a scalar directive **`:embedstylesheet`** (whose value is the name of the stylesheet) at the start of the page object; if you do so, the **`linkstylesheets()`** [standard macro](standardmacros) in the page header calls **`embedstylesheet()`** for you.
 
-### Support for LESS and SASS
+### CSS Alternatives
 
 At some point, I discovered [LESS](http://lesscss.org), a more convenient way of writing and structuring CSS. I instantly added LESS support to RubyFrontier. This had to be done at the core RubyFrontier level because it affected two of the [standard macros](standardmacros), **`linkstylesheet()`** and **`embedstylesheet()`**.
 
-However, the developer of LESS stopped supporting it as a Ruby gem and turned it into a JavaScript thing. So I had to change the nature of RubyFrontier's support. Initially, as a replacement for LESS, RubyFrontier started supported [SASS](sass) instead. This meant modifying **`linkstylesheet()`** and **`embedstylesheet()`** again. Clearly, this was not going to be a maintainable approach going forward.
+However, the developer of LESS stopped supporting it as a Ruby gem and turned it into a JavaScript thing. So I had to change the nature of RubyFrontier's support. Initially, as a replacement for LESS, RubyFrontier started supported [Sass](sass) instead. This meant modifying **`linkstylesheet()`** and **`embedstylesheet()`** again. Clearly, this was not going to be a maintainable approach going forward.
 
 Ultimately, therefore, I just threw up my hands and added a filter, `cssFilter`, which is used by the **`linkstylesheet()`** and **`embedstylesheet()`** macros. As with other [filters](filters), you are expected to put a file `cssFilter.rb` in the `#filters` folder; its top-level `cssFilter` method is called the way [filters](filters) are normally called, namely with one parameter — the [page table](pagetable). At that moment, the page table contains a `:csstext` string entry consisting of the contents of the style sheet file now being processed by **`linkstylesheet()`** or **`embedstylesheet()`**; it's up to you to modify this as desired.
 
-So, for example, to run SASS against the stylesheet, you could say:
+So, for example, to run Sass against the stylesheet, you could say:
 
     def cssFilter(adrPageTable)
-      adrPageTable[:csstext] = Sass::Engine.new(adrPageTable[:csstext], 
-        :syntax => :scss, :style => :expanded).render
+      adrPageTable[:csstext] = Sass.compile_string(adrPageTable[:csstext]).css
     end
 
-In that example, running SASS is unconditional; if you wanted to make it conditional, of course, you could. For example you might introduce a [directive](scalardirectives) and check its value. To help you, the page table contains a `:sheetName` string telling you the name of the stylesheet being processed.
+In that example, running Sass is unconditional; if you wanted to make it conditional, of course, you could. For example you might introduce a [directive](scalardirectives) and check its value. To help you, the page table contains a `:sheetName` string telling you the name of the stylesheet being processed.
 
-To get you started, this approach to using SASS is illustrated both by the source for this documentation (RubyFrontier > Show RubyFrontier Docs Source) and by the new model site that you get when you create a new site (RubyFrontier > New Site).
+To get you started, this approach to using Sass is illustrated both by the source for this documentation (RubyFrontier > Show RubyFrontier Docs Source) and by the new model site that you get when you create a new site (RubyFrontier > New Site).
 
 ### JavaScript Files
 
