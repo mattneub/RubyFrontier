@@ -163,9 +163,14 @@ class UserLand::Html::PageMaker
     # run directives in the template (or, if direct template, just use it)
     s = directTemplate || runDirectives(adrTemplate)
     # TODO: omitting stuff about revising if #fileExtension was changed by template
-      
+    
     # if we have no title by now, that's an error
     raise "You forgot to give this page a title!" unless adrPageTable[:title]
+    
+    # NEW: flatten any indentations at line-start in the template; this is nice because,
+    # while it can make no difference to the meaning of the template macros and HTML,
+    # it allows a human to write a template with indentation for clarity without risk
+    s = s.gsub(/^\s*/, "")
     
     # embed page into template at <bodytext>
     # I've cut Frontier's <title> substitution feature, it saves nothing and leads to error
