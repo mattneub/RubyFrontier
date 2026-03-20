@@ -27,7 +27,7 @@ The result of that call is that following page header will be prefixed to your p
 
 But before the prefixing takes place, the [macros](macros) within that page header are themselves processed. These are [standard macros](standardmacros) — that is, they are calls to stock methods included within RubyFrontier itself. Let's walk through the default page header, and I'll comment on each of its parts.
 
-* The DOCTYPE is XHTML. In general, RubyFrontier leans towards XHTML, and if possible you should probably use it. (If you really want a different DOCTYPE, you'll need to supply your own page header, as described later on this page.)
+* The DOCTYPE is XHTML. If you prefer HTML 5, say `<%%= pageheader(html5: true) %>`. (If you want some other DOCTYPE, you'll need to supply your own page header, as described later on this page.)
 
 * The `<head>` area begins. The **`metatags()`** call inserts tags at the start of the `<head>` area, as follows:
 

@@ -52,9 +52,11 @@ This is a lot of information, and it may seem at first like too much to take in.
 
 1. Any [scalar directives](scalardirectives) at the start of the [template](template) are evaluated and stripped (unless the `:directTemplate` directive is in force). 
 
+1. The [template](template) is **flattened**, meaning that any indentation at the start of any line of the template is removed. The reason for doing this is that indentation might be meaningful in one sense at [pageFilter](filters) time but in a different sense at [postMacroFilter](filters) time, when the body text has been embedded into the [template](template). For example, the template might be [haml](haml) but the body text might be [kramdown](kramdown) — like the source for this web page.
+
 1. The `:bodytext` is **embedded in the [template](template)** by substituting it for the pseudo-tag `<bodytext>` or for a tag `<p id="bodytext"></p>`.
 
-1. **[Macros](macros) are processed** (except in the highly unlikely circumstance that the [scalar directive](scalardirectives) `:processmacros` is `false`). A macro is an [ERB](ERB) expression in your page object or template (the two have been combined by the previous step into a single string). This is when calculated content (such as [images](images) and automatically generated navigation) is substituted into the Web page.
+1. **[Macros](macros) are processed** (except in the highly unlikely circumstance that the [scalar directive](scalardirectives) `:processmacros` is `false`). A macro is an [ERB](ERB) expression in your page object or template (the two have been combined by the previous step into a single string). This is when calculated content (such as [images](images) and automatically generated navigation) is typically substituted into the Web page.
 
 1. **[PostMacroFilter](filters) time.** If we found a `#filters` folder and there is a `postMacroFilter.rb` file in it, we call that file's top-level `postMacroFilter()` method with one parameter — the [page table](pagetable). This is your chance to modify the page table's `:postmacrotext` entry, which contains the rendered page object, poured into its template, and with macros already processed, but glossary expansion not yet performed. In my own sites, for example, this is the point at which I would pass a [kramdown](http://kramdown.gettalong.org/) text page object through kramdown to turn it into HTML (if I'm using kramdown instead of Markdown).
 

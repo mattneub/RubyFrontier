@@ -1,10 +1,10 @@
 --- 
-Apple: http://www.apple.com
-ERB: http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html
+Apple: https://www.apple.com
+ERB: https://docs.ruby-lang.org/en/master/ERB.html
 Frontier: http://frontier.userland.com
-Ruby: http://www.ruby-lang.org/en/
-TextMate: http://macromates.com/
-kramdown: http://kramdown.gettalong.org/
-less: http://lesscss.org/
-haml: http://haml-lang.com/
-sass: http://sass-lang.com/tutorial.html
+Ruby: http:s//www.ruby-lang.org/en/
+TextMate: https://macromates.com/
+kramdown: https://kramdown.gettalong.org/
+less: https://lesscss.org/
+haml: https://haml.info/
+sass: https://sass-lang.com/

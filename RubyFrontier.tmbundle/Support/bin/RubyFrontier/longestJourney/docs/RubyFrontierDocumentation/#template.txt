@@ -1,20 +1,20 @@
-<%= pageheader() %>
+<%= pageheader(html5: true) %>
 .logobar
-	<%= imageref("rubyFrontierLogo", (adrObject.simplename.to_s == "default" ? nil : {:glossref => "default"})) %>
-	%p RubyFrontier Documentation
+    <%= imageref("rubyFrontierLogo", {:glossref => "default"}) %>
+    %p RubyFrontier Documentation
 <% html.getImageData("background") %>
 <%= navbars() %>
 %h1{:markdown => "span"}<
-	<%= title %>
+    <%= title %>
 .heart{:markdown => "1"}
-	%p#bodytext The body text will replace this entire p tag.
+    %p#bodytext The body text will replace this entire p tag.
 .nextbar
-	<%= truenext() %>
+    <%= truenext() %>
 %hr
-%p{:style => "font-size:80%; text-align:center"}
-	This documentation prepared
-	by Matt Neuburg, phd = matt at tidbits dot com 
-	(<a href="http://www.apeth.net/matt/">http://www.apeth.net/matt/</a>),
-	using <b><a href="default">RubyFrontier</a></b>.<br />Download RubyFrontier from
-	<a href="https://github.com/mattneub/RubyFrontier">GitHub</a>.
+%p{:style => "font-size: 80%; text-align: center;"}
+    This documentation prepared
+    by Matt Neuburg, phd = matt at tidbits dot com 
+    (<a href="https://www.apeth.net/matt/">https://www.apeth.net/matt/</a>),
+    using <b><a href="default">RubyFrontier</a></b>.<br />Download RubyFrontier from
+    <a href="https://github.com/mattneub/RubyFrontier">GitHub</a>.
 <%= pagefooter() %>

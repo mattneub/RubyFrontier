@@ -34,7 +34,7 @@ In Frontier, when a macro runs, certain **abbreviated modes of expression** are 
 
 * Finally, as a last-ditch effort, **keys in the [page table hash](pagetable)** are themselves in scope, both as symbols and as strings. 
 
-    For example, if you say `title`, and there is no local variable or known method `title`, then (if we call the page table `pt`) `pt[:title]` will be sought, and if that isn't found, `pt["title"]` will be sought.
+    For example, if you say `title`, and there is no local variable or known method `title`, then `@adrPageTable[:title]` will be sought, and if that isn't found, `@adrPageTable["title"]` will be sought.
 
     However, unlike Frontier, this works only for getting; you cannot set a key in the page table hash in this way. The reason is that the `with` mechanism that permitted this in Frontier was dangerous; it was all too easy to set a value in the page table (or elsewhere in the "database") accidentally. This limitation is no inconvenience, however, because if you want to set a key in the page table hash, you can do so easily through your access to the page table as `@adrPageTable`.
 
