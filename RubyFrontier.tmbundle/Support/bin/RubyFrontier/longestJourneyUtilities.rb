@@ -252,7 +252,7 @@ class Pathname # convenience methods
     URI::Parser.new.escape(outcome)
   end
 =begin code to get size of various sorts of image
-# no longer used; we now use the Dimensions gem, which provides a unified locus for all image types
+# no longer used; we now use the image_size gem, which provides a unified locus for all image types
   def image_size # read image file height and width
     # stolen from the Internet :) http://snippets.dzone.com/posts/show/805
     case self.extname.downcase
@@ -272,10 +272,10 @@ class Pathname # convenience methods
   end
 =end
   def image_size # read image file height and width
-    # we now use Dimensions gem
+    # we now use image_size gem
     case self.extname.downcase
     when ".png", ".gif", ".jpg", ".jpeg", ".tif", ".tiff"
-      return Dimensions::dimensions(self)
+      return ImageSize.path(self).size
     else
       return [nil, nil]
     end
