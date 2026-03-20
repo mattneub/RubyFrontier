@@ -128,7 +128,8 @@ module UserLand::Html::StandardMacros
     htmlText = htmlText.gsub("/>",">") if htmlstyle
     htmlText + "\n"
   end
-  def pageheader(adrPageTable=@adrPageTable) # generate standard page header from html tag to body tag
+  # NEW: can supply `html5: true` to get HTML doctype
+  def pageheader(adrPageTable=@adrPageTable, html5: false) # generate standard page header from html tag to body tag
     # if pageheader directive exists, assume macro was explicitly called in error
     # cool because template can contain pageheader() call with or without #pageheader directive elsewhere
     # also, page can demand standard pageheader with page directive #pageheader false
@@ -136,10 +137,17 @@ module UserLand::Html::StandardMacros
     # our approach is simply to provide a standard header
     # note that we do not return it! we slot it into the #pageheader directive for later processing...
     # ... and just return an empty string
-    adrPageTable[:pageheader] = '
+    doctype = <<DONE
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+DONE
+    if html5 then doctype = <<DONE
+<!DOCTYPE html>
+<html>
+DONE
+    end
+    remainder = <<DONE
 <head>
 <%= metatags() %>
 <%= linkstylesheets() %>
@@ -147,7 +155,8 @@ module UserLand::Html::StandardMacros
 <title><%= title %></title>
 </head>
 <%= bodytag() %>
-'
+DONE
+    adrPageTable[:pageheader] = doctype + remainder
     return ""
   end
   def pagefooter(t="") # generate standard page footer, just closing body and html tags
