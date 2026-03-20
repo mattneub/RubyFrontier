@@ -36,6 +36,10 @@ require 'opml'
       and not highly recommended for getting either, since confusing to read, and @adrPageTable is readily available
       but's a Frontier legacy so I've left it in (and I d*o use it)
 =end
+=begin NEW: add `**moreargs` so that the method being called can have keyword arguments;
+  thus for example for the first time macros can take keyword arguments
+  I believe this can be done without breakage
+=end
 class BindingMaker
   def html # if user's expression starts with "html", return object with method_missing to handle rest of expression
     # so we need to send back an object that will allow us to hear about the *next* word ("getLink" etc.)
@@ -43,23 +47,23 @@ class BindingMaker
     # to make the latter possible, we capture a ref to the PageMaker instance
     itsPageMaker = @thePageMaker
     Module.new do
-      class << self; self; end.send(:define_method, :method_missing) do |s, *args|
+      class << self; self; end.send(:define_method, :method_missing) do |s, *args, **moreargs|
         if UserLand::Html.respond_to? s
-          return UserLand::Html.send(s, *args)
+          return UserLand::Html.send(s, *args, **moreargs)
         else
-          return itsPageMaker.send(s, *args)
+          return itsPageMaker.send(s, *args, **moreargs)
         end
       end
     end
   end
   # handle shortcut / bareword expressions in macro evaluation
-  def method_missing(s, *args)
+  def method_missing(s, *args, **moreargs)
     # if starts with html., we are not called, html method above handled it
     # test for user.html.macros not needed, since user can inject into UserLand::Html via user.rb
     # test for tools table not needed, they are part of this BindingMaker object already
 
     # try html.standardMacros; it is included into PageMaker
-    return @thePageMaker.send(s, *args) if UserLand::Html::StandardMacros.method_defined?(s)
+    return @thePageMaker.send(s, *args, **moreargs) if UserLand::Html::StandardMacros.method_defined?(s)
     
     # try adrPageTable; unlike Frontier, and wisely I think, we allow implicit get but no implicit set
     if 0 == args.length and result = @adrPageTable.fetch2(s)
