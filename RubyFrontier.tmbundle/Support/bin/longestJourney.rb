@@ -49,6 +49,8 @@ module TextMate
   end
 end
 
+require 'uri'
+
 # trampoline for html-output commands
 # they call RubyFrontier::perform (syntax is :method_name, trueOrFalse, argsForMethodCall...)
 # we interpose our fake stdout and then do the require and call UserLand.Html
